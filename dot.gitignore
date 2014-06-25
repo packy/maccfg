@@ -1,0 +1,16 @@
+#
+# global .gitignore
+#
+
+# ignore local .gitignore files
+.gitignore
+
+# Ignore OS X Desktop Services Store files
+.DS_Store
+
+# ignore emacs backup files
+*~
+
+# ignore Emacs working files
+\#*#
+

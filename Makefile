@@ -1,5 +1,8 @@
 gitdir := $(HOME)/git
-all: ${gitdir}/ack2 ${gitdir}/file-next ${gitdir}/z dotfiles
+
+all: git-repos dotfiles homebrewed perlbrew
+
+git-repos: ${gitdir}/ack2 ${gitdir}/file-next ${gitdir}/z
 
 ${gitdir}/ack2:
 	git clone https://github.com/packy/ack2.git ${gitdir}/ack2; \
@@ -27,13 +30,19 @@ $(HOME)/.bash_functions:
 $(HOME)/.bash_git:
 	cp dot.bash_git $(HOME)/.bash_git
 
+$(HOME)/.bash_ls:
+	cp dot.bash_ls $(HOME)/.bash_ls
+
 $(HOME)/.bashrc:
 	cp dot.bashrc $(HOME)/.bashrc
 
 $(HOME)/.emacs:
 	cp dot.emacs $(HOME)/.emacs
 
-dotfiles: $(HOME)/.bash_ack $(HOME)/.bash_aliases $(HOME)/.bash_functions $(HOME)/.bash_git $(HOME)/.bashrc $(HOME)/.emacs
+dotfiles: $(HOME)/.bash_ack $(HOME)/.bash_aliases $(HOME)/.bash_functions \
+          $(HOME)/.bash_git $(HOME)/.bash_ls $(HOME)/.bashrc $(HOME)/.emacs
+
+homebrewed: homebrew pcre git coreutils findutils
 
 homebrew: /usr/local/bin/brew
 	ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
@@ -59,5 +68,6 @@ findutils: homebrew
 	brew install findutils
 endif
 
-
-
+perlbrew: $(HOME)/perl5/perlbrew
+	curl -L http://install.perlbrew.pl | bash
+	perlbrew install stable
