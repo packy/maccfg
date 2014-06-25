@@ -1,0 +1,5 @@
+%set smartexit 1
+%set editor xemacs-wait
+%set editor_line_endings Unix
+%extension load keepalive
+/blurb @ BMC
