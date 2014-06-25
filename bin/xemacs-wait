@@ -1,0 +1,3 @@
+#!/bin/sh
+$HOME/bin/xemacs-start-server
+/Applications/Emacs.app/Contents/MacOS/bin/emacsclient $*
