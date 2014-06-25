@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # turn monitor mode OFF and
 # suppress "[#] Done  /foo/bar" messages
 set +o monitor

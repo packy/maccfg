@@ -1,0 +1,104 @@
+#!/bin/bash
+
+# so Homebrew compiles git with PCRE
+export USE_LIBPCRE=yes
+
+GIT_BIN=$(which git)
+HOMEBREW_CELLAR=$(brew --config | grep HOMEBREW_CELLAR | awk '{print $2}')
+GIT_VERSION=$($GIT_BIN --version | perl -pe 's/git\s+version\s+//;')
+GIT_ROOT=$HOMEBREW_CELLAR/git/$GIT_VERSION
+GIT_CORE=$GIT_ROOT/libexec/git-core
+export PATH=$PATH:$GIT_CORE
+
+#
+# git customizations
+#
+
+. $GIT_ROOT/etc/bash_completion.d/git-completion.bash
+
+# experimental
+. ~/bin/gitp4_auto
+
+function git () {
+    if [[ $EUID -eq 0 ]]; then
+        echo "Don't run git as root!" 1>&2
+    else
+        /usr/local/bin/git $*
+    fi
+}
+
+export LESS=FRX
+alias gb='git branch'
+
+function parse_git_branch {
+  WRAP=$1
+  ref=$(git-symbolic-ref HEAD 2> /dev/null) || return
+  if [[ "$WRAP" = "wrap" ]] ; then
+    echo "(${ref#refs/heads/})"
+  else
+    echo "${ref#refs/heads/}"
+  fi
+}
+
+function make_git_titlebar {
+  case $TERM in
+    xterm*)
+    TITLEBAR='\[\033]0;\u@\h: \w $(parse_git_branch wrap)\007\]'
+    ;;
+    *)
+    TITLEBAR=""
+    ;;
+  esac
+}
+
+function make_git_prompt () {
+  local BLACK="\[\033[0;30m\]";
+  local BLUE="\[\033[0;34m\]";
+
+  make_git_titlebar
+  PS1="${TITLEBAR}\\$ "
+  PS2='> '
+  PS4='+ '
+}
+alias gp=make_git_prompt
+
+newbranch () {
+  git branch $*
+  echo Created git branch \"$1\"
+  git checkout $1
+}
+
+edit_last () {
+    xemacs $(perl -e '$foo =`git log -1 --name-only --pretty=oneline`;
+                      $foo =~ s/^.*$//m; print $foo;')
+}
+
+mergebug () {
+    OLDBRANCH=$(parse_git_branch)
+    git co master
+    git merge $OLDBRANCH
+    git branch -d $OLDBRANCH
+}
+
+last_sha () {
+    git log -1 --pretty='%h'
+}
+
+squash_last () {
+    git commit --fixup=$(last_sha) $*
+}
+
+commit_matching ()
+{
+    MATCHES=$(git status | perl -e '
+        $match = shift @ARGV;
+        $match = qr/$match/;
+        while (<STDIN>) {
+            if ( m{$match} ) {
+                chomp;
+                s/\#\s+modified:\s+/ /;
+                print;
+            }
+        }' $1)
+    git commit $MATCHES
+}
