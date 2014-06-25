@@ -1,0 +1,8 @@
+#!/bin/sh -e
+branch=$(git symbolic-ref HEAD)
+branch=${branch##refs/heads/}
+remote=$(git config "branch.${branch}.remote")
+remoteBranch=$(git config "branch.${branch}.merge")
+remoteBranch=${remoteBranch##refs/heads/}
+
+echo "${remote:?}/${remoteBranch:?}"
