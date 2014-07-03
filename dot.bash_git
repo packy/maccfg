@@ -16,9 +16,6 @@ export PATH=$PATH:$GIT_CORE
 
 . $GIT_ROOT/etc/bash_completion.d/git-completion.bash
 
-# experimental
-. ~/bin/gitp4_auto
-
 function git () {
     if [[ $EUID -eq 0 ]]; then
         echo "Don't run git as root!" 1>&2
@@ -102,3 +99,18 @@ commit_matching ()
         }' $1)
     git commit $MATCHES
 }
+
+# some perforce stuff, too!
+alias p4noedit='P4EDITOR=sleep-toucher git p4 submit'
+
+function p4 () {
+    if [[ $EUID -eq 0 ]]; then
+        echo "Don't run perforce as root!" 1>&2
+    else
+        /usr/local/bin/p4 $*
+    fi
+}
+
+# experimental
+. ~/bin/gitp4_auto
+
