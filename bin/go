@@ -1,0 +1,209 @@
+#!/usr/bin/env perl
+
+use Config::General;
+use Data::Dumper::Concise;
+use Getopt::Long;
+use Readonly;
+use Term::ReadKey;
+
+Readonly my $sshpass => '/usr/local/bin/sshpass';
+Readonly my $ssh     => '/usr/bin/ssh';
+
+my %hostmap;
+my $gorc         = $ENV{HOME}.'/.gorc';
+my $hostmap_file = $ENV{HOME}.'/.go_hostmap.txt';
+my @ADAPTERS     = qw/utun0 en4 en0 en1/;
+my $push_cmds    = 1;
+my $def_user     = 'root';
+my $method       = 'password';
+my $verbose      = 0;
+my $fake         = 0;
+my $def_passwd;
+my %config;
+
+GetOptions
+    "rc=s"       => \$gorc,
+    "adapter=s"  => \@ADAPTERS,
+    "hostmap=s"  => \$hostmap_file,
+    "commands!"  => \$push_commands,
+    "username=s" => \$def_user,
+    "publickey"  => sub { $method = 'publickey' },
+    "password"   => sub { $method = 'password' },
+    "hostbased"  => sub { $method = 'hostbased' },
+    "verbose+"   => \$verbose,
+    "fake!"      => \$fake,
+    "prompt"    => sub {
+        $method = 'password';
+        print "Password: ";
+        ReadMode('noecho'); # don't echo
+        chomp($def_passwd = <STDIN>);
+        ReadMode(0);        # back to normal
+    },
+    ;
+
+if (-f $gorc) {
+    my $conf   = Config::General->new($gorc);
+    %config = $conf->getall;
+    print Dumper(\%config);
+    set_from_rc_data(\%config);
+}
+
+my $target = shift @ARGV;
+
+my $ip = get_ip();
+
+unless (is_up($target)) {
+    print "$target is down!\n" if $target;
+    exit;
+}
+
+if (exists $config{hosts}) {
+    if (exists $config{hosts}->{$target}) {
+        set_from_rc_data($config{hosts}->{$target});
+    }
+}
+
+read_hostmap();
+
+my $os = get_os($target);
+
+my $commands = ($push_commands) ? os_commands($os, $ip) : q{};
+my $ssh      = ($method eq 'password')
+             ? qq{$sshpass -p $def_passwd $ssh $def_user\@$target}
+             : qq{$ssh $def_user\@$target};
+
+my $script = qq{tell application "iTerm"
+  set oldterm to current terminal
+  set newterm to (make new terminal)
+  tell newterm
+    set newsession to (make new session at the end of sessions)
+    tell newsession
+      exec command "$ssh"
+      $commands
+    end tell
+  end tell
+end tell
+};
+
+my $tmp = "/tmp/$$.osa";
+open my $out, '>', $tmp;
+print {$out} $script;
+close $out;
+
+print "Connecting to $target ";
+print qq{using command "$ssh" } if ($verbose);
+print "...\n";
+print $script if ($verbose > 1);
+print `osascript $tmp` unless ($fake);
+unlink $tmp;
+
+sub os_commands {
+    my ($os, $ip) = @_;
+    my $tmp = '/tmp/$$.sh';
+    if ($os eq 'rhel') {
+        return qq{
+write text "export PACKBOOK_IP=$ip"
+write text "curl -fsSkL http://\$PACKBOOK_IP/~packy/bash/linux_bash.sh > $tmp; source $tmp; rm -f $tmp"
+        };
+    }
+    elsif ($os eq 'solaris') {
+        return qq{
+write text "exec bash"
+write text "export PACKBOOK_IP=$ip"
+write contents of file "/Users/packy/Sites/bash/solaris_bash_helpers.sh"
+        };
+    }
+    elsif ($os eq 'aix') {
+        return qq{
+write text "exec /usr/local/bin/dash"
+write text "export PACKBOOK_IP=$ip"
+write contents of file "/Users/packy/Sites/bash/aix_dash_helpers.sh"
+        };
+    }
+}
+
+sub is_up {
+    my $target = \$_[0];
+    my $output = `ping -c 1 -t 5 $$target`;
+    ($$target) = $output =~ /^PING\s+(\S+)\s+/;
+    my ($up)   = $output =~ /1 packets transmitted, 1 packets received/;
+    return $up;
+}
+
+sub read_hostmap {
+    if (-e $hostmap_file) {
+        my $data;
+        open my $file, '<', $hostmap_file;
+        while (my $line = <$file>) {
+            $data .= $line;
+        }
+        close $file;
+        %hostmap = %{ eval $data };
+    }
+}
+
+sub write_hostmap {
+    open my $file, '>', $hostmap_file;
+    print {$file} Dumper(\%hostmap);
+    close $file;
+}
+
+sub get_os {
+    my ($target) = @_;
+    $target = lc $target;
+
+    return 'rhel'    if $target =~ /^rh\d+/;
+    return 'solaris' if $target =~ /^sl\d+/;
+    return 'aix'     if $target =~ /^ax\d+/;
+
+    if (exists $hostmap{$target}) {
+        if (exists $hostmap{$target}->{os}) {
+            return $hostmap{$target}->{os};
+        }
+    }
+    else {
+        print "Running nmap -O $garget to determine OS...\n";
+        my $os   = 'unknown';
+        my $data = `sudo nmap -O $target`;
+        if ($data =~ /Running: Linux/) {
+            $os = 'rhel';
+        }
+        $hostmap{$target} = { os => $os, nmap => $data };
+        write_hostmap();
+    }
+}
+
+sub get_ip {
+    foreach my $adapter (@ADAPTERS) {
+        my $data = `ifconfig $adapter 2>/dev/null`;
+        if (my($ip) = $data =~ /inet\s+(\d+\.\d+\.\d+\.\d+)/) {
+            return $ip;
+        }
+    }
+}
+
+sub set_from_rc_data {
+    my $config = shift;
+    if (exists $config->{default_password}) {
+        $def_passwd = $config->{default_password};
+    }
+
+    if (exists $config->{default_username}) {
+        $def_user = $config->{default_username};
+    }
+
+    if (exists $config->{commands}) {
+        ($commands) = ($config->{commands} !~ /^(no|0)$/i);
+    }
+
+    if (exists $config->{method}) {
+        foreach ($config->{method}) {
+            /publickey/ && do { $method = 'publickey'; last };
+            /password/  && do { $method = 'password';  last };
+            /hostbased/ && do { $method = 'hostbased'; last };
+        }
+    }
+
+}
+
+__END__
