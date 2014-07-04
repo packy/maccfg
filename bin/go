@@ -7,7 +7,7 @@ use Readonly;
 use Term::ReadKey;
 
 Readonly my $sshpass => '/usr/local/bin/sshpass';
-Readonly my $ssh     => '/usr/bin/ssh';
+Readonly my $ssh     => '/usr/bin/ssh -oStrictHostKeyChecking=no';
 
 my %hostmap;
 my $gorc         = $ENV{HOME}.'/.gorc';
@@ -41,10 +41,13 @@ GetOptions
     },
     ;
 
+unless (any {$_ eq 'gridapp-dev.com'} get_search_domains()) {
+    add_search_domains(qw/gridapp-dev.com dev.gridapp.com gridapp.com/);
+}
+
 if (-f $gorc) {
-    my $conf   = Config::General->new($gorc);
-    %config = $conf->getall;
-    print Dumper(\%config);
+    my $conf = Config::General->new($gorc);
+    %config  = $conf->getall;
     set_from_rc_data(\%config);
 }
 
@@ -206,4 +209,46 @@ sub set_from_rc_data {
 
 }
 
+sub get_search_domains {
+    my $file = "/tmp/scutil.$$.txt";
+    open my $fh, '>', $file;
+    print {$fh} qq{open\nget State:/Network/Service/com.cisco.anyconnect/DNS\nd.show\nquit\n};
+    close $fh;
+>
+    open $pipe, "scutil <$file |";
+    my $mode;
+    my @list;
+    while (my $line = <$pipe>) {
+        if ($line =~ /SearchDomains/) {
+            $mode = 'domainlist';
+            next;
+        }
+        next unless $mode;
+        last if $line =~ /\}/;
+        my($domain) = $line =~ /\d+\s+:\s+(\S+)\s*$/;
+        push @list, $domain;
+    }
+    close $pipe;
+    unlink $file;
+
+    return @list;
+}
+
+sub add_search_domains {
+    my $file = "/tmp/scutil.$$.txt";
+    open my $fh, '>', $file;
+    print {$fh} qq{open\nd.init\nget State:/Network/Service/com.cisco.anyconnect/DNS\n};
+    foreach my $domain (@_) {
+        print {$fh} "d.add DomainName $domain\n"
+    }
+    print {$fh} qq{set State:/Network/Service/com.cisco.anyconnect/DNS\nquit\n};
+    close $fh;
+
+    print "Adding search domains!\n";
+    if ($verbose) {
+        print "sudo scutil < -\n" . `cat $file`;
+    }
+    `sudo scutil <$file`;
+    unlink $file;
+}
 __END__
