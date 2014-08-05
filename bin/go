@@ -9,6 +9,7 @@ use List::MoreUtils qw( any );
 
 Readonly my $sshpass => '/usr/local/bin/sshpass';
 Readonly my $ssh     => '/usr/bin/ssh -oStrictHostKeyChecking=no';
+Readonly my $scp     => '/usr/bin/scp -oStrictHostKeyChecking=no';
 
 my %hostmap;
 my $gorc         = $ENV{HOME}.'/.gorc';
@@ -77,9 +78,7 @@ my $os = get_os($target);
 print "OS: $os\n" if ($verbose);
 
 my $commands = ($push_cmds) ? os_commands($os, $ip) : q{};
-my $ssh      = ($method eq 'password')
-             ? qq{$sshpass -p $def_passwd $ssh $def_user\@$target}
-             : qq{$ssh $def_user\@$target};
+my $sshcmd   = ssh_command();
 
 my $script = qq{tell application "iTerm"
   set oldterm to current terminal
@@ -87,7 +86,7 @@ my $script = qq{tell application "iTerm"
   tell newterm
     set newsession to (make new session at the end of sessions)
     tell newsession
-      exec command "$ssh"
+      exec command "$sshcmd"
       $commands
     end tell
   end tell
@@ -99,12 +98,48 @@ open my $out, '>', $tmp;
 print {$out} $script;
 close $out;
 
+copy_files_to_node();
 print "Connecting to $target ";
 print qq{using command "$ssh" } if ($verbose);
 print "...\n";
 print $script if ($verbose > 1);
 print `osascript $tmp` unless ($fake);
 unlink $tmp;
+
+sub copy_files_to_node {
+    if ($os eq 'aix') {
+        my $cp = scp_command('/tmp/',
+                             '~/Sites/bash/aix_dash.sh',
+                             '~/Sites/bash/aix_less.bin');
+        print "$cp\n";
+        print `$cp`;
+    }
+}
+
+sub ssh_command {
+    my $cmd;
+    if ($method eq 'password') {
+        $cmd = qq{$sshpass -p $def_passwd $ssh $def_user\@$target};
+    }
+    else {
+        $cmd = qq{$ssh $def_user\@$target};
+    }
+    if (@_) {
+        $cmd .= q{ } . join q{ }, @_;
+    }
+    return $cmd;
+}
+
+sub scp_command {
+    my $dest  = shift;
+    my $files = join q{ }, @_;
+    if ($method eq 'password') {
+        return qq{$sshpass -p $def_passwd $scp $files $def_user\@$target:$dest};
+    }
+    else {
+        return qq{$scp $files $def_user\@$target:$dest};
+    }
+}
 
 sub os_commands {
     my ($os, $ip) = @_;
@@ -125,7 +160,6 @@ write contents of file "/Users/packy/Sites/bash/solaris_bash_helpers.sh"
     elsif ($os eq 'aix') {
         return qq{
 write text "exec /usr/local/bin/dash"
-write text "export PACKBOOK_IP=$ip"
 write contents of file "/Users/packy/Sites/bash/aix_dash_helpers.sh"
         };
     }
