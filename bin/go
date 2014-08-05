@@ -5,6 +5,7 @@ use Data::Dumper::Concise;
 use Getopt::Long;
 use Readonly;
 use Term::ReadKey;
+use List::MoreUtils qw( any );
 
 Readonly my $sshpass => '/usr/local/bin/sshpass';
 Readonly my $ssh     => '/usr/bin/ssh -oStrictHostKeyChecking=no';
@@ -25,7 +26,7 @@ GetOptions
     "rc=s"       => \$gorc,
     "adapter=s"  => \@ADAPTERS,
     "hostmap=s"  => \$hostmap_file,
-    "commands!"  => \$push_commands,
+    "commands!"  => \$push_cmds,
     "username=s" => \$def_user,
     "publickey"  => sub { $method = 'publickey' },
     "password"   => sub { $method = 'password' },
@@ -41,9 +42,9 @@ GetOptions
     },
     ;
 
-unless (any {$_ eq 'gridapp-dev.com'} get_search_domains()) {
-    add_search_domains(qw/gridapp-dev.com dev.gridapp.com gridapp.com/);
-}
+#unless (any {$_ eq 'gridapp-dev.com'} get_search_domains()) {
+#    add_search_domains(qw/gridapp-dev.com dev.gridapp.com gridapp.com/);
+#}
 
 if (-f $gorc) {
     my $conf = Config::General->new($gorc);
@@ -54,6 +55,10 @@ if (-f $gorc) {
 my $target = shift @ARGV;
 
 my $ip = get_ip();
+
+if (exists $config{aliases} && exists $config{aliases}->{$target}) {
+    $target = $config{aliases}->{$target};
+}
 
 unless (is_up($target)) {
     print "$target is down!\n" if $target;
@@ -69,8 +74,9 @@ if (exists $config{hosts}) {
 read_hostmap();
 
 my $os = get_os($target);
+print "OS: $os\n" if ($verbose);
 
-my $commands = ($push_commands) ? os_commands($os, $ip) : q{};
+my $commands = ($push_cmds) ? os_commands($os, $ip) : q{};
 my $ssh      = ($method eq 'password')
              ? qq{$sshpass -p $def_passwd $ssh $def_user\@$target}
              : qq{$ssh $def_user\@$target};
@@ -165,7 +171,7 @@ sub get_os {
         }
     }
     else {
-        print "Running nmap -O $garget to determine OS...\n";
+        print "Running nmap -O $target to determine OS...\n";
         my $os   = 'unknown';
         my $data = `sudo nmap -O $target`;
         if ($data =~ /Running: Linux/) {
@@ -187,6 +193,7 @@ sub get_ip {
 
 sub set_from_rc_data {
     my $config = shift;
+    print '$config = '.Dumper($config) if $verbose;
     if (exists $config->{default_password}) {
         $def_passwd = $config->{default_password};
     }
@@ -196,7 +203,7 @@ sub set_from_rc_data {
     }
 
     if (exists $config->{commands}) {
-        ($commands) = ($config->{commands} !~ /^(no|0)$/i);
+        ($push_cmds) = ($config->{commands} !~ /^(no|0)$/i);
     }
 
     if (exists $config->{method}) {
@@ -210,15 +217,22 @@ sub set_from_rc_data {
 }
 
 sub get_search_domains {
+    my $ps = `ps -ef`;
+    my $service;
+    if ($ps =~ /Cisco AnyConnect Secure Mobility Client/) {
+    }
     my $file = "/tmp/scutil.$$.txt";
+    my $cmds = qq{open\nget State:/Network/Service/com.cisco.anyconnect/DNS\nd.show\nquit\n};
     open my $fh, '>', $file;
-    print {$fh} qq{open\nget State:/Network/Service/com.cisco.anyconnect/DNS\nd.show\nquit\n};
+    print {$fh} $cmds;
     close $fh;
->
+
+    print "scutil < -\n$cmds\n" if ($verbose);
     open $pipe, "scutil <$file |";
     my $mode;
     my @list;
     while (my $line = <$pipe>) {
+        print $line if ($verbose);
         if ($line =~ /SearchDomains/) {
             $mode = 'domainlist';
             next;
