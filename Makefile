@@ -1,4 +1,5 @@
 gitdir := $(HOME)/git
+pwd := $(shell pwd)
 
 all: git-repos dotfiles homebrewed perlbrew
 
@@ -10,7 +11,7 @@ ${gitdir}/ack2:
 	perl Makefile.PL; \
 	make ack-standalone; \
 	ln -s ${gitdir}/ack2/ack-standalone $(HOME)/bin/ack; \
-	cp dot.ackrc $(HOME)/.ackrc
+	ln -s ${pwd}/dot.ackrc $(HOME)/.ackrc
 
 ${gitdir}/file-next:
 	git clone https://github.com/petdance/file-next.git ${gitdir}/file-next
@@ -19,25 +20,25 @@ ${gitdir}/z:
 	git clone https://github.com/rupa/z.git ${gitdir}/z
 
 $(HOME)/.bash_ack:
-	cp dot.bash_ack $(HOME)/.bash_ack
+	ln -s ${pwd}/dot.bash_ack $(HOME)/.bash_ack
 
 $(HOME)/.bash_aliases:
-	cp dot.bash_aliases $(HOME)/.bash_aliases
+	ln -s ${pwd}/dot.bash_aliases $(HOME)/.bash_aliases
 
 $(HOME)/.bash_functions:
-	cp dot.bash_functions $(HOME)/.bash_functions
+	ln -s ${pwd}/dot.bash_functions $(HOME)/.bash_functions
 
 $(HOME)/.bash_git:
-	cp dot.bash_git $(HOME)/.bash_git
+	ln -s ${pwd}/dot.bash_git $(HOME)/.bash_git
 
 $(HOME)/.bash_ls:
-	cp dot.bash_ls $(HOME)/.bash_ls
+	ln -s ${pwd}/dot.bash_ls $(HOME)/.bash_ls
 
 $(HOME)/.bashrc:
-	cp dot.bashrc $(HOME)/.bashrc
+	ln -s ${pwd}/dot.bashrc $(HOME)/.bashrc
 
 $(HOME)/.emacs:
-	cp dot.emacs $(HOME)/.emacs
+	ln -s ${pwd}/dot.emacs $(HOME)/.emacs
 
 dotfiles: $(HOME)/.bash_ack $(HOME)/.bash_aliases $(HOME)/.bash_functions \
           $(HOME)/.bash_git $(HOME)/.bash_ls $(HOME)/.bashrc $(HOME)/.emacs
