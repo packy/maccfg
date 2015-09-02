@@ -43,44 +43,58 @@ GetOptions
     },
     ;
 
-#unless (any {$_ eq 'gridapp-dev.com'} get_search_domains()) {
-#    add_search_domains(qw/gridapp-dev.com dev.gridapp.com gridapp.com/);
-#}
-
 if (-f $gorc) {
     my $conf = Config::General->new($gorc);
     %config  = $conf->getall;
     set_from_rc_data(\%config);
 }
 
-my $target = shift @ARGV;
-
 my $ip = get_ip();
-
-if (exists $config{aliases} && exists $config{aliases}->{$target}) {
-    $target = $config{aliases}->{$target};
-}
-
-unless (is_up($target)) {
-    print "$target is down!\n" if $target;
-    exit;
-}
-
-if (exists $config{hosts}) {
-    if (exists $config{hosts}->{$target}) {
-        set_from_rc_data($config{hosts}->{$target});
-    }
-}
 
 read_hostmap();
 
-my $os = get_os($target);
-print "OS: $os\n" if ($verbose);
+while (@ARGV) {
 
-my $commands = ($push_cmds) ? os_commands($os, $ip) : q{};
-my $sshcmd   = ssh_command();
+    my $target = next_target();
 
-my $script = qq{tell application "iTerm"
+    my $os = get_os($target);
+    print "OS: $os\n" if ($verbose);
+
+    my $commands = ($push_cmds) ? os_commands($os, $ip) : q{};
+    my $sshcmd   = ssh_command($target);
+    my $script   = new_terminal_applescript($sshcmd, $commands);
+
+    my $tmp      = make_temp($script);
+
+    copy_files_to_node();
+    connect_to_target($target, $script, $tmp);
+}
+
+sub next_target {
+    my $target = shift @ARGV;
+
+    if (exists $config{aliases} && exists $config{aliases}->{$target}) {
+        $target = $config{aliases}->{$target};
+    }
+
+    if (exists $config{hosts}) {
+        if (exists $config{hosts}->{$target}) {
+            set_from_rc_data($config{hosts}->{$target});
+        }
+    }
+
+    unless (is_up($target)) {
+        print "$target is down!\n" if $target;
+        exit;
+    }
+
+    return $target;
+}
+
+sub new_terminal_applescript {
+    my ($sshcmd, $commands) = @_;
+
+return qq{tell application "iTerm"
   set oldterm to current terminal
   set newterm to (make new terminal)
   tell newterm
@@ -93,18 +107,29 @@ my $script = qq{tell application "iTerm"
 end tell
 };
 
-my $tmp = "/tmp/$$.osa";
-open my $out, '>', $tmp;
-print {$out} $script;
-close $out;
+}
 
-copy_files_to_node();
-print "Connecting to $target ";
-print qq{using command "$ssh" } if ($verbose);
-print "...\n";
-print $script if ($verbose > 1);
-print `osascript $tmp` unless ($fake);
-unlink $tmp;
+sub make_temp {
+    my($script) = @_;
+
+    my $tmp = "/tmp/$$.osa";
+    open my $out, '>', $tmp;
+    print {$out} $script;
+    close $out;
+
+    return $tmp;
+}
+
+sub connect_to_target {
+    my($target, $script, $tmp) = @_;
+
+    print "Connecting to $target ";
+    print qq{using command "$ssh" } if ($verbose);
+    print "...\n";
+    print $script if ($verbose > 1);
+    print `osascript $tmp` unless ($fake);
+    unlink $tmp;
+}
 
 sub copy_files_to_node {
     if ($os eq 'aix') {
@@ -117,6 +142,7 @@ sub copy_files_to_node {
 }
 
 sub ssh_command {
+    my $target = shift @_;
     my $cmd;
     if ($method eq 'password') {
         $cmd = qq{$sshpass -p $def_passwd $ssh $def_user\@$target};
