@@ -77,15 +77,15 @@ sub next_target {
         $target = $config{aliases}->{$target};
     }
 
+    unless (is_up($target)) {
+        print "$target is down!\n" if $target;
+        exit;
+    }
+
     if (exists $config{hosts}) {
         if (exists $config{hosts}->{$target}) {
             set_from_rc_data($config{hosts}->{$target});
         }
-    }
-
-    unless (is_up($target)) {
-        print "$target is down!\n" if $target;
-        exit;
     }
 
     return $target;
