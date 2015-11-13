@@ -66,7 +66,7 @@ while (@ARGV) {
 
     my $tmp      = make_temp($script);
 
-    copy_files_to_node();
+    copy_files_to_node($target, $os);
     connect_to_target($target, $script, $tmp);
 }
 
@@ -132,11 +132,23 @@ sub connect_to_target {
 }
 
 sub copy_files_to_node {
+    my ($target, $os) = @_;
+    my (@files, $dest);
+
     if ($os eq 'aix') {
-        my $cp = scp_command('/tmp/',
-                             '~/Sites/bash/aix_dash.sh',
-                             '~/Sites/bash/aix_less.bin');
-        print "$cp\n";
+        @files = ( '~/Sites/bash/aix_dash.sh',
+                   '~/Sites/bash/aix_less.bin' );
+        $dest = '/tmp/';
+    }
+
+    if (@files) {
+        my $cp = scp_command($target, $dest, @files);
+        print "Copying files to $target ";
+        if ($verbose) {
+            my $files = join q{ }, @files;
+            print qq{using $scp $files $def_user\@$target:$dest};
+        }
+        print "...\n";
         print `$cp`;
     }
 }
@@ -157,6 +169,7 @@ sub ssh_command {
 }
 
 sub scp_command {
+    my $target = shift @_;
     my $dest  = shift;
     my $files = join q{ }, @_;
     if ($method eq 'password') {
