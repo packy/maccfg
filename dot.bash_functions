@@ -23,9 +23,10 @@ tlily () {
 authorize () {
   HOSTNAME=$(hostname -s)
   USER=$(whoami)
-  REMOTE_PUB=.ssh/id_rsa_${HOSTNAME}_${USER}.pub
-  scp ~/.ssh/id_rsa.pub $1@$2:$REMOTE_PUB
-  ssh $1@$2 "cat ~/$REMOTE_PUB >> ~/.ssh/authorized_keys"
+  DIR="~/.ssh"
+  REMOTE_PUB="~/.ssh/id_rsa_${HOSTNAME}_${USER}.pub"
+  AUTH_KEYS="~/.ssh/authorized_keys"
+  cat ~/.ssh/id_rsa.pub | ssh $1@$2 "umask 077; test -d $DIR || mkdir $DIR; cat > $REMOTE_PUB; cat $REMOTE_PUB >> $AUTH_KEYS; test -x /sbin/restorecon && /sbin/restorecon $DIR $REMOTE_PUB $AUTH_KEYS" || exit 1
 }
 
 forget_host () {
@@ -73,5 +74,14 @@ uniq_path () {
     my @PATH = grep { ! $seen{$_}++ } split /$sep/, $ENV{PATH};
     print join $sep, @PATH, @ARGV;
   ' $*)
+}
+
+7zarc () {
+    for DIR in $*; do
+        7z a -t7z -mx=9 -m0=lzma -mfb=64 -md=32m -ms=on $DIR.7z $DIR
+        trash $DIR
+        mkdir -p old/
+        mv $DIR.7z old/
+    done
 }
 
