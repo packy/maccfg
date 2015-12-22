@@ -14,7 +14,7 @@ Readonly my $scp     => '/usr/bin/scp -oStrictHostKeyChecking=no';
 my %hostmap;
 my $gorc         = $ENV{HOME}.'/.gorc';
 my $hostmap_file = $ENV{HOME}.'/.go_hostmap.txt';
-my @ADAPTERS     = qw/utun0 en4 en0 en1/;
+my @ADAPTERS     = qw/utun0 en5 en4 en0 en1/;
 my $push_cmds    = 1;
 my $def_user     = 'root';
 my $method       = 'password';
