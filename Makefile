@@ -43,7 +43,7 @@ $(HOME)/.emacs:
 dotfiles: $(HOME)/.bash_ack $(HOME)/.bash_aliases $(HOME)/.bash_functions \
           $(HOME)/.bash_git $(HOME)/.bash_ls $(HOME)/.bashrc $(HOME)/.emacs
 
-homebrewed: homebrew pcre git coreutils findutils
+homebrewed: homebrew bash pcre git coreutils findutils switchaudio-osx node openssl p7zip
 
 homebrew: /usr/local/bin/brew
 	ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
@@ -67,6 +67,32 @@ endif
 ifeq ($(shell brew ls --versions findutils),)
 findutils: homebrew 
 	brew install findutils
+endif
+
+ifeq ($(shell brew ls --versions switchaudio-osx),)
+switchaudio-osx: homebrew 
+	brew install switchaudio-osx
+endif
+
+ifeq ($(shell brew ls --versions bash),)
+bash: homebrew 
+	brew install bash
+	sudo echo "/usr/local/bin/bash # bash 4.3.42" >> /etc/shells
+endif
+
+ifeq ($(shell brew ls --versions node),)
+node: homebrew 
+	brew install node
+endif
+
+ifeq ($(shell brew ls --versions p7zip),)
+p7zip: homebrew 
+	brew install p7zip
+endif
+
+ifeq ($(shell brew ls --versions openssl),)
+openssl: homebrew 
+	brew install openssl
 endif
 
 perlbrew: $(HOME)/perl5/perlbrew
