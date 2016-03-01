@@ -93,7 +93,15 @@ sub next_target {
 
 sub new_terminal_applescript {
     my ($sshcmd, $commands) = @_;
-
+    if ($ENV{ITERM_SESSION_ID} =~ /:/) {
+        # iTerm3 v3!
+return qq{
+tell application "iTerm2"
+  set newWindow to (create window with default profile command "$sshcmd")
+end tell
+};
+    }
+    else {
 return qq{tell application "iTerm"
   set oldterm to current terminal
   set newterm to (make new terminal)
@@ -106,7 +114,7 @@ return qq{tell application "iTerm"
   end tell
 end tell
 };
-
+    }
 }
 
 sub make_temp {
