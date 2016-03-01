@@ -27,3 +27,5 @@ alias     agt='go rh5-si-336'
 alias    agt2='go rh6-si-370'
 alias     ibr='go 10.100.5.110'
 alias markmgr='go rh6-ma-211'
+
+alias bluehost='ssh dardanco@www.dardan.com'
