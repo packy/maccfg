@@ -1,3 +1,4 @@
-. .bashrc
-source $HOME/perl5/perlbrew/etc/bashrc
+#!/usr/bin/env bash
+# for syntax highlightling in emacs, mostly
 
+source $HOME/.bashrc

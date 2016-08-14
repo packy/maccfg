@@ -1,5 +1,9 @@
 #!/bin/bash
 
+rclean () {
+    find . -name '*~' -o -name '.*~' | xargs rm -fv
+}
+
 xtitle () { printf "\e]0;%s\007" "$1"; }
 
 xsize () {
@@ -35,45 +39,14 @@ forget_host () {
   mv $TMP $HOME/.ssh/known_hosts
 }
 
-unshift_path () {
-  export PATH=$(/usr/bin/perl -e '
-    my $sep  = q{:};
-    my $alt  = join q{|}, @ARGV;
-    my $add  = qr/^(?:$alt)$/;
-    # get the dirs in $PATH that are not being put on the front
-    my @PATH = grep { !/$add/ } split /$sep/, $ENV{PATH};
-    print join $sep, @ARGV, @PATH;
-  ' $*)
-}
-
-
-push_path () {
-  export PATH=$(/usr/bin/perl -e '
-    my $sep  = q{:};
-    my $alt  = join q{|}, @ARGV;
-    my $add  = qr/^(?:$alt)$/;
-    # get the dirs in $PATH that are not being put on the end
-    my @PATH = grep { !/$add/ } split /$sep/, $ENV{PATH};
-    print join $sep, @PATH, @ARGV;
-  ' $*)
-}
-
-explode_path () {
-  /usr/bin/perl -e '
-    my $PATH  = $ENV{PATH};
-    my $sep   = q{:};
-    my @parts = split /$sep/, $PATH;
-    print "  ", join("\n  ", @parts), "\n";
-  '
-}
-
-uniq_path () {
-  export PATH=$(/usr/bin/perl -e '
-    my $sep  = q{:};
-    my %seen;
-    my @PATH = grep { ! $seen{$_}++ } split /$sep/, $ENV{PATH};
-    print join $sep, @PATH, @ARGV;
-  ' $*)
+mkdot () {
+  echo "Making png files..."
+  for DOT in $(ls *.dot); do
+    PNG=$(perl -e 'my $png=shift; $png=~s/\.dot\z/.png/; print $png;' $DOT)
+    echo "  $DOT => $PNG"
+    dot -Tpng -o $PNG $DOT
+  done
+  echo "done."
 }
 
 7zarc () {
@@ -84,4 +57,3 @@ uniq_path () {
         mv $DIR.7z old/
     done
 }
-

@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+# for syntax highlightling in emacs, mostly
+
 # LSCOLORS
 # The value of this variable describes what color to use for which
 # attribute when colors are enabled with CLICOLOR.  This string is a
@@ -29,7 +32,6 @@
 # use.
 #
 # The order of the attributes are as follows:
-
 #       1.   directory
 #       2.   symbolic link
 #       3.   socket
@@ -46,4 +48,46 @@
 # default background for regular directories, black foreground and red
 # background for setuid executables, etc.
 
-export LSCOLORS=Exfxcxdxbxegedabagacad
+export  LSCOLORS=ExfxFxdxCxGgDdabagacad
+#export LSCOLORS=Exfxcxdxbxegedabagacad
+
+function demo_ls_colors () {
+    echo Generate new spec with http://geoff.greer.fm/lscolors/
+    echo
+    DIR=/tmp/color_demo
+    FORMAT01=" 1 - directory (%s):           "; FILE01=$DIR/directory
+    FORMAT02=" 2 - symbolic link (%s):       "; FILE02=$DIR/symbolic_link
+    FORMAT03=" 3 - socket (%s):              "; FILE03=$DIR/socket
+    FORMAT04=" 4 - pipe (%s):                "; FILE04=$DIR/pipe
+    FORMAT05=" 5 - executable (%s):          "; FILE05=$DIR/executable
+    FORMAT06=" 6 - block special (%s):       "; FILE06=/dev/disk0
+    FORMAT07=" 7 - character special (%s):   "; FILE07=/dev/console
+    FORMAT08=" 8 - executable
+     with setuid bit set (%s): ";               FILE08=${FILE05}_w_setuid
+    FORMAT09=" 9 - executable
+     with setgid bit set (%s): ";               FILE09=${FILE05}_w_setgid
+    FORMAT10="10 - directory writable to others,
+         with sticky bit (%s): ";               FILE10=${FILE01}_w_sticky_bit
+    FORMAT11="11 - directory writable to others,
+      without sticky bit (%s): ";               FILE11=${FILE01}_wo_sticky_bit
+
+    mkdir -p   $FILE01 $FILE10 $FILE11
+    chmod 1777 $FILE10
+    chmod 2777 $FILE11
+    ln -s /tmp $FILE02
+    python -c "import socket as s; sock = s.socket(s.AF_UNIX); sock.bind('$FILE03')"
+    mkfifo $FILE04
+    touch  $FILE05 ; chmod 0755 $FILE05
+    touch  $FILE08 ; chmod 4755 $FILE08
+    touch  $FILE09 ; chmod 2755 $FILE09
+    ls -Gl $DIR
+    echo
+    echo LSCOLORS=$LSCOLORS yields:
+    for i in 1 2 3 4 5 6 7 8 9 10 11; do
+        FMT=$(printf "\$FORMAT%02d" $i); eval FORMAT="$FMT"
+        FIL=$(printf "\$FILE%02d" $i);   eval FILE="$FIL"
+        CODE=$(perl -e 'print substr($ENV{LSCOLORS}, ($ARGV[0]-1) * 2, 2)' $i)
+        printf "$FORMAT" $CODE; ls -Gd $FILE
+    done
+    rm -rf $DIR
+}

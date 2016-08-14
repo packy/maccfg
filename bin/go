@@ -66,7 +66,9 @@ while (@ARGV) {
 
     my $tmp      = make_temp($script);
 
-    copy_files_to_node($target, $os);
+    if ($commands) {
+        copy_files_to_node($target, $os);
+    }
     connect_to_target($target, $script, $tmp);
 }
 
@@ -98,6 +100,9 @@ sub new_terminal_applescript {
 return qq{
 tell application "iTerm2"
   set newWindow to (create window with default profile command "$sshcmd")
+  tell current session of newWindow
+    $commands
+  end tell
 end tell
 };
     }
@@ -143,13 +148,26 @@ sub copy_files_to_node {
     my ($target, $os) = @_;
     my (@files, $dest);
 
-    if ($os eq 'aix') {
+    $dest = '/tmp/packybin';
+    if ($os eq 'rhel') {
+        @files = ( '~/Sites/bash/linux_bash.sh',
+                   '~/Sites/bash/aix_less.bin' );
+    }
+    elsif ($os eq 'aix') {
         @files = ( '~/Sites/bash/aix_dash.sh',
                    '~/Sites/bash/aix_less.bin' );
-        $dest = '/tmp/';
     }
 
     if (@files) {
+        print "Making temporary directory on $target ";
+        my $cmd = ssh_command($target);
+        if ($verbose) {
+            my $files = join q{ }, @files;
+            print qq{using $cmd "mkdir -p $dest"};
+        }
+        print "...\n";
+        print `$cmd "mkdir -p $dest"`;
+
         my $cp = scp_command($target, $dest, @files);
         print "Copying files to $target ";
         if ($verbose) {
@@ -194,7 +212,7 @@ sub os_commands {
     if ($os eq 'rhel') {
         return qq{
 write text "export PACKBOOK_IP=$ip"
-write text "curl -fsSkL http://\$PACKBOOK_IP/~packy/bash/linux_bash.sh > $tmp; source $tmp; rm -f $tmp"
+write text "source /tmp/packybin/linux_bash.sh"
         };
     }
     elsif ($os eq 'solaris') {

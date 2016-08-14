@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+p4l () {
+    p4 login
+    ~/BitBar/PerforceTicketStatus.1m.sh
+}
+
+p4_revertall () {
+    p4 opened | perl -ne 's/\#.*$//; print;' | xargs p4 revert
+}
+

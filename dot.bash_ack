@@ -1,5 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# for syntax highlightling in emacs, mostly
+
 export ACK_COLOR_FILENAME=red
-export ACK_OPTIONS='--known-types --color'
+export ACK_OPTIONS='--known-types --type-add perl=.csv --color'
 export ACK_PAGER='less -FRX'
 source $HOME/git/ack2/completion.bash

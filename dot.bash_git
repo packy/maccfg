@@ -10,11 +10,26 @@ GIT_ROOT=$HOMEBREW_CELLAR/git/$GIT_VERSION
 GIT_CORE=$GIT_ROOT/libexec/git-core
 export PATH=$PATH:$GIT_CORE
 
+export LESS=FRX
+alias gb='git branch'
+export GITDIR=$HOME/git
+alias ggs='cd "$GITDIR"/scriptlib; gp' # go go gadget scriptlib!  ... what?
+alias ggm='cd "$GITDIR"/manager_scripts; gp'
+alias gge='cd "$GITDIR"/extraclarity; gp'
+alias ggg='cd "$GITDIR"/mgmt; gp'
+alias ggq='cd "$GITDIR"/qa; gp'
+alias ggc='cd "$GITDIR"/compliance; gp'
+
+alias ccolab=/Applications/ccollab_client/ccollab
+
+alias p4noedit='if ! p4 login -s; then p4 login; fi; P4EDITOR=sleep-toucher git p4 submit'
+alias p4n='if ! p4 login -s; then p4 login; fi; P4EDITOR=sleep-toucher git p4 submit'
+
 #
 # git customizations
 #
-
 . $GIT_ROOT/etc/bash_completion.d/git-completion.bash
+. ~/bin/gitp4_auto # experimental
 
 function git () {
     if [[ $EUID -eq 0 ]]; then
@@ -24,8 +39,13 @@ function git () {
     fi
 }
 
-export LESS=FRX
-alias gb='git branch'
+function p4 () {
+    if [[ $EUID -eq 0 ]]; then
+        echo "Don't run perforce as root!" 1>&2
+    else
+        /usr/local/bin/p4 $*
+    fi
+}
 
 function parse_git_branch {
   WRAP=$1
@@ -49,13 +69,7 @@ function make_git_titlebar {
 }
 
 function make_git_prompt () {
-  local BLACK="\[\033[0;30m\]";
-  local BLUE="\[\033[0;34m\]";
-
-  make_git_titlebar
-  PS1="${TITLEBAR}\\$ "
-  PS2='> '
-  PS4='+ '
+  source "$GITDIR"/bash-git-prompt/gitprompt.sh
 }
 alias gp=make_git_prompt
 
@@ -63,6 +77,31 @@ newbranch () {
   git branch $*
   echo Created git branch \"$1\"
   git checkout $1
+}
+
+_make_branch_name () {
+    perl -e '$str = join "_", @ARGV; if ($ARGV[0] =~ /^\d+$/) { $str = "bug$str"; } print $str;' $*
+}
+
+newbug () {
+    git checkout master
+    newbranch $(_make_branch_name $*)
+}
+
+mvbug () {
+    git branch -m bug$1 bug$2
+}
+
+renbug () {
+    OLDBRANCH=$(parse_git_branch)
+    git branch -m $OLDBRANCH $(_make_branch_name $*)
+}
+
+delbug () {
+    OLDBRANCH=$(parse_git_branch)
+    git co master
+    git up
+    git branch -d $OLDBRANCH
 }
 
 edit_last () {
@@ -85,6 +124,54 @@ squash_last () {
     git commit --fixup=$(last_sha) $*
 }
 
+gl () {
+   git log $(local_commits_only)
+   printf "\n"
+}
+
+gln () {
+   git ln $(local_commits_only)
+   printf "\n"
+}
+
+glb () {
+   BUG=parse_git_branch | perl -ne 'chomp; s/bug/bug /; print qq{$_};'
+   git log --grep "$BUG"
+   printf "\n"
+}
+glnb () {
+   BUG=parse_git_branch | perl -ne 'chomp; s/bug/bug /; print qq{$_};'
+   git log --name-only --grep "$BUG"
+   printf "\n"
+}
+
+syncall () {
+   DIRS='cmdutils compliance customer_customizations dagent db_setup devel extraclarity manager_scripts mediaprep mgmt qa qa_scripts dagent scriptlib'
+   CURDIR=`pwd`
+   p4 sync
+   for DIR in $DIRS; do
+      printf "\n\n========================= $DIR =========================\n\n"
+      cd "$GITDIR"/$DIR
+      CHANGES=$(git status --short --untracked-files=no)
+      OLDBRANCH=$(parse_git_branch)
+      if [[ "$CHANGES" != "" ]]; then
+          git stash
+      fi
+      if [[ "$OLDBRANCH" != "master" ]]; then
+          git co master
+      fi
+      git up
+      git gc
+      if [[ "$OLDBRANCH" != "master" ]]; then
+          git co $OLDBRANCH
+      fi
+      if [[ "$CHANGES" != "" ]]; then
+          git stash pop
+      fi
+   done
+   cd $CURDIR
+}
+
 commit_matching ()
 {
     MATCHES=$(git status | perl -e '
@@ -100,17 +187,12 @@ commit_matching ()
     git commit $MATCHES
 }
 
+if [[ -x /Applications/p4merge.app/Contents/Resources/launchp4merge ]]; then
+p4diff ()
+{
+    /Applications/p4merge.app/Contents/Resources/launchp4merge $* &
+}
+fi
+
 # some perforce stuff, too!
 alias p4noedit='P4EDITOR=sleep-toucher git p4 submit'
-
-function p4 () {
-    if [[ $EUID -eq 0 ]]; then
-        echo "Don't run perforce as root!" 1>&2
-    else
-        /usr/local/bin/p4 $*
-    fi
-}
-
-# experimental
-. ~/bin/gitp4_auto
-

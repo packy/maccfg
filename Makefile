@@ -43,7 +43,11 @@ $(HOME)/.emacs:
 dotfiles: $(HOME)/.bash_ack $(HOME)/.bash_aliases $(HOME)/.bash_functions \
           $(HOME)/.bash_git $(HOME)/.bash_ls $(HOME)/.bashrc $(HOME)/.emacs
 
-homebrewed: homebrew bash pcre git coreutils findutils switchaudio-osx node openssl p7zip
+perlbrew: $(HOME)/perl5/perlbrew
+	curl -L http://install.perlbrew.pl | bash
+	perlbrew install stable
+
+homebrewed: homebrew bash fpp git libpng node pcre switchaudio-osx xz coreutils freetype icu4c mysql openssl php70 unixodbc findutils gettext jpeg nmap p7zip readline wget
 
 homebrew: /usr/local/bin/brew
 	ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
@@ -95,6 +99,67 @@ openssl: homebrew
 	brew install openssl
 endif
 
-perlbrew: $(HOME)/perl5/perlbrew
-	curl -L http://install.perlbrew.pl | bash
-	perlbrew install stable
+ifeq ($(shell brew ls --versions fpp),)
+fpp: homebrew
+	brew install fpp
+endif
+
+ifeq ($(shell brew ls --versions freetype),)
+freetype: homebrew
+	brew install freetype
+endif
+
+ifeq ($(shell brew ls --versions gettext),)
+gettext: homebrew
+	brew install gettext
+endif
+
+ifeq ($(shell brew ls --versions icu4c),)
+icu4c: homebrew
+	brew install icu4c
+endif
+
+ifeq ($(shell brew ls --versions jpeg),)
+jpeg: homebrew
+	brew install jpeg
+endif
+
+ifeq ($(shell brew ls --versions libpng),)
+libpng: homebrew
+	brew install libpng
+endif
+
+ifeq ($(shell brew ls --versions mysql),)
+mysql: homebrew
+	brew install mysql
+endif
+
+ifeq ($(shell brew ls --versions nmap),)
+nmap: homebrew
+	brew install nmap
+endif
+
+ifeq ($(shell brew ls --versions php70),)
+php70: homebrew
+	brew install php70
+endif
+
+ifeq ($(shell brew ls --versions readline),)
+readline: homebrew
+	brew install readline
+endif
+
+ifeq ($(shell brew ls --versions unixodbc),)
+unixodbc: homebrew
+	brew install unixodbc
+endif
+
+ifeq ($(shell brew ls --versions wget),)
+wget: homebrew
+	brew install wget
+endif
+
+ifeq ($(shell brew ls --versions xz),)
+xz: homebrew
+	brew install xz
+endif
