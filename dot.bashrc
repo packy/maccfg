@@ -25,14 +25,14 @@ push_path $HOME/bin
 uniq_path # remove any duplicates in the PATH
 
 # finally, load all the bash customizations
-for DOTFILE in functions git ack aliases ls aws bmc; do
+for DOTFILE in functions git ack aliases ls perforce aws bmc; do
     if [[ -f $HOME/.bash_$DOTFILE ]]; then
         source $HOME/.bash_$DOTFILE
     fi
 done
 
 for MODULE in \
-    ${HOME}/.iterm2_shell_integration.bash \
+    $HOME/.iterm2_shell_integration.bash \
     $HOME/perl5/perlbrew/etc/bashrc ; do
     if [[ -f $MODULE ]]; then
         source $MODULE
