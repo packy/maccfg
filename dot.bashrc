@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 # for syntax highlightling in emacs, mostly
 
+function source_file () {
+    FILE=$1
+    PRINTERR=$2
+    if [[ -f $FILE ]]; then
+        printf "\e7Sourcing %s ..." $FILE # \e7 saves cursor position
+        source $FILE
+        printf "\e8\e[0K" # restore cursor, clear line from cursor right
+    elif [[ "$PRINTERR" != "" ]]; then
+        echo ERROR: Unable to find $FILE >> /dev/stderr
+    fi
+}
+
 # turn monitor mode OFF and
 # suppress "[#] Done  /foo/bar" messages
 set +o monitor
@@ -13,7 +25,7 @@ if [[ "$TERM" = "dumb" ]] ; then
 fi
 
 # I want to manipulate the path first
-source $HOME/.bash_path_functions
+source_file $HOME/.bash_path_functions "Error if not found"
 
 # add dirs to the FRONT of the PATH
 unshift_path /usr/local/bin
@@ -26,23 +38,15 @@ uniq_path # remove any duplicates in the PATH
 
 # finally, load all the bash customizations
 for DOTFILE in functions git ack aliases ls perforce aws bmc; do
-    if [[ -f $HOME/.bash_$DOTFILE ]]; then
-        source $HOME/.bash_$DOTFILE
-    fi
+    source_file $HOME/.bash_$DOTFILE
 done
 
 for MODULE in \
     $HOME/.iterm2_shell_integration.bash \
     $HOME/perl5/perlbrew/etc/bashrc ; do
-    if [[ -f $MODULE ]]; then
-        source $MODULE
-    fi
+    source_file $MODULE
 done
 
 gp # git prompt
 
-ITERM2=
-if [[ -f $ITERM2 ]]; then
-    source $ITERM2
-fi
 export EDITOR=xemacs-wait
