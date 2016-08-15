@@ -9,3 +9,6 @@ p4_revertall () {
     p4 opened | perl -ne 's/\#.*$//; print;' | xargs p4 revert
 }
 
+is_git-p4_repo () {
+    git rev-parse --symbolic --remotes 2>/dev/null | grep ^p4/
+}
