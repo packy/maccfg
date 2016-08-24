@@ -8,7 +8,7 @@ use Term::ReadKey;
 use List::MoreUtils qw( any );
 
 Readonly my $sshpass => '/usr/local/bin/sshpass';
-Readonly my $ssh     => '/usr/bin/ssh -oStrictHostKeyChecking=no';
+Readonly my $ssh     => '/usr/bin/ssh -oStrictHostKeyChecking=no -oServerAliveInterval=60';
 Readonly my $scp     => '/usr/bin/scp -oStrictHostKeyChecking=no';
 
 my %hostmap;
@@ -20,6 +20,7 @@ my $def_user     = 'root';
 my $method       = 'password';
 my $verbose      = 0;
 my $fake         = 0;
+my $force_os;
 my $def_passwd;
 my %config;
 
@@ -32,6 +33,7 @@ GetOptions
     "publickey"  => sub { $method = 'publickey' },
     "password"   => sub { $method = 'password' },
     "hostbased"  => sub { $method = 'hostbased' },
+    "os=s"       => \$force_os,
     "verbose+"   => \$verbose,
     "fake!"      => \$fake,
     "prompt"    => sub {
@@ -57,7 +59,7 @@ while (@ARGV) {
 
     my $target = next_target();
 
-    my $os = get_os($target);
+    my $os = ($force_os) ? $force_os : get_os($target);
     print "OS: $os\n" if ($verbose);
 
     my $commands = ($push_cmds) ? os_commands($os, $ip) : q{};
