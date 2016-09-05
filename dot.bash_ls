@@ -48,6 +48,7 @@
 # default background for regular directories, black foreground and red
 # background for setuid executables, etc.
 
+export  CLICOLOR=1
 export  LSCOLORS=ExfxFxdxCxGgDdabagacad
 #export LSCOLORS=Exfxcxdxbxegedabagacad
 
