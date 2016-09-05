@@ -33,7 +33,9 @@ dotfiles: $(HOME)/.ackrc \
           $(HOME)/.bash_perforce_functions \
           $(HOME)/.bash_prodile \
           $(HOME)/.bashrc \
-          $(HOME)/.emacs
+          $(HOME)/.emacs \
+          $(HOME)/.gitconfig \
+          $(HOME)/.gitignore
 
 perlbrew: $(HOME)/perl5/perlbrew
 	curl -L http://install.perlbrew.pl | bash
