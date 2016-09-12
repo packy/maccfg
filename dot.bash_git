@@ -28,8 +28,6 @@ alias p4n='if ! p4 login -s; then p4 login; fi; P4EDITOR=sleep-toucher git p4 su
 #
 # git customizations
 #
-. $GIT_ROOT/etc/bash_completion.d/git-completion.bash
-. ~/bin/gitp4_auto # experimental
 
 function git () {
     if [[ $EUID -eq 0 ]]; then
@@ -196,3 +194,7 @@ fi
 
 # some perforce stuff, too!
 alias p4noedit='P4EDITOR=sleep-toucher git p4 submit'
+
+restore_cursor_clear_down
+source_file $GIT_ROOT/etc/bash_completion.d/git-completion.bash
+source_file ~/bin/gitp4_auto # experimental

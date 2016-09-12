@@ -1,0 +1,17 @@
+#!/bin/bash
+
+PERLBREW=$1
+
+if [[ ! -x "$PERLBREW" ]]; then 
+    curl -L http://install.perlbrew.pl | bash 
+fi 
+
+source $HOME/perl5/perlbrew/etc/bashrc 
+
+if [[ "$(perlbrew list)" == "" ]]; then
+    perlbrew install stable 
+fi
+
+if [[ ! -x "$HOME/perl5/perlbrew/bin/cpanm" ]]; then
+    perlbrew install-cpanm
+fi

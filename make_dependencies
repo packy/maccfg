@@ -1,0 +1,27 @@
+#!/bin/bash
+
+DEPDIR=$1
+
+mkdir -p $DEPDIR >/dev/null
+
+check_dependency () {
+    FILE=$DEPDIR/$1;
+    if $2 >/dev/null 2>&1; then
+        if [[ ! -e $FILE ]]; then
+            touch $FILE
+        fi
+    else
+        rm -f $FILE
+    fi
+}
+
+check_dependency File-Next "perl -MFile::Next -e '1;'"
+check_dependency homebrew  "which brew"
+
+if [[ -e $DEPDIR/homebrew ]]; then
+    brew list --versions | awk '{ print $1 }' | while read LINE; do
+        if [[ ! -e $DEPDIR/homebrew-$LINE ]]; then
+            touch $DEPDIR/homebrew-$LINE
+        fi
+    done
+fi

@@ -1,26 +1,51 @@
+DEPDIR := .d
+$(shell ./make_dependencies $(DEPDIR) )
 gitdir := $(HOME)/git
+bindir := $(HOME)/bin
+PERLBREW := $(HOME)/perl5/perlbrew/bin/perlbrew
 pwd := $(shell pwd)
 
-all: git-repos dotfiles homebrewed perlbrew
+all: dotfiles binfiles homebrewed perlbrew git-repos
 
-git-repos: ${gitdir}/ack2 ${gitdir}/file-next ${gitdir}/z
+git-repos: $(DEPDIR)/File-Next ${bindir}/ack #${gitdir}/z
 
 ${gitdir}/ack2:
-	git clone https://github.com/packy/ack2.git ${gitdir}/ack2; \
-	cd ${gitdir}/ack2; \
-	perl Makefile.PL; \
-	make ack-standalone; \
-	ln -s ${gitdir}/ack2/ack-standalone $(HOME)/bin/ack; \
-	ln -s ${pwd}/dot.ackrc $(HOME)/.ackrc
+	git clone https://github.com/packy/ack2.git ${gitdir}/ack2
+
+${gitdir}/ack2/Makefile: $(DEPDIR)/homebrew $(PERLBREW) $(DEPDIR)/File-Next
+	cd ${gitdir}/ack2; perl Makefile.PL;
+
+${gitdir}/ack2/ack-standalone: ${gitdir}/ack2/Makefile
+	cd ${gitdir}/ack2; make ack-standalone
+	touch ${gitdir}/ack2/ack-standalone
+
+${bindir}/ack: ${gitdir}/ack2/ack-standalone
+	ln -fs ${gitdir}/ack2/ack-standalone ${bindir}/ack
+	touch ${bindir}/ack
 
 ${gitdir}/file-next:
 	git clone https://github.com/petdance/file-next.git ${gitdir}/file-next
+
+$(DEPDIR)/File-Next:
+	cd ${gitdir}/file-next; perl Makefile.PL; make install
 
 ${gitdir}/z:
 	git clone https://github.com/rupa/z.git ${gitdir}/z
 
 $(HOME)/%: dot%
-	perl -e '(my $$source = "$@") =~ s{^.*/([^/]+)$$}{${pwd}/dot$$1}; symlink $$source, "$@";'
+	@perl -e '(my $$source = "$@") =~ s{^.*/([^/]+)$$}{${pwd}/dot$$1}; printf "symlinking %s to %s\n", $$source, "$@"; unlink "$@"; symlink $$source, "$@";'
+
+$(bindir)/%: $(pwd)/bin/%
+	ln -fs $(pwd)/bin/$* $(bindir)/$*
+
+binfiles: $(bindir)/git-ack \
+	  $(bindir)/git-tracks \
+	  $(bindir)/sleep-toucher \
+	  $(bindir)/xemacs-start-server \
+	  $(bindir)/git-autofix \
+	  $(bindir)/go \
+	  $(bindir)/xemacs \
+	  $(bindir)/xemacs-wait
 
 dotfiles: $(HOME)/.ackrc \
           $(HOME)/.bash_ack \
@@ -31,28 +56,26 @@ dotfiles: $(HOME)/.ackrc \
           $(HOME)/.bash_path_functions \
           $(HOME)/.bash_perforce \
           $(HOME)/.bash_perforce_functions \
-          $(HOME)/.bash_prodile \
+          $(HOME)/.bash_profile \
           $(HOME)/.bashrc \
           $(HOME)/.emacs \
           $(HOME)/.gitconfig \
           $(HOME)/.gitignore
 
-perlbrew: $(HOME)/perl5/perlbrew
-	curl -L http://install.perlbrew.pl | bash
-	perlbrew install stable
+perlbrew:
+	@${gitdir}/maccfg/install_perlbrew ${PERLBREW}
 
-HOMEBREWED = bash fpp pcre git libpng node switchaudio-osx xz coreutils freetype icu4c mysql openssl php70 unixodbc findutils gettext jpeg nmap p7zip readline wget
+HOMEBREWED = bash fpp pcre git libpng node switchaudio-osx xz coreutils freetype icu4c mysql openssl homebrew/php/php70 unixodbc findutils gettext jpeg nmap p7zip readline wget
 
 .ONESHELL:
-homebrewed: homebrew $(HOMEBREWED)
-	for PKG in $(HOMEBREWED); do
-	  if [[ "$$(brew --versions $$PKG" = "" ]]; then
-	    brew install $$PKG
-	  fi
+homebrewed:
+	@${gitdir}/maccfg/install_homebrew
+	@for PKG in $(HOMEBREWED); do \
+	    FILE=$(echo homebrew-$$PKG | sed -e '/-.*\/-/g') ;\
+	    if [[ ! -e $(DEPDIR)/$$FILE ]]; then \
+		brew install $$PKG ;\
+	    fi ;\
 	done
-
-homebrew: /usr/local/bin/brew
-	ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
 
 git: USE_LIBPCRE=yes
 git: homebrew pcre 

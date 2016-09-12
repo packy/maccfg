@@ -1,13 +1,22 @@
 #!/usr/bin/env bash
 # for syntax highlightling in emacs, mostly
 
+function save_cursor () {
+    printf "\e[s" # \e[s saves cursor position
+}
+
+function restore_cursor_clear_down () {
+    printf "\e[u\e[J" # restore cursor, clear screen from cursor down
+}
+
 function source_file () {
     FILE=$1
     PRINTERR=$2
     if [[ -f $FILE ]]; then
-        printf "\e7Sourcing %s ..." $FILE # \e7 saves cursor position
+        save_cursor
+        printf "Sourcing %s ...\n" $FILE
         source $FILE
-        printf "\e8\e[0K" # restore cursor, clear line from cursor right
+        restore_cursor_clear_down
     elif [[ "$PRINTERR" != "" ]]; then
         echo ERROR: Unable to find $FILE >> /dev/stderr
     fi
@@ -37,7 +46,7 @@ push_path $HOME/bin
 uniq_path # remove any duplicates in the PATH
 
 # finally, load all the bash customizations
-for DOTFILE in functions git ack aliases ls perforce aws bmc; do
+for DOTFILE in functions ack aliases ls perforce aws bmc git; do
     source_file $HOME/.bash_$DOTFILE
 done
 

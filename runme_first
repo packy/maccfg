@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# update the Command Line Tools for Xcode
+xcode-select --install
+
+USER=$(whoami)
+if [[ ! -w /usr/local ]]; then
+    echo Error: The /usr/local directory is not writable.
+    echo running sudo chown -R $USER:admin /usr/local
+    sudo chown -R $USER:admin /usr/local
+fi
+
+if ! which brew; then
+    URL=https://raw.githubusercontent.com/Homebrew/install/master/install
+    ruby -e "$(curl -fsSL $URL)"
+else
+    brew update
+fi
