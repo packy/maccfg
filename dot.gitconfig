@@ -1,12 +1,15 @@
-[user]
-	email = PackyAnderson@gmail.com
-	name = Packy Anderson
+[include]
+        path = ~/.gitconfig_user
+
 [alias]
+        up = p4 rebase
         co = checkout
         ln = log --name-only
         uncommit = reset --mixed HEAD~1
-#        fixup = commit --fixup=HEAD
+        fixup = commit --fixup=HEAD
         loggrep = log --perl-regexp --grep
+        stashed = stash list --pretty=stashed
+        jira = log --pretty=jira
 
 [apply]
         whitespace = fix
@@ -14,6 +17,10 @@
 [core]
 	editor = xemacs-wait
 	excludesfile = ~/.gitignore
+
+[pretty]
+        jira = format:Author: %aN <%aE>%nDate:   %ci%n%n%w(73,1,2)%+s%n%+b%x1B
+        stashed = format:%gd: %Cred%h%Creset %Cgreen[%ar]%Creset %s
 
 #
 # valid colors are "normal", "black", "red", "green", "yellow",
@@ -53,6 +60,8 @@
 [help]
 	format = web
 [gui]
+	recentrepo = /Users/packy/git/scriptlib
+	recentrepo = /Users/packy/git/ack2
 [push]
 	default = simple
 
@@ -69,3 +78,12 @@
         keepTemporaries = false
         trustExitCode = false
         keepBackup = false
+
+[difftool]
+        prompt = false
+
+[difftool "p4mergetool"]
+        cmd = /Applications/p4merge.app/Contents/Resources/launchp4merge "$LOCAL" "$REMOTE"
+
+[log]
+	date = local
