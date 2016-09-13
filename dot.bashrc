@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 # for syntax highlightling in emacs, mostly
 
+function is_interactive() {
+    [[ $- == *i* ]]
+}
+
 function save_cursor () {
-    printf "\e[s" # \e[s saves cursor position
+    is_interactive && printf "\e[s" # \e[s saves cursor position
 }
 
 function restore_cursor_clear_down () {
-    printf "\e[u\e[J" # restore cursor, clear screen from cursor down
+    is_interactive && printf "\e[u\e[J" # restore cursor, clear screen from cursor down
 }
 
 function source_file () {
@@ -14,11 +18,11 @@ function source_file () {
     PRINTERR=$2
     if [[ -f $FILE ]]; then
         save_cursor
-        printf "Sourcing %s ...\n" $FILE
+        is_interactive && printf "Sourcing %s ...\n" $FILE
         source $FILE
         restore_cursor_clear_down
     elif [[ "$PRINTERR" != "" ]]; then
-        echo ERROR: Unable to find $FILE >> /dev/stderr
+        is_interactive && echo ERROR: Unable to find $FILE >> /dev/stderr
     fi
 }
 
@@ -56,6 +60,6 @@ for MODULE in \
     source_file $MODULE
 done
 
-gp # git prompt
+is_interactive && gp # git prompt
 
 export EDITOR=xemacs-wait
