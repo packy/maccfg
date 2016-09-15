@@ -57,3 +57,12 @@ mkdot () {
         mv $DIR.7z old/
     done
 }
+
+pl2html () {
+    PATHNAME=$1
+    FILENAME=$(basename $PATHNAME)
+    perltidy -html -hcc=red -nnn $PATHNAME -o /tmp/$FILENAME.html
+    open /tmp/$FILENAME.html
+    set +o monitor
+    (sleep 5; rm -f /tmp/$FILENAME.html) &
+}
