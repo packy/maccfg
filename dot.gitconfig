@@ -18,6 +18,9 @@
 	editor = xemacs-wait
 	excludesfile = ~/.gitignore
 
+[rebase]
+        autosquash = true
+
 [pretty]
         jira = format:Author: %aN <%aE>%nDate:   %ci%n%n%w(73,1,2)%+s%n%+b%x1B
         stashed = format:%gd: %Cred%h%Creset %Cgreen[%ar]%Creset %s
