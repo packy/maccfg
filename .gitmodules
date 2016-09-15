@@ -1,0 +1,3 @@
+[submodule "emacs.d/modes/cperl-mode"]
+	path = emacs.d/modes/cperl-mode
+	url = git@github.com:packy/cperl-mode.git
