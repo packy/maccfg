@@ -28,11 +28,8 @@
 (add-to-list 'command-switch-alist
              '("--read-only" . command-line-find-file-read-only))
 
-
 ; tab stops
-(setq tab-width 4
-      cperl-indent-level 4
-      cperl-tab-always-indent 1)
+(setq tab-width 4)
 
 ; use spaces instead of tabs
 (defun set-tabs-equals-spaces-hook ()
@@ -41,8 +38,14 @@
 
 ;(autoload 'perl-mode "cperl-mode" "alternate mode for editing Perl programs" t)
 (defalias 'perl-mode 'cperl-mode)
+(load-library "cperl-mode")
 
-(setq cperl-indent-level 4)
+(setq cperl-indent-level 4
+      cperl-close-paren-offset -4
+      cperl-continued-statement-offset 4
+      cperl-indent-subs-specially nil
+      cperl-indent-parens-as-block t
+      cperl-tab-always-indent t)
 
 (add-hook 'cperl-mode-hook
 	  '(lambda nil
@@ -50,6 +53,14 @@
 	     (set-tabs-equals-spaces-hook)
 	     )
 	  )
+
+ ;; (defun cperl-backward-to-start-of-continued-exp (lim)
+ ;;  (if (memq (preceding-char) (append ")]}\"'`" nil))
+ ;;      (forward-sexp -1))
+ ;;  (beginning-of-line)
+ ;;  (if (or (<= (point) lim) (< 0 cperl-continued-statement-offset))
+ ;;      (goto-char (1+ lim)))
+ ;;  (skip-chars-forward " \t"))
 
 (load "~/.emacs.d/modes/php-mode")
 (autoload 'php-mode "php-mode" "Major mode for editing php code." t)
@@ -163,3 +174,7 @@
 ;-------------------------------------------------------------------------------
 
 ;(require 'fill-column-indicator)
+
+;; Local Variables:
+;; mode: emacs-lisp
+;; End:
