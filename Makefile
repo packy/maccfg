@@ -1,11 +1,12 @@
 DEPDIR := .d
 $(shell ./make_dependencies $(DEPDIR) )
 gitdir := $(HOME)/git
+emacsdir := $(HOME)/.emacs.d
 bindir := $(HOME)/bin
 PERLBREW := $(HOME)/perl5/perlbrew/bin/perlbrew
 pwd := $(shell pwd)
 
-all: dotfiles binfiles homebrewed perlbrew git-repos
+all: dotfiles binfiles homebrewed perlbrew git-repos emacsfiles
 
 git-repos: $(DEPDIR)/File-Next ${bindir}/ack #${gitdir}/z
 
@@ -37,6 +38,18 @@ $(HOME)/%: dot%
 
 $(bindir)/%: $(pwd)/bin/%
 	ln -fs $(pwd)/bin/$* $(bindir)/$*
+
+$(emacsdir)/elpa/%: $(pwd)/emacs.d/elpa/%
+	rm -rf $(emacsdir)/elpa/$*; \
+	ln -fs $(pwd)/emacs.d/elpa/$* $(emacsdir)/elpa/
+
+$(emacsdir)/modes/%: $(pwd)/emacs.d/modes/%
+	ln -fs $(pwd)/emacs.d/modes/$* $(emacsdir)/modes/$*
+
+emacsfiles: $(emacsdir)/elpa/archives \
+            $(emacsdir)/elpa/minimap-1.2 \
+            $(emacsdir)/modes/php-mode.el \
+            $(emacsdir)/modes/cperl-mode.el
 
 binfiles: $(bindir)/git-ack \
 	  $(bindir)/git-tracks \
@@ -75,6 +88,11 @@ homebrewed:
 	    if [[ ! -e $(DEPDIR)/$$FILE ]]; then \
 		brew install $$PKG ;\
 	    fi ;\
+	done
+
+emacs:
+	if [[ ! -e $(DEPDIR)/homebrew-emacs ]]; then \
+	    brew install emacs --with-cocca
 	done
 
 git: USE_LIBPCRE=yes
