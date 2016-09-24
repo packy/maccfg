@@ -1,0 +1,12 @@
+#!/usr/local/bin/bash
+
+exec > $HOME/.darwinrc_last_login.log 2>&1 # save output to a log
+
+set +i # disable interactive mode
+
+source $HOME/.bashrc
+
+if [[ "$HOSTNAME" == "speedy" ]]; then
+    # the Mac Pro at home
+    start_dropbox.sh
+fi
