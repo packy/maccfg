@@ -39,15 +39,25 @@ $(HOME)/%: dot%
 $(bindir)/%: $(pwd)/bin/%
 	ln -fs $(pwd)/bin/$* $(bindir)/$*
 
+$(emacsdir)/elpa:
+	mkdir -p $(emacsdir)/elpa
+	touch $(pwd)/emacs.d/elpa/*
+
 $(emacsdir)/elpa/%: $(pwd)/emacs.d/elpa/%
 	rm -rf $(emacsdir)/elpa/$*; \
 	ln -fs $(pwd)/emacs.d/elpa/$* $(emacsdir)/elpa/
 
+$(emacsdir)/modes:
+	mkdir -p $(emacsdir)/modes
+	touch $(pwd)/emacs.d/modes/*
+
 $(emacsdir)/modes/%: $(pwd)/emacs.d/modes/%
 	ln -fs $(pwd)/emacs.d/modes/$* $(emacsdir)/modes/$*
 
-emacsfiles: $(emacsdir)/elpa/archives \
+emacsfiles: $(emacsdir)/elpa \
+            $(emacsdir)/elpa/archives \
             $(emacsdir)/elpa/minimap-1.2 \
+            $(emacsdir)/modes \
             $(emacsdir)/modes/php-mode.el \
             $(emacsdir)/modes/cperl-mode.el
 
@@ -65,12 +75,14 @@ dotfiles: $(HOME)/.ackrc \
           $(HOME)/.bash_aliases \
           $(HOME)/.bash_functions \
           $(HOME)/.bash_git \
+          $(HOME)/.bash_login \
           $(HOME)/.bash_ls \
           $(HOME)/.bash_path_functions \
           $(HOME)/.bash_perforce \
           $(HOME)/.bash_perforce_functions \
           $(HOME)/.bash_profile \
           $(HOME)/.bashrc \
+          $(HOME)/.darwinrc \
           $(HOME)/.emacs \
           $(HOME)/.gitconfig \
           $(HOME)/.gitignore

@@ -57,3 +57,7 @@ mkdot () {
         mv $DIR.7z old/
     done
 }
+
+ts () {
+    export TS=$(date '+%Y-%m-%d %H:%M:%S')
+}
