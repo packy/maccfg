@@ -3,10 +3,12 @@
 use Config::General;
 use Data::Dumper::Concise;
 use Getopt::Long;
+use Proc::ProcessTable;
 use Readonly;
 use Term::ReadKey;
 use List::MoreUtils qw( any );
 
+Readonly my $iTerm2  => '/Applications/iTerm.app/Contents/MacOS/iTerm2';
 Readonly my $sshpass => '/usr/local/bin/sshpass';
 Readonly my $ssh     => '/usr/bin/ssh -oStrictHostKeyChecking=no -oServerAliveInterval=60';
 Readonly my $scp     => '/usr/bin/scp -oStrictHostKeyChecking=no';
@@ -149,6 +151,12 @@ sub connect_to_target {
 sub copy_files_to_node {
     my ($target, $os) = @_;
     my (@files, $dest);
+
+    my @existing = existing_sessions();
+    if ( any { $_ =~ /$target/ } @existing ) {
+        print "Existing session on $target; skipping file copy.\n";
+        return;
+    }
 
     $dest = '/tmp/packybin';
     if ($os eq 'rhel') {
@@ -366,4 +374,17 @@ sub add_search_domains {
     `sudo scutil <$file`;
     unlink $file;
 }
+
+sub existing_sessions {
+    my @sessions;
+    my $ps = Proc::ProcessTable->new->table;
+    my $match = qr{$iTerm2 --server $ssh};
+    foreach my $p ( @$ps ) {
+        next unless $p->cmndline =~ /$match/;
+        push @sessions, $p->cmndline;
+        $sessions[-1] =~ s/$match\s+//;
+    }
+    return @sessions;
+}
+
 __END__
