@@ -1,3 +1,5 @@
 --known-types
 --color
 --smart-case
+--type-add=rpmspec:match:\.spec\.in$
+--type-add=csv:ext:csv
