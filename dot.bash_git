@@ -45,6 +45,14 @@ function p4 () {
     fi
 }
 
+function is_git_dir () {
+    [ -d .git ] || [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == "true" ]
+}
+
+function is_git_p4_dir () {
+    is_git_dir && git cat-file commit HEAD | grep -q git-p4
+}
+
 function parse_git_branch {
   WRAP=$1
   ref=$(git-symbolic-ref HEAD 2> /dev/null) || return
@@ -72,9 +80,13 @@ function make_git_prompt () {
 alias gp=make_git_prompt
 
 newbranch () {
-  git branch $*
-  echo Created git branch \"$1\"
-  git checkout $1
+    if is_git_dir; then
+        git branch $*
+        echo Created git branch \"$1\"
+        git checkout $1
+    else
+        echo Not a git dir: $(pwd)
+    fi
 }
 
 _make_branch_name () {
@@ -82,8 +94,12 @@ _make_branch_name () {
 }
 
 newbug () {
-    git checkout master
-    newbranch $(_make_branch_name $*)
+    if is_git_dir; then
+        git checkout master
+        newbranch $(_make_branch_name $*)
+    else
+        echo Not a git dir: $(pwd)
+    fi
 }
 
 mvbug () {
