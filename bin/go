@@ -8,7 +8,7 @@ use Readonly;
 use Term::ReadKey;
 use List::MoreUtils qw( any );
 
-Readonly my $iTerm2  => '/Applications/iTerm.app/Contents/MacOS/iTerm2';
+Readonly my $iTerm2  => '^/.+\.app/Contents/MacOS/iTerm2';
 Readonly my $sshpass => '/usr/local/bin/sshpass';
 Readonly my $ssh     => '/usr/bin/ssh -oStrictHostKeyChecking=no -oServerAliveInterval=60';
 Readonly my $scp     => '/usr/bin/scp -oStrictHostKeyChecking=no';
@@ -378,7 +378,7 @@ sub add_search_domains {
 sub existing_sessions {
     my @sessions;
     my $ps = Proc::ProcessTable->new->table;
-    my $match = qr{$iTerm2 --server $ssh};
+    my $match = qr{$iTerm2 --server.* $ssh};
     foreach my $p ( @$ps ) {
         next unless $p->cmndline =~ /$match/;
         push @sessions, $p->cmndline;
