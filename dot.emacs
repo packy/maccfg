@@ -148,13 +148,7 @@
 
 ;-------------------------------------------------------------------------------
 
-(defun no-trailing-whitespace ()
-  (interactive)
-  (goto-char 1)
-  (while (search-forward-regexp "[ ]+
-" nil t)
-    (replace-match "
-" t nil)))
+(defalias 'no-trailing-whitespace 'delete-trailing-whitespace)
 
 ;-------------------------------------------------------------------------------
 
