@@ -70,3 +70,7 @@ pl2html () {
 ts () {
     export TS=$(date '+%Y-%m-%d %H:%M:%S')
 }
+
+get_front_window_bounds () {
+    osascript -e "tell application \"$1\" to get bounds of the front window"
+}
