@@ -160,28 +160,32 @@ glnb () {
 }
 
 syncall () {
-   DIRS='cmdutils compliance customer_customizations dagent db_setup devel extraclarity manager_scripts mediaprep mgmt qa qa_scripts dagent scriptlib'
    CURDIR=`pwd`
+   DIRS=$(find "$GITDIR" -maxdepth 1 -type d | sed -e "s:$GITDIR/::" | grep -v "$GITDIR")
    p4 sync
    for DIR in $DIRS; do
-      printf "\n\n========================= $DIR =========================\n\n"
-      cd "$GITDIR"/$DIR
-      CHANGES=$(git status --short --untracked-files=no)
-      OLDBRANCH=$(parse_git_branch)
-      if [[ "$CHANGES" != "" ]]; then
-          git stash
-      fi
-      if [[ "$OLDBRANCH" != "master" ]]; then
-          git co master
-      fi
-      git up
-      git gc
-      if [[ "$OLDBRANCH" != "master" ]]; then
-          git co $OLDBRANCH
-      fi
-      if [[ "$CHANGES" != "" ]]; then
-          git stash pop
-      fi
+       cd "$GITDIR/$DIR"
+       if is_git_p4_dir; then 
+           printf "\n\n========================= $DIR =========================\n\n"
+           CHANGES=$(git status --short --untracked-files=no)
+           OLDBRANCH=$(parse_git_branch)
+           if [[ "$CHANGES" != "" ]]; then
+               echo Stashing uncommitted changes
+               git stash
+           fi
+           if [[ "$OLDBRANCH" != "master" ]]; then
+               git co master
+           fi
+           git up
+           git gc
+           if [[ "$OLDBRANCH" != "master" ]]; then
+               git co $OLDBRANCH
+           fi
+           if [[ "$CHANGES" != "" ]]; then
+               echo Popping stashed changes
+               git stash pop
+           fi
+       fi
    done
    cd $CURDIR
 }
