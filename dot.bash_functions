@@ -74,3 +74,7 @@ ts () {
 get_front_window_bounds () {
     osascript -e "tell application \"$1\" to get bounds of the front window"
 }
+
+get_screen_resolution () {
+    osascript -e "tell application \"Finder\" to get bounds of window of desktop" | perl -ne '(undef, undef, $x, $y) = split /,\s+/; print "$x x $y"'
+}
