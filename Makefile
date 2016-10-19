@@ -67,6 +67,7 @@ binfiles: $(bindir)/git-ack \
 	  $(bindir)/xemacs-start-server \
 	  $(bindir)/git-autofix \
 	  $(bindir)/go \
+	  $(bindir)/get_emacs_center_elisp \
 	  $(bindir)/xemacs \
 	  $(bindir)/xemacs-wait
 

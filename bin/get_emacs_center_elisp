@@ -1,0 +1,36 @@
+#!/Users/packy/perl5/perlbrew/perls/perl-5.16.2/bin/perl
+use strict;
+use warnings;
+
+my $logfile =  '/tmp/dot.emacs.log';
+unlink $logfile;
+
+sub writelog {
+    open my $log, '>>', $logfile;
+    print $log join "\n", @_, q{};
+    close $log;
+}
+
+my $line = run_applescript(q{tell application "Finder" to get bounds of window of desktop});
+writelog "DISPLAY", $line;
+chomp $line;
+
+my(undef, undef, $pix_width, $pix_height) = split /,\s+/, $line;
+
+print "(center-window $pix_width $pix_height)";
+
+sub run_applescript {
+    my $script = shift;
+    use IPC::Open2;
+    use Symbol;
+    my $pid = open2(my $out = gensym(), my $in = gensym(), 'osascript');
+    print $in $script, "\n";
+    close $in;
+
+    my $output;
+    while (my $line = <$out>) {
+        $output .= $line;
+    }
+    close $out;
+    return $output;
+}

@@ -166,6 +166,20 @@
       (error "The buffer has been modified"))))
 
 ;-------------------------------------------------------------------------------
+(defun center-window (x y)
+  "Center the window on the screen."
+  (interactive)
+  (setq edges (window-pixel-edges))
+  (setq height (- (/ y 2) (/ (- (nth 3 edges) (nth 1 edges)) 2)))
+  (setq width  (- (/ x 2) (/ (- (nth 2 edges) (nth 0 edges)) 2)))
+  (setq mylist `((top . height)  (left . width)))
+  (setcdr (assq 'top  mylist) height)
+  (setcdr (assq 'left mylist) width)
+  (setq initial-frame-alist mylist)
+)
+
+(eval (car (read-from-string
+            (shell-command-to-string "get_emacs_center_elisp"))))
 
 ;(require 'fill-column-indicator)
 
