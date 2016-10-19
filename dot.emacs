@@ -181,7 +181,14 @@
 (eval (car (read-from-string
             (shell-command-to-string "get_emacs_center_elisp"))))
 
-;(require 'fill-column-indicator)
+;-------------------------------------------------------------------------------
+
+(add-to-list 'load-path "~/.emacs.d/modes")
+
+(setq-default fill-column 80)
+(setq fci-rule-width 1)
+(setq fci-rule-color "darkblue")
+(require 'fill-column-indicator)
 
 ;; Local Variables:
 ;; mode: emacs-lisp

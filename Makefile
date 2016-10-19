@@ -58,6 +58,7 @@ emacsfiles: $(emacsdir)/elpa \
             $(emacsdir)/elpa/archives \
             $(emacsdir)/elpa/minimap-1.2 \
             $(emacsdir)/modes \
+            $(emacsdir)/modes/fill-column-indicator.el \
             $(emacsdir)/modes/php-mode.el \
             $(emacsdir)/modes/cperl-mode.el
 
