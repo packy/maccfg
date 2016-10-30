@@ -179,7 +179,7 @@
 )
 
 (eval (car (read-from-string
-            (shell-command-to-string "get_emacs_center_elisp"))))
+            (shell-command-to-string "/Users/packy/bin/get_emacs_center_elisp"))))
 
 ;-------------------------------------------------------------------------------
 
