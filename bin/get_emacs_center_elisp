@@ -2,17 +2,7 @@
 use strict;
 use warnings;
 
-my $logfile =  '/tmp/dot.emacs.log';
-unlink $logfile;
-
-sub writelog {
-    open my $log, '>>', $logfile;
-    print $log join "\n", @_, q{};
-    close $log;
-}
-
 my $line = run_applescript(q{tell application "Finder" to get bounds of window of desktop});
-writelog "DISPLAY", $line;
 chomp $line;
 
 my(undef, undef, $pix_width, $pix_height) = split /,\s+/, $line;
