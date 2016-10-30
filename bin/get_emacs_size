@@ -1,0 +1,10 @@
+#!/usr/bin/osascript
+tell application "System Events"
+    if the front window of application process "Emacs" exists then
+        set theMessage to ("window exists" as string)
+        set the props to get the properties of the front window of application process "Emacs"
+        copy {size} of props to stdout
+    else
+        copy "600, 550" to stdout
+    end if
+end tell
