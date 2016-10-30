@@ -81,7 +81,7 @@ function demo_ls_colors () {
     mkfifo $FILE04
     touch  $FILE05 ; chmod 0755 $FILE05
     touch  $FILE08 ; chmod 4755 $FILE08
-    touch  $FILE09 ; chmod 2755 $FILE09
+    touch  $FILE09 ; chgrp everyone $FILE09 ; chmod 2755 $FILE09
     ls -Gl $DIR
     echo
     echo LSCOLORS=$LSCOLORS yields:
