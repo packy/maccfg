@@ -33,3 +33,6 @@ alias sapdown='cd ~/SAP_Downloads/Download_Manager; java -classpath DLManager.ja
 alias eject="osascript -e 'tell application \"Finder\" to eject (every disk whose ejectable is true and local volume is true and free space is not equal to 0)'"
 
 alias pacander='ssh -v adprod\\pacander@W-PACANDER-20.gridapp-dev.com'
+
+alias rsync_pwd_to='rsync -avz .'
+
