@@ -6,7 +6,7 @@ bindir := $(HOME)/bin
 PERLBREW := $(HOME)/perl5/perlbrew/bin/perlbrew
 pwd := $(shell pwd)
 
-all: dotfiles binfiles homebrewed perlbrew git-repos emacsfiles
+all: binfiles homebrewed perlbrew git-repos emacsfiles install
 
 git-repos: $(DEPDIR)/File-Next ${bindir}/ack #${gitdir}/z
 
@@ -32,9 +32,6 @@ $(DEPDIR)/File-Next:
 
 ${gitdir}/z:
 	git clone https://github.com/rupa/z.git ${gitdir}/z
-
-$(HOME)/%: dot%
-	@perl -e '(my $$source = "$@") =~ s{^.*/([^/]+)$$}{${pwd}/dot$$1}; printf "symlinking %s to %s\n", $$source, "$@"; unlink "$@"; symlink $$source, "$@";'
 
 $(bindir)/%: $(pwd)/bin/%
 	ln -fs $(pwd)/bin/$* $(bindir)/$*
@@ -72,23 +69,6 @@ binfiles: $(bindir)/git-ack \
 	  $(bindir)/xemacs \
 	  $(bindir)/xemacs-wait
 
-dotfiles: $(HOME)/.ackrc \
-          $(HOME)/.bash_ack \
-          $(HOME)/.bash_aliases \
-          $(HOME)/.bash_functions \
-          $(HOME)/.bash_git \
-          $(HOME)/.bash_login \
-          $(HOME)/.bash_ls \
-          $(HOME)/.bash_path_functions \
-          $(HOME)/.bash_perforce \
-          $(HOME)/.bash_perforce_functions \
-          $(HOME)/.bash_profile \
-          $(HOME)/.bashrc \
-          $(HOME)/.darwinrc \
-          $(HOME)/.emacs \
-          $(HOME)/.gitconfig \
-          $(HOME)/.gitignore
-
 perlbrew:
 	@${gitdir}/maccfg/install_perlbrew ${PERLBREW}
 
@@ -114,3 +94,7 @@ git: homebrew pcre
 
 bash: /etc/shells
 	@if ! grep -q "/usr/local/bin/bash" /etc/shells; then echo "Please add /usr/local/bin/bash to /etc/shells"; fi
+
+.PHONY: install
+install: all
+	@cd dotfiles && $(MAKE)
