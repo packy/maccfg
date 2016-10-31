@@ -45,7 +45,7 @@ bash: /etc/shells
 	fi
 
 .PHONY: install
-install: ack emacs perlbrew
+install: ack
 	@cd dotfiles && $(MAKE)
 	@cd bin      && $(MAKE)
 	@cd emacs.d  && $(MAKE)
