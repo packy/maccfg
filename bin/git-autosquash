@@ -1,0 +1,10 @@
+#!/bin/sh
+# Auto-squashes 
+# eg 
+#   git autosquash
+
+dirty="$(git diff --name-only --exit-code HEAD)"
+
+( test -z "$dirty" || git stash ) &&
+  GIT_EDITOR=$HOME/bin/sleep-toucher git rebase --interactive --autosquash &&
+  ( test -z "$dirty" || git stash pop )
