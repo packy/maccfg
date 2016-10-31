@@ -1,12 +1,14 @@
+export emacsdir := $(HOME)/.emacs.d
+export gitdir   := $(HOME)/git
+export bindir   := $(HOME)/bin
+
 DEPDIR := .d
 $(shell ./make_dependencies $(DEPDIR) )
-gitdir := $(HOME)/git
-emacsdir := $(HOME)/.emacs.d
-bindir := $(HOME)/bin
+
 PERLBREW := $(HOME)/perl5/perlbrew/bin/perlbrew
 pwd := $(shell pwd)
 
-all: binfiles homebrewed perlbrew git-repos emacsfiles install
+all:  homebrewed perlbrew git-repos emacsfiles install
 
 git-repos: $(DEPDIR)/File-Next ${bindir}/ack #${gitdir}/z
 
@@ -33,9 +35,6 @@ $(DEPDIR)/File-Next:
 ${gitdir}/z:
 	git clone https://github.com/rupa/z.git ${gitdir}/z
 
-$(bindir)/%: $(pwd)/bin/%
-	ln -fs $(pwd)/bin/$* $(bindir)/$*
-
 $(emacsdir)/elpa:
 	mkdir -p $(emacsdir)/elpa
 	touch $(pwd)/emacs.d/elpa/*
@@ -58,16 +57,6 @@ emacsfiles: $(emacsdir)/elpa \
             $(emacsdir)/modes/fill-column-indicator.el \
             $(emacsdir)/modes/php-mode.el \
             $(emacsdir)/modes/cperl-mode.el
-
-binfiles: $(bindir)/git-ack \
-	  $(bindir)/git-tracks \
-	  $(bindir)/sleep-toucher \
-	  $(bindir)/xemacs-start-server \
-	  $(bindir)/git-autofix \
-	  $(bindir)/go \
-	  $(bindir)/get_emacs_center_elisp \
-	  $(bindir)/xemacs \
-	  $(bindir)/xemacs-wait
 
 perlbrew:
 	@${gitdir}/maccfg/install_perlbrew ${PERLBREW}
@@ -96,5 +85,6 @@ bash: /etc/shells
 	@if ! grep -q "/usr/local/bin/bash" /etc/shells; then echo "Please add /usr/local/bin/bash to /etc/shells"; fi
 
 .PHONY: install
-install: all
+install: 
 	@cd dotfiles && $(MAKE)
+	@cd bin      && $(MAKE)
