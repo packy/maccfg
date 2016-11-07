@@ -1,25 +1,17 @@
-$(emacsdir)/elpa:
-	mkdir -p $(emacsdir)/elpa
-	touch $(pwd)/elpa/*
+modes := $(filter-out $(wildcard *~), $(wildcard modes/*))
+elpa  := $(filter-out $(wildcard *~), $(wildcard elpa/*))
+pwd   := $(shell pwd)
 
-$(emacsdir)/elpa/%: $(pwd)/elpa/%
-	@echo Symlinking Emacs Lisp Package Archive...
-	ln -vfs $(pwd)/elpa/$* $(emacsdir)/elpa/
-
-$(emacsdir)/modes:
-	mkdir -p $(emacsdir)/modes
-	touch $(pwd)/modes/*
-
-$(emacsdir)/modes/%: $(pwd)/modes/%
+.PHONY: install
+install: $(modes) $(elpa)
 	@echo Symlinking Emacs Modes...
-	ln -vfs $(pwd)/modes/$* $(emacsdir)/modes/$*
+	@mkdir -p $(emacsdir)/modes
+	@for FILE in $(modes); do \
+	    ln -vsf $(pwd)/$$FILE $(emacsdir)/$$FILE; \
+	done
+	@echo Symlinking Emacs Lisp Package Archive...
+	@mkdir -p $(emacsdir)/elpa
+	@for FILE in $(elpa); do \
+	    ln -vsf $(pwd)/$$FILE $(emacsdir)/$$FILE; \
+	done
 
-emacsfiles: $(emacsdir)/elpa \
-            $(emacsdir)/elpa/archives \
-            $(emacsdir)/elpa/minimap-1.2 \
-            $(emacsdir)/modes \
-            $(emacsdir)/modes/fill-column-indicator.el \
-            $(emacsdir)/modes/php-mode.el \
-            $(emacsdir)/modes/cperl-mode.el
-
-install: emacsfiles
