@@ -5,6 +5,7 @@ use Data::Dumper::Concise;
 use Getopt::Long;
 use Proc::ProcessTable;
 use Readonly;
+use Scalar::Readonly ':all';
 use Term::ReadKey;
 use List::MoreUtils qw( any );
 
@@ -26,26 +27,41 @@ my $force_os;
 my $def_passwd;
 my %config;
 
-GetOptions
-    "rc=s"       => \$gorc,
-    "adapter=s"  => \@ADAPTERS,
-    "hostmap=s"  => \$hostmap_file,
-    "commands!"  => \$push_cmds,
-    "username=s" => \$def_user,
-    "publickey"  => sub { $method = 'publickey' },
-    "password"   => sub { $method = 'password' },
-    "hostbased"  => sub { $method = 'hostbased' },
-    "os=s"       => \$force_os,
-    "verbose+"   => \$verbose,
-    "fake!"      => \$fake,
-    "prompt"    => sub {
+sub set_option_readonly {
+    my ($key, $value) = @_;
+    if ($key eq 'username') {
+        $def_user = $value;  readonly_on($def_user);
+        print "Setting user to '$value' via command line\n" if $verbose;
+    }
+    elsif ($key eq 'publickey' || $key eq 'password' || $key eq 'hostbased') {
+        $method = $key;  readonly_on($method);
+        print "Setting authentication method to '$method' via command line\n"
+            if $verbose;
+    }
+    elsif ($key eq 'prompt') {
         $method = 'password';
         print "Password: ";
         ReadMode('noecho'); # don't echo
         chomp($def_passwd = <STDIN>);
         ReadMode(0);        # back to normal
-    },
-    ;
+        readonly_on($def_passwd);
+        print "Setting passwd via command line\n" if $verbose;
+    }
+}
+
+GetOptions
+    "rc=s"       => \$gorc,
+    "adapter=s"  => \@ADAPTERS,
+    "hostmap=s"  => \$hostmap_file,
+    "commands!"  => \$push_cmds,
+    "os=s"       => \$force_os,
+    "verbose+"   => \$verbose,
+    "fake!"      => \$fake,
+    "username=s" => \&set_option_readonly,
+    "publickey"  => \&set_option_readonly,
+    "password"   => \&set_option_readonly,
+    "hostbased"  => \&set_option_readonly,
+    "prompt"     => \&set_option_readonly;
 
 if (-f $gorc) {
     my $conf = Config::General->new($gorc);
@@ -304,18 +320,20 @@ sub set_from_rc_data {
     my $config = shift;
     print '$config = '.Dumper($config) if $verbose;
     if (exists $config->{default_password}) {
-        $def_passwd = $config->{default_password};
+        $def_passwd = $config->{default_password}
+            unless readonly($def_passwd);
     }
 
     if (exists $config->{default_username}) {
-        $def_user = $config->{default_username};
+        $def_user = $config->{default_username}
+            unless readonly($def_user);
     }
 
     if (exists $config->{commands}) {
         ($push_cmds) = ($config->{commands} !~ /^(no|0)$/i);
     }
 
-    if (exists $config->{method}) {
+    if (exists $config->{method} && ! readonly($method)) {
         foreach ($config->{method}) {
             /publickey/ && do { $method = 'publickey'; last };
             /password/  && do { $method = 'password';  last };
