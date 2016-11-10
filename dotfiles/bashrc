@@ -5,6 +5,11 @@ function is_interactive() {
     [[ $- == *i* ]]
 }
 
+function scroll_if_at_bottom () {
+    is_interactive && printf "\n\e[1A" # newline, cursor up 1 line
+}
+scroll_if_at_bottom
+
 function save_cursor () {
     is_interactive && printf "\e[s" # \e[s saves cursor position
 }
