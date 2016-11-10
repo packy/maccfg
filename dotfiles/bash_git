@@ -1,10 +1,17 @@
 #!/bin/bash
 
+lift_Cellar () {
+    if [[ ! -h $HOME/.homebrew_cellar ]]; then
+        ln -sf $(brew --config | grep HOMEBREW_CELLAR | awk '{print $2}') $HOME/.homebrew_cellar
+    fi
+    readlink $HOME/.homebrew_cellar
+}
+
 # so Homebrew compiles git with PCRE
 export USE_LIBPCRE=yes
 
 GIT_BIN=$(which git)
-HOMEBREW_CELLAR=$(brew --config | grep HOMEBREW_CELLAR | awk '{print $2}')
+HOMEBREW_CELLAR=$(lift_Cellar)
 GIT_VERSION=$($GIT_BIN --version | perl -pe 's/git\s+version\s+//;')
 GIT_ROOT=$HOMEBREW_CELLAR/git/$GIT_VERSION
 GIT_CORE=$GIT_ROOT/libexec/git-core
