@@ -1,0 +1,146 @@
+#!/usr/bin/env perl
+# submit changes to code collaborator
+
+use strict;
+use warnings;
+use v5.10;
+
+use Getopt::Long;
+use Pod::Usage;
+use Readonly;
+
+Readonly my $CCOLAB => '/Applications/ccollab_client/ccollab';
+
+my $branch=`git symbolic-ref HEAD`;
+chomp $branch;
+$branch =~ s{refs/heads/}{};
+
+my $review  = 'new';
+my $comment = q{};
+my $last    = 0;
+my $fake    = 0;
+my $man     = 0;
+my $help    = 0;
+my @options;
+
+GetOptions ( 'review=s'  => \$review,
+             'branch=s'  => \$branch,
+             'last=i'    => \$last,
+             'comment=s' => sub {
+                 my (undef,$val) = @_;
+                 $comment = qq{--upload-comment "$val"};
+             },
+             'cchelp' => sub {
+                 print `$CCOLAB help addgitdiffs`;
+                 exit;
+             },
+             'fake'   => \$fake,
+             'help|?' => \$help,
+             'man'    => \$man)
+    or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitval => 0, -verbose => 2) if $man;
+
+unless ($review =~ /^(?:\d+|new|ask|last)$/) {
+    die "--review must be an integer review-id, 'new', 'ask', or 'last'\n";
+}
+
+# we're in the master branch? look for commits not pushed to p4
+if ($branch eq 'master') {
+    my $head = 0;
+    my $sep = '=-=SPLIT=-=';
+    local $/ = "\n$sep\n";
+    open my $data, qq{git log --pretty=format:"commit %h%n%s%n%n%b$sep" |};
+    while (my $commit = <$data>) {
+        my ($sha1) = $commit =~ /^commit (\S+)/s;
+        my ($p4)   = $commit =~
+            /\[git-p4: depot-paths = "[^"]+": change = (\d+)\]/;
+
+        last if ($p4);
+        $head++;
+    }
+    if ($last) {
+        $head = $last;
+    }
+    unless ($head > 0) {
+        die "No local commits to submit for review!\n";
+    }
+    $branch = "master~$head";
+}
+
+my $args = join q{ }, @ARGV;
+if ($fake) {
+    print "$CCOLAB addgitdiffs $comment $review master $branch $args\n";
+}
+else {
+    print `$CCOLAB addgitdiffs $comment $review master $branch $args`;
+}
+
+
+__END__
+
+=head1 NAME
+
+git cc - submit changes to code collaborator
+
+=head1 SYNOPSIS
+
+git cc [options] [-- git-diff-args ..]
+
+ Options:
+   --branch          Specify a branch for the diff
+   --comment         Comment used to upload files
+   --review          Integer review-id, 'new', 'ask', or 'last'
+   --cchelp          Display the help for "ccolab addgitdiffs"
+   --fake            Print the ccolab command, don't run it.
+   --man             full documentation
+   -?                brief help message
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--branch>
+
+Specify a branch for the diff. This will be diffed against the master
+branch.  The default is the current branch.  If the current branch is
+the master, this utility will look for commits in master that haven't
+been submitted to Perforce.
+
+=item B<--comment>
+
+Comment used to upload files (defaults to command-line arguments)
+
+NOTE: If you want to submit a comment with spaces, you should call
+B<git cc> as B<git-cc>, since B<git> removes any quoting from the
+command line before calling external functions.
+
+=item B<--review>
+
+Must be either an integer review-id, 'new', 'ask', or 'last' (defaults
+to new).
+
+=item B<--cchelp>
+
+Display the output of the commane "ccolab help addgitdiffs".
+
+=item B<--fake>
+
+Print the ccolab command, don't run it.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<-?>
+
+Print a brief help message and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+B<git cc> will take the difference between the current branch and the
+master branch and submit it to Code Collaborator.
+
+=cut
