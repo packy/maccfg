@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+# Usage: git-buglog [bugnum]
+# Looks for all commits with the specified bug number in the commit message. If
+# no bug number is specified and the current branch is a bug branch, takes the
+# bug number from the branch name
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config pass_through);
+
+my $issue;
+my $regexp;
+my $verbose;
+my $issue_id_regexp = qr/(?i)(dro06-\d+)/;
+
+GetOptions
+    'issue=s' => \$issue,
+    'verbose' => \$verbose;
+
+unless ($issue) {
+    my $branch=`git symbolic-ref HEAD`;
+    chomp $branch;
+    $branch =~ s{refs/heads/}{};
+    ($issue) = $branch =~ /$issue_id_regexp/i;
+}
+if (defined $issue) {
+    $regexp = sprintf '--perl-regexp --grep "%s"', $issue;
+}
+else {
+    die "An issue id must be specified!\n";
+}
+
+my $PARAMS = join q{ }, @ARGV;
+
+print "> git log $regexp $PARAMS" if $verbose;
+exec    "git log $regexp $PARAMS";

@@ -1,4 +1,5 @@
 srcdir   := $(shell pwd)
+bindir   := $(HOME)/bin
 binfiles := $(filter-out Makefile $(wildcard *~), $(wildcard *))
 
 .PHONY: install
