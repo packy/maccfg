@@ -5,34 +5,24 @@ use strict;
 use warnings;
 use v5.10;
 
-use Getopt::Long;
+use Getopt::Long qw(:config pass_through);
+use List::MoreUtils qw( uniq );
 use Pod::Usage;
 use Readonly;
+use Symbol;
 
-Readonly my $CCOLAB => '/Applications/ccollab_client/ccollab';
-
-my $branch=`git symbolic-ref HEAD`;
-chomp $branch;
-$branch =~ s{refs/heads/}{};
+Readonly my $CCOLLAB => '/Applications/ccollab_client/ccollab';
 
 my $review  = 'new';
-my $comment = q{};
-my $last    = 0;
 my $fake    = 0;
 my $man     = 0;
 my $help    = 0;
 my @options;
 
 GetOptions ( 'review=s'  => \$review,
-             'branch=s'  => \$branch,
-             'last=i'    => \$last,
-             'comment=s' => sub {
-                 my (undef,$val) = @_;
-                 $comment = qq{--upload-comment "$val"};
-             },
              'cchelp' => sub {
-                 print `$CCOLAB help addgitdiffs`;
-                 exit;
+                 my $args = join q{ }, @ARGV;
+                 exec "$CCOLLAB help addchangelist $args";
              },
              'fake'   => \$fake,
              'help|?' => \$help,
@@ -45,35 +35,127 @@ unless ($review =~ /^(?:\d+|new|ask|last)$/) {
     die "--review must be an integer review-id, 'new', 'ask', or 'last'\n";
 }
 
-# we're in the master branch? look for commits not pushed to p4
-if ($branch eq 'master') {
-    my $head = 0;
-    my $sep = '=-=SPLIT=-=';
-    local $/ = "\n$sep\n";
-    open my $data, qq{git log --pretty=format:"commit %h%n%s%n%n%b$sep" |};
-    while (my $commit = <$data>) {
-        my ($sha1) = $commit =~ /^commit (\S+)/s;
-        my ($p4)   = $commit =~
-            /\[git-p4: depot-paths = "[^"]+": change = (\d+)\]/;
+#
+# first, prepare submits for Perforce
+#
 
-        last if ($p4);
-        $head++;
-    }
-    if ($last) {
-        $head = $last;
-    }
-    unless ($head > 0) {
-        die "No local commits to submit for review!\n";
-    }
-    $branch = "master~$head";
-}
+system "git config --add git-p4.skipSubmitEdit true";
 
-my $args = join q{ }, @ARGV;
+my $command = 'git-p4 submit --prepare-p4-only';
+
 if ($fake) {
-    print "$CCOLAB addgitdiffs $comment $review master $branch $args\n";
+    $command .= ' --dry-run';
 }
-else {
-    print `$CCOLAB addgitdiffs $comment $review master $branch $args`;
+
+my $filter_state = 1;
+my @templates;
+my $filter = sub {
+    my $line = shift;
+    if (my ($t) = $line =~ /You can delete the file "([^"]+)" when finished./) {
+        push @templates, $t;
+    }
+    if ($line =~ / Perforce\s+checkout | Synchronizing\s+p4\s+checkout /x) {
+        $filter_state = 1;
+    }
+    elsif ($line =~ / Applying\s+\b[a-f0-9]+\b | opened\s+for\s+edit /x) {
+        $filter_state = 0;
+        print "$line\n";
+        return 1;
+    }
+    print "$line\n" if $filter_state;
+    return 1;
+};
+
+run_filtered({ command => $command, filter => $filter });
+
+unless (@templates) {
+    die "No templates were created by $command\n";
+}
+
+my @changes;
+$filter = sub {
+    my $line = shift;
+    if (my ($c) = $line =~ /Change (\d+) created/i) {
+        push @changes, $c;
+    }
+    print "$line\n";
+    return 1;
+};
+
+foreach my $t (@templates) {
+    # first, remove the diff from the end of the change spec
+    my $t2 = $t . 'tmp';
+    open my $in,  '<', $t;
+    open my $out, '>', $t2;
+    while (my $line = <$in>) {
+        last if $line =~ /everything below this line is just the diff/;
+        print {$out} $line;
+    }
+    close $out;
+    close $in;
+
+    $command = 'p4 change -i <' . $t2;
+
+    my $count = scalar @changes;
+
+    run_filtered({ command => $command, filter => $filter });
+
+    if (@changes > $count) {
+        unlink $t;
+        unlink $t2;
+    }
+    else {
+        print STDERR "No Perforce changes were created by $command\n";
+    }
+}
+
+unless (@changes) {
+    exit 1;
+}
+
+$filter_state = 1;
+my @reviews;
+my $url;
+$filter = sub {
+    my $line = shift;
+    if (my ($u) = $line =~ /Connecting to Collaborator Server (\S+)/i) {
+        $url = $u;
+    }
+    if (my ($r) = $line =~ /Review \#(\d+):/i) {
+        push @reviews, $r;
+    }
+    if ($line =~ /^ERROR: Executing command/) {
+        # end of the line! time to get off!
+        return 0;
+    }
+    print "$line\n";
+    return 1;
+};
+
+$command = "$CCOLLAB addchangelist " . join q{ }, $review, @changes;
+
+run_filtered({ command => $command, filter => $filter });
+
+@reviews = uniq @reviews;
+
+foreach my $r (@reviews) {
+    system "open ${url}ui#review:id=$r";
+}
+
+sub run_filtered {
+    my $args = shift;
+    my $command = $args->{command};
+    my $filter  = $args->{filter} || sub {};
+
+    $command .= ' 2>&1'; # redirect stderr to stdout
+
+    open my $fh, "$command |";
+    while (my $line = <$fh>) {
+        chomp $line;
+        last unless $filter->($line); # if filter returns false, stop reading
+    }
+    close $fh;
+
 }
 
 
@@ -85,13 +167,11 @@ git cc - submit changes to code collaborator
 
 =head1 SYNOPSIS
 
-git cc [options] [-- git-diff-args ..]
+git cc [options] 
 
  Options:
-   --branch          Specify a branch for the diff
-   --comment         Comment used to upload files
    --review          Integer review-id, 'new', 'ask', or 'last'
-   --cchelp          Display the help for "ccolab addgitdiffs"
+   --cchelp          Display the help for "ccolab addchangelist"
    --fake            Print the ccolab command, don't run it.
    --man             full documentation
    -?                brief help message
@@ -100,21 +180,6 @@ git cc [options] [-- git-diff-args ..]
 
 =over 8
 
-=item B<--branch>
-
-Specify a branch for the diff. This will be diffed against the master
-branch.  The default is the current branch.  If the current branch is
-the master, this utility will look for commits in master that haven't
-been submitted to Perforce.
-
-=item B<--comment>
-
-Comment used to upload files (defaults to command-line arguments)
-
-NOTE: If you want to submit a comment with spaces, you should call
-B<git cc> as B<git-cc>, since B<git> removes any quoting from the
-command line before calling external functions.
-
 =item B<--review>
 
 Must be either an integer review-id, 'new', 'ask', or 'last' (defaults
@@ -122,7 +187,8 @@ to new).
 
 =item B<--cchelp>
 
-Display the output of the commane "ccolab help addgitdiffs".
+Display the output of the command "ccollab help".  Any parameters after this
+option are passed to ccollab help.
 
 =item B<--fake>
 
