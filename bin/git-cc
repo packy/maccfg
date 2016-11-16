@@ -17,9 +17,11 @@ my $review  = 'new';
 my $fake    = 0;
 my $man     = 0;
 my $help    = 0;
+my $verbose = 0;
 my @options;
 
 GetOptions ( 'review=s'  => \$review,
+             'verbose+'  => \$verbose,
              'cchelp' => sub {
                  my $args = join q{ }, @ARGV;
                  exec "$CCOLLAB help addchangelist $args";
@@ -149,8 +151,10 @@ sub run_filtered {
 
     $command .= ' 2>&1'; # redirect stderr to stdout
 
+    print "VERBOSE: RUNNING $command |\n" if $verbose;
     open my $fh, "$command |";
     while (my $line = <$fh>) {
+        print "VERBOSE: $line" if $verbose;
         chomp $line;
         last unless $filter->($line); # if filter returns false, stop reading
     }
