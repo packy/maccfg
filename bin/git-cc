@@ -6,10 +6,14 @@ use warnings;
 use v5.10;
 
 use Getopt::Long qw(:config pass_through);
+use JSON;
 use List::MoreUtils qw( uniq );
 use Pod::Usage;
 use Readonly;
 use Symbol;
+
+(my $branch = `git symbolic-ref HEAD`) =~ s{refs/heads/}{};
+chomp $branch;
 
 Readonly my $CCOLLAB => '/Applications/ccollab_client/ccollab';
 
@@ -18,10 +22,12 @@ my $fake    = 0;
 my $man     = 0;
 my $help    = 0;
 my $verbose = 0;
+my $commit  = 0;
 my @options;
 
 GetOptions ( 'review=s'  => \$review,
              'verbose+'  => \$verbose,
+             'commit+'   => \$commit,
              'cchelp' => sub {
                  my $args = join q{ }, @ARGV;
                  exec "$CCOLLAB help addchangelist $args";
@@ -35,6 +41,24 @@ pod2usage(-exitval => 0, -verbose => 2) if $man;
 
 unless ($review =~ /^(?:\d+|new|ask|last)$/) {
     die "--review must be an integer review-id, 'new', 'ask', or 'last'\n";
+}
+
+if ($commit) {
+    # ok, the code review is done!  Commit the code to Perforce!
+
+    if ($review  =~ /^(?:\d+)$/) {
+        commit_review($review);
+    }
+    elsif ($branch) {
+        my $data = `git config branch.$branch.reviews`;
+        my $reviews = decode_json($data);
+        foreach my $review (keys %$reviews) {
+            commit_review($review);
+        }
+    }
+
+    run_filtered({ command => "git p4 rebase" });
+    exit;
 }
 
 #
@@ -117,6 +141,7 @@ unless (@changes) {
 
 $filter_state = 1;
 my @reviews;
+my %attachment;
 my $url;
 $filter = sub {
     my $line = shift;
@@ -125,6 +150,10 @@ $filter = sub {
     }
     if (my ($r) = $line =~ /Review \#(\d+):/i) {
         push @reviews, $r;
+    }
+    if (my($c, $r) =
+        $line =~ /\@(\d+) successfully attached to Review \#(\d+):/) {
+        push @{$attachment{$r}}, $c;
     }
     if ($line =~ /^ERROR: Executing command/) {
         # end of the line! time to get off!
@@ -135,6 +164,7 @@ $filter = sub {
 };
 
 $command = "$CCOLLAB addchangelist " . join q{ }, $review, @changes;
+$command .= ' --no-browser';
 
 run_filtered({ command => $command, filter => $filter });
 
@@ -144,10 +174,13 @@ foreach my $r (@reviews) {
     system "open ${url}ui#review:id=$r";
 }
 
+my $reviews_json = encode_json(\%attachment);
+system "git config --add branch.$branch.reviews '$reviews_json'";
+
 sub run_filtered {
     my $args = shift;
     my $command = $args->{command};
-    my $filter  = $args->{filter} || sub {};
+    my $filter  = $args->{filter} || sub { my $line = shift; print "$line\n"; };
 
     $command .= ' 2>&1'; # redirect stderr to stdout
 
@@ -162,6 +195,11 @@ sub run_filtered {
 
 }
 
+sub commit_review {
+    my $review = shift;
+    my $command = join q{ }, $CCOLLAB, 'commit', $review, '--non-interactive';
+    run_filtered({ command => $command });
+}
 
 __END__
 
@@ -174,7 +212,9 @@ git cc - submit changes to code collaborator
 git cc [options] 
 
  Options:
+   --commit          Commit the completed review for this branch.
    --review          Integer review-id, 'new', 'ask', or 'last'
+   --verbose         Display the commands run and the output from those commands
    --cchelp          Display the help for "ccolab addchangelist"
    --fake            Print the ccolab command, don't run it.
    --man             full documentation
@@ -184,6 +224,10 @@ git cc [options]
 
 =over 8
 
+=item B<--commit>
+
+If the review for this branch was prepared with git-cc, the review ID is stored in the branch's configuration, and git-cc --commit will retrieve that information and submit the review to Perforce.  This can be used with any Code Collaborator review if the review ID is specified with --review.
+
 =item B<--review>
 
 Must be either an integer review-id, 'new', 'ask', or 'last' (defaults
@@ -191,8 +235,7 @@ to new).
 
 =item B<--cchelp>
 
-Display the output of the command "ccollab help".  Any parameters after this
-option are passed to ccollab help.
+Display the output of the command "ccollab help addchangelist".  Any parameters after this option are passed to ccollab help.
 
 =item B<--fake>
 
