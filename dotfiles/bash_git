@@ -29,8 +29,11 @@ alias ggc='cd "$GITDIR"/compliance; gp'
 
 alias ccolab=/Applications/ccollab_client/ccollab
 
-alias p4noedit='if ! p4 login -s; then p4 login; fi; P4EDITOR=sleep-toucher git p4 submit'
-alias p4n='if ! p4 login -s; then p4 login; fi; P4EDITOR=sleep-toucher git p4 submit'
+git config --add git-p4.skipSubmitEdit true
+P4N='if ! p4 login -s; then p4 login; fi; git p4 submit'
+alias p4noedit=$P4N
+alias p4n=$P4N
+unset P4N
 
 #
 # git customizations

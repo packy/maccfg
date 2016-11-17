@@ -1,0 +1,212 @@
+#!/usr/bin/env perl
+# submit changes to code collaborator
+
+use strict;
+use warnings;
+use v5.10;
+
+use Getopt::Long qw(:config pass_through);
+use List::MoreUtils qw( uniq );
+use Pod::Usage;
+use Readonly;
+use Symbol;
+
+Readonly my $CCOLLAB => '/Applications/ccollab_client/ccollab';
+
+my $review  = 'new';
+my $fake    = 0;
+my $man     = 0;
+my $help    = 0;
+my @options;
+
+GetOptions ( 'review=s'  => \$review,
+             'cchelp' => sub {
+                 my $args = join q{ }, @ARGV;
+                 exec "$CCOLLAB help addchangelist $args";
+             },
+             'fake'   => \$fake,
+             'help|?' => \$help,
+             'man'    => \$man)
+    or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitval => 0, -verbose => 2) if $man;
+
+unless ($review =~ /^(?:\d+|new|ask|last)$/) {
+    die "--review must be an integer review-id, 'new', 'ask', or 'last'\n";
+}
+
+#
+# first, prepare submits for Perforce
+#
+
+system "git config --add git-p4.skipSubmitEdit true";
+
+my $command = 'git-p4 submit --prepare-p4-only';
+
+if ($fake) {
+    $command .= ' --dry-run';
+}
+
+my $filter_state = 1;
+my @templates;
+my $filter = sub {
+    my $line = shift;
+    if (my ($t) = $line =~ /You can delete the file "([^"]+)" when finished./) {
+        push @templates, $t;
+    }
+    if ($line =~ / Perforce\s+checkout | Synchronizing\s+p4\s+checkout /x) {
+        $filter_state = 1;
+    }
+    elsif ($line =~ / Applying\s+\b[a-f0-9]+\b | opened\s+for\s+edit /x) {
+        $filter_state = 0;
+        print "$line\n";
+        return 1;
+    }
+    print "$line\n" if $filter_state;
+    return 1;
+};
+
+run_filtered({ command => $command, filter => $filter });
+
+unless (@templates) {
+    die "No templates were created by $command\n";
+}
+
+my @changes;
+$filter = sub {
+    my $line = shift;
+    if (my ($c) = $line =~ /Change (\d+) created/i) {
+        push @changes, $c;
+    }
+    print "$line\n";
+    return 1;
+};
+
+foreach my $t (@templates) {
+    # first, remove the diff from the end of the change spec
+    my $t2 = $t . 'tmp';
+    open my $in,  '<', $t;
+    open my $out, '>', $t2;
+    while (my $line = <$in>) {
+        last if $line =~ /everything below this line is just the diff/;
+        print {$out} $line;
+    }
+    close $out;
+    close $in;
+
+    $command = 'p4 change -i <' . $t2;
+
+    my $count = scalar @changes;
+
+    run_filtered({ command => $command, filter => $filter });
+
+    if (@changes > $count) {
+        unlink $t;
+        unlink $t2;
+    }
+    else {
+        print STDERR "No Perforce changes were created by $command\n";
+    }
+}
+
+unless (@changes) {
+    exit 1;
+}
+
+$filter_state = 1;
+my @reviews;
+my $url;
+$filter = sub {
+    my $line = shift;
+    if (my ($u) = $line =~ /Connecting to Collaborator Server (\S+)/i) {
+        $url = $u;
+    }
+    if (my ($r) = $line =~ /Review \#(\d+):/i) {
+        push @reviews, $r;
+    }
+    if ($line =~ /^ERROR: Executing command/) {
+        # end of the line! time to get off!
+        return 0;
+    }
+    print "$line\n";
+    return 1;
+};
+
+$command = "$CCOLLAB addchangelist " . join q{ }, $review, @changes;
+
+run_filtered({ command => $command, filter => $filter });
+
+@reviews = uniq @reviews;
+
+foreach my $r (@reviews) {
+    system "open ${url}ui#review:id=$r";
+}
+
+sub run_filtered {
+    my $args = shift;
+    my $command = $args->{command};
+    my $filter  = $args->{filter} || sub {};
+
+    $command .= ' 2>&1'; # redirect stderr to stdout
+
+    open my $fh, "$command |";
+    while (my $line = <$fh>) {
+        chomp $line;
+        last unless $filter->($line); # if filter returns false, stop reading
+    }
+    close $fh;
+
+}
+
+
+__END__
+
+=head1 NAME
+
+git cc - submit changes to code collaborator
+
+=head1 SYNOPSIS
+
+git cc [options] 
+
+ Options:
+   --review          Integer review-id, 'new', 'ask', or 'last'
+   --cchelp          Display the help for "ccolab addchangelist"
+   --fake            Print the ccolab command, don't run it.
+   --man             full documentation
+   -?                brief help message
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--review>
+
+Must be either an integer review-id, 'new', 'ask', or 'last' (defaults
+to new).
+
+=item B<--cchelp>
+
+Display the output of the command "ccollab help".  Any parameters after this
+option are passed to ccollab help.
+
+=item B<--fake>
+
+Print the ccolab command, don't run it.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<-?>
+
+Print a brief help message and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+B<git cc> will take the difference between the current branch and the
+master branch and submit it to Code Collaborator.
+
+=cut
