@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # for syntax highlightling in emacs, mostly
 
+export TZ=/usr/share/zoneinfo/America/New_York
+
 function is_interactive() {
     [[ $- == *i* ]]
 }
