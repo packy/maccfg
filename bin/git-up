@@ -1,0 +1,15 @@
+#!/bin/sh
+
+function is_git_dir () {
+    [ -d .git ] || [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == "true" ]
+}
+
+function is_git_p4_dir () {
+    is_git_dir && git cat-file commit HEAD | grep -q git-p4
+}
+
+if is_git_p4_dir; then
+   git p4 rebase $*
+else
+   git pull --rebase $*
+fi

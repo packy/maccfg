@@ -2,7 +2,6 @@
         path = ~/.gitconfig_user
 
 [alias]
-        up = p4 rebase
         co = checkout
         ln = log --name-only
         uncommit = reset --mixed HEAD~1
