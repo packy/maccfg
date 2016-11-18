@@ -23,9 +23,10 @@ my $man     = 0;
 my $help    = 0;
 my $verbose = 0;
 my $commit  = 0;
-my @options;
+my @changes;
 
 GetOptions ( 'review=s'  => \$review,
+             'change=i'  => \@changes,
              'verbose+'  => \$verbose,
              'commit+'   => \$commit,
              'cchelp' => sub {
@@ -65,110 +66,22 @@ if ($commit) {
 # first, prepare submits for Perforce
 #
 
-system "git config --add git-p4.skipSubmitEdit true";
-
-my $command = 'git-p4 submit --prepare-p4-only';
-
-if ($fake) {
-    $command .= ' --dry-run';
-}
-
-my $filter_state = 1;
-my @templates;
-my $filter = sub {
-    my $line = shift;
-    if (my ($t) = $line =~ /You can delete the file "([^"]+)" when finished./) {
-        push @templates, $t;
-    }
-    if ($line =~ / Perforce\s+checkout | Synchronizing\s+p4\s+checkout /x) {
-        $filter_state = 1;
-    }
-    elsif ($line =~ / Applying\s+\b[a-f0-9]+\b | opened\s+for\s+edit /x) {
-        $filter_state = 0;
-        print "$line\n";
-        return 1;
-    }
-    print "$line\n" if $filter_state;
-    return 1;
-};
-
-run_filtered({ command => $command, filter => $filter });
-
-unless (@templates) {
-    die "No templates were created by $command\n";
-}
-
-my @changes;
-$filter = sub {
-    my $line = shift;
-    if (my ($c) = $line =~ /Change (\d+) created/i) {
-        push @changes, $c;
-    }
-    print "$line\n";
-    return 1;
-};
-
-foreach my $t (@templates) {
-    # first, remove the diff from the end of the change spec
-    my $t2 = $t . 'tmp';
-    open my $in,  '<', $t;
-    open my $out, '>', $t2;
-    while (my $line = <$in>) {
-        last if $line =~ /everything below this line is just the diff/;
-        print {$out} $line;
-    }
-    close $out;
-    close $in;
-
-    $command = 'p4 change -i <' . $t2;
-
-    my $count = scalar @changes;
-
-    run_filtered({ command => $command, filter => $filter });
-
-    if (@changes > $count) {
-        unlink $t;
-        unlink $t2;
-    }
-    else {
-        print STDERR "No Perforce changes were created by $command\n";
-    }
+unless (@changes) {
+    # if we weren't passed changes, let's do a p4 submit to make some
+    @changes = p4_submit();
 }
 
 unless (@changes) {
     exit 1;
 }
 
-$filter_state = 1;
+my $url;
 my @reviews;
 my %attachment;
-my $url;
-$filter = sub {
-    my $line = shift;
-    if (my ($u) = $line =~ /Connecting to Collaborator Server (\S+)/i) {
-        $url = $u;
-    }
-    if (my ($r) = $line =~ /Review \#(\d+):/i) {
-        push @reviews, $r;
-    }
-    if (my($c, $r) =
-        $line =~ /\@(\d+) successfully attached to Review \#(\d+):/) {
-        push @{$attachment{$r}}, $c;
-    }
-    if ($line =~ /^ERROR: Executing command/) {
-        # end of the line! time to get off!
-        return 0;
-    }
-    print "$line\n";
-    return 1;
-};
-
-$command = "$CCOLLAB addchangelist " . join q{ }, $review, @changes;
-$command .= ' --no-browser';
-
-run_filtered({ command => $command, filter => $filter });
-
-@reviews = uniq @reviews;
+make_reviews({ changes => \@changes,
+               reviews => \@reviews,
+               attach  => \%attachment,
+               url     => \$url });
 
 foreach my $r (@reviews) {
     system "open ${url}ui#review:id=$r";
@@ -176,6 +89,126 @@ foreach my $r (@reviews) {
 
 my $reviews_json = encode_json(\%attachment);
 system "git config --add branch.$branch.reviews '$reviews_json'";
+
+###############################################################################
+
+sub p4_submit {
+    # don't call up an editor
+    system "git config --add git-p4.skipSubmitEdit true";
+
+    my $command = 'git-p4 submit --prepare-p4-only';
+
+    if ($fake) {
+        $command .= ' --dry-run';
+    }
+
+    my $filter_state = 1;
+    my @templates;
+    my $filter = sub {
+        my $line = shift;
+        if (my ($t) =
+            $line =~ /You can delete the file "([^"]+)" when finished./) {
+            push @templates, $t;
+        }
+        if ($line =~ / Perforce\s+checkout | Synchronizing\s+p4\s+checkout /x) {
+            $filter_state = 1;
+        }
+        elsif ($line =~ / Applying\s+\b[a-f0-9]+\b | opened\s+for\s+edit /x) {
+            $filter_state = 0;
+            print "$line\n";
+            return 1;
+        }
+        print "$line\n" if $filter_state;
+        return 1;
+    };
+
+    run_filtered({ command => $command, filter => $filter });
+
+    unless (@templates) {
+        die "No templates were created by $command\n";
+    }
+
+    my @changes;
+    $filter = sub {
+        my $line = shift;
+        if (my ($c) = $line =~ /Change (\d+) created/i) {
+            push @changes, $c;
+        }
+        print "$line\n";
+        return 1;
+    };
+
+    foreach my $t (@templates) {
+        # first, remove the diff from the end of the change spec
+        my $t2 = $t . 'tmp';
+        open my $in,  '<', $t;
+        open my $out, '>', $t2;
+        while (my $line = <$in>) {
+            last if $line =~ /everything below this line is just the diff/;
+            print {$out} $line;
+        }
+        close $out;
+        close $in;
+
+        $command = 'p4 change -i <' . $t2;
+
+        my $count = scalar @changes;
+
+        run_filtered({ command => $command, filter => $filter });
+
+        if (@changes > $count) {
+            unlink $t;
+            unlink $t2;
+        }
+        else {
+            print STDERR "No Perforce changes were created by $command\n";
+        }
+    }
+
+    return @changes;
+}
+
+###############################################################################
+
+sub make_reviews {
+    my $args = shift;
+    my $changes = $args->{changes};
+    my $reviews = $args->{reviews};
+    my $attach  = $args->{attach};
+    my $url     = $args->{url};
+
+    my $filter_state = 1;
+
+    my $filter = sub {
+        my $line = shift;
+        if (my ($u) = $line =~ /Connecting to Collaborator Server (\S+)/i) {
+            $$url = $u;
+        }
+        if (my ($r) = $line =~ /Review \#(\d+):/i) {
+            push @$reviews, $r;
+        }
+        if (my($c, $r) =
+            $line =~ /\@(\d+) successfully attached to Review \#(\d+):/) {
+            push @{$attach->{$r}}, $c;
+        }
+        if ($line =~ /^ERROR: Executing command/) {
+            # end of the line! time to get off!
+            return 0;
+        }
+        print "$line\n";
+        return 1;
+    };
+
+    my $command = "$CCOLLAB addchangelist " . join q{ }, $review, @$changes;
+
+    run_filtered({ command => $command, filter => $filter });
+
+    @$reviews = uniq @$reviews;
+
+    return;
+}
+
+###############################################################################
 
 sub run_filtered {
     my $args = shift;
