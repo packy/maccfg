@@ -96,7 +96,7 @@ sub p4_submit {
     # don't call up an editor
     system "git config --add git-p4.skipSubmitEdit true";
 
-    my $command = 'git-p4 submit --prepare-p4-only';
+    my $command = 'git-p4-dirty submit --prepare-p4-only';
 
     if ($fake) {
         $command .= ' --dry-run';
