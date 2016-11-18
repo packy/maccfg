@@ -230,7 +230,9 @@ sub run_filtered {
 
 sub commit_review {
     my $review = shift;
-    my $command = join q{ }, $CCOLLAB, 'commit', $review, '--non-interactive';
+    # I don't want to edit this, so I want to just touch the file and move on
+    $ENV{EDITOR} = 'sleep-toucher';
+    my $command = join q{ }, $CCOLLAB, 'commit', $review;
     run_filtered({ command => $command });
 }
 
