@@ -1,4 +1,6 @@
 #!/usr/bin/env perl
+use strict;
+use warnings;
 
 use Config::General;
 use Data::Dumper::Concise;
@@ -355,7 +357,7 @@ sub get_search_domains {
     close $fh;
 
     print "scutil < -\n$cmds\n" if ($verbose);
-    open $pipe, "scutil <$file |";
+    open my $pipe, "scutil <$file |";
     my $mode;
     my @list;
     while (my $line = <$pipe>) {
