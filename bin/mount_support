@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Net::Netrc;
+
+my $host = 'fs01-hou.adprod.bmc.com';
+my $verbose = 0;
+my $fake;
+my $login;
+my $password;
+
+GetOptions
+    'fake!'      => \$fake,
+    'host=s'     => \$host,
+    'user=s'     => \$login,
+    'verbose+'   => \$verbose,
+    'password=s' => \$password;
+
+my $entry = Net::Netrc->lookup($host);
+$login    = $entry->login    unless defined $login;
+$password = $entry->password unless defined $password;
+
+my $auth  = join ':', $login, $password;
+
+my $issue = strip_path(shift(@ARGV),
+                       '\\\\fs01-hou.adprod.bmc.com\\Main$\\BDA_support');
+
+
+my $fspath      = join '/', 'main$', 'BDA_support', $issue;
+my $mount_point = join '/', '/Volumes', $issue;
+
+print "Mounting //$host/$fspath\n";
+my $mount = "//$auth\@$host/$fspath";
+
+exit if $fake;
+
+unless ( -d $mount_point ) {
+    mkdir $mount_point;
+}
+
+system "mount_smbfs $mount $mount_point";
+
+system "open $mount_point";
+
+
+sub strip_path {
+    my($issue, $strip) = @_;
+
+    my $loop;
+    while ($loop++ < 2) {
+        for my $start ( 0 .. length($strip) - 1 ) {
+            my $substr = substr $strip, $start;
+            print "DEBUG: index($issue, $substr)\n" if $verbose >= 2;
+            if (index($issue, $substr) == 0) {
+                # we found the substring at the start; remove it
+                substr $issue, 0, length($substr), q{};
+                return $issue;
+            }
+        }
+
+        # remove single backslashes
+        $strip =~ s/\\(?!\\)//g;
+    }
+    return $issue;
+}
