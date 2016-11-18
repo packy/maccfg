@@ -916,8 +916,7 @@ class P4Submit(Command, P4UserMap):
         self.p4HasMoveCommand = p4_has_move_command()
 
     def check(self):
-        if len(p4CmdList("opened ...")) > 0:
-            die("You have files opened with perforce! Close them before starting the sync.")
+        return
 
     def separate_jobs_from_description(self, message):
         """Extract and return a possible Jobs field in the commit
