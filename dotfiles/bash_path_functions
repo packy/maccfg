@@ -37,6 +37,7 @@ explode_path () {
     my $PATH  = $ENV{PATH};
     my $sep   = q{:};
     my @parts = split /$sep/, $PATH;
+    print "PATH:\n";
     print "  ", join("\n  ", @parts), "\n";
   '
 }
