@@ -3,7 +3,9 @@
 export EDITOR=xemacs
 alias xe=xemacs
 
-alias grep='grep --color=auto'
+export GREP_COLOR='30;43'
+export GREP_OPTIONS='--color=auto'
+#alias grep='grep --color=auto'
 
 alias clean='rm -fv *~ .*~'
 
