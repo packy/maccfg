@@ -1,3 +1,5 @@
+#; -*-Conf-*-  Set emacs conf mode
+
 [include]
         path = ~/.gitconfig_user
 
@@ -91,3 +93,6 @@
 
 [log]
 	date = local
+
+[git-p4]
+	skipSubmitEdit = true
