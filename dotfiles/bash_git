@@ -30,7 +30,7 @@ alias ggmac='cd "$GITDIR"/maccfg; gp'
 
 alias ccolab=/Applications/ccollab_client/ccollab
 
-P4N='if ! p4 login -s; then p4 login; fi; git p4 submit'
+P4N='if ! p4 login -s; then p4 login; fi; if git config --get ccollab.ensure-content-reviewed >/dev/null; then echo Code in $(basename `pwd`) must go through Code Collaborator; else git p4 submit; fi'
 alias p4noedit=$P4N
 alias p4n=$P4N
 unset P4N
