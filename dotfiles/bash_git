@@ -26,6 +26,7 @@ alias gge='cd "$GITDIR"/extraclarity; gp'
 alias ggg='cd "$GITDIR"/mgmt; gp'
 alias ggq='cd "$GITDIR"/qa; gp'
 alias ggc='cd "$GITDIR"/compliance; gp'
+alias ggmac='cd "$GITDIR"/maccfg; gp'
 
 alias ccolab=/Applications/ccollab_client/ccollab
 
