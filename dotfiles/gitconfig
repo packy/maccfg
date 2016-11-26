@@ -13,6 +13,7 @@
         loggrep = log --perl-regexp --grep
         stashed = stash list --pretty=stashed
         jira = log --pretty=jira
+        unpushed = log origin/master..HEAD
 
 [apply]
         whitespace = fix
