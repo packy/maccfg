@@ -39,6 +39,7 @@
         branch = auto
         diff = auto
         status = auto
+	ui = true
 
 [color "branch"]
         current = yellow bold
@@ -53,7 +54,7 @@
 	commit = yellow reverse
 
 [color "status"]
-        added = blue
+        added = blue normal bold
         changed = green
         untracked = cyan
 
@@ -96,3 +97,7 @@
 
 [git-p4]
 	skipSubmitEdit = true
+[user]
+	name = packy@cpan.org
+	email = packy@cpan.org
+	name = Packy Anderson
