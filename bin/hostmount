@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+HOSTNAME=$1
+USERNAME=${2:-$USER}
+
+MOUNT_PATH=//$USERNAME@$HOSTNAME._smb._tcp.local/$USERNAME
+MOUNT_POINT=$HOME/$HOSTNAME
+NOT_MOUNTED="$MOUNT_POINT/Not mounted!"
+
+if mount | grep -q $MOUNT_PATH; then
+    echo Already mounted on $MOUNT_POINT
+    exit
+fi
+
+if [[ -d $MOUNT_POINT ]]; then
+    COUNT=$(ls -a $MOUNT_POINT | wc -l)
+    if [[ -f "$NOT_MOUNTED" ]]; then
+        if [[ $COUNT -ne 3 ]]; then
+            echo $MOUNT_POINT does not appear to be an empty mount directory
+            exit 1
+        fi
+    else
+        if [[ $COUNT -ne 2 ]]; then
+            echo $MOUNT_POINT does not appear to be an empty mount directory
+            exit 1
+        fi        
+    fi
+else
+    if [[ -e $MOUNT_POINT ]]; then
+        echo Cannot mount to $MOUNT_POINT: not a directory >> /dev/stderr
+        exit 1
+    fi
+    mkdir -p $MOUNT_POINT
+fi
+
+touch "$NOT_MOUNTED"
+
+echo Mounting $MOUNT_PATH
+mount_afp $MOUNT_PATH $MOUNT_POINT
