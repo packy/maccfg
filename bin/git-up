@@ -5,7 +5,7 @@ function is_git_dir () {
 }
 
 function is_git_p4_dir () {
-    is_git_dir && git log HEAD~10..HEAD | grep -q git-p4
+    is_git_dir && git log HEAD~10..HEAD | grep -q '\[git-p4\:'
 }
 
 if is_git_p4_dir; then
