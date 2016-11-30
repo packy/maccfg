@@ -9,7 +9,9 @@ function is_git_p4_dir () {
 }
 
 if is_git_p4_dir; then
-   git p4 rebase $*
+    echo "> git p4 rebase $*"
+    git p4 rebase $*
 else
-   git pull --rebase $*
+    echo "> git pull --rebase $*"
+    git pull --rebase $*
 fi
