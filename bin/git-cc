@@ -263,7 +263,11 @@ git cc [options]
 
 If the review for this branch was prepared with git-cc, the review ID is stored in the branch's configuration, and git-cc --commit will retrieve that information and submit the review to Perforce.  This can be used with any Code Collaborator review if the review ID is specified with --review.
 
-=item B<--review>
+=item B<--change> I<change_id>
+
+Must be an integer change id.  May be specified more than once.  Create a review from the specified changes.
+
+=item B<--review> I<parameter>
 
 Must be either an integer review-id, 'new', 'ask', or 'last' (defaults
 to new).
@@ -280,7 +284,7 @@ Print the ccolab command, don't run it.
 
 Prints the manual page and exits.
 
-=item B<-?>
+=item B<-?|--help>
 
 Print a brief help message and exits.
 
@@ -288,7 +292,6 @@ Print a brief help message and exits.
 
 =head1 DESCRIPTION
 
-B<git cc> will take the difference between the current branch and the
-master branch and submit it to Code Collaborator.
+B<git cc> will take commits in the current branch that have not been pushed to Perforce and create Code Collaborator reviews with them.  It will then take note of the review ID in the git congiguration for the branch so it can automatically commit the review later using the B<git cc --commit> command.
 
 =cut
