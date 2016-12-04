@@ -2,12 +2,13 @@
 HOSTNAME=$1
 USERNAME=${2:-$USER}
 
+DISPLAY_PATH=//$USERNAME@$HOSTNAME/$USERNAME
 MOUNT_PATH=//$USERNAME@$HOSTNAME._smb._tcp.local/$USERNAME
 MOUNT_POINT=$HOME/$HOSTNAME
 NOT_MOUNTED="$MOUNT_POINT/Not mounted!"
 
 if mount | grep -q $MOUNT_PATH; then
-    echo Already mounted on $MOUNT_POINT
+    echo $DISPLAY_PATH already mounted on $(mount | grep $MOUNT_PATH | awk '{ print $3 }')
     exit
 fi
 
@@ -34,5 +35,5 @@ fi
 
 touch "$NOT_MOUNTED"
 
-echo Mounting $MOUNT_PATH
-mount_afp $MOUNT_PATH $MOUNT_POINT
+echo Mounting $DISPLAY_PATH on $MOUNT_POINT
+mount -t smbfs $MOUNT_PATH $MOUNT_POINT
