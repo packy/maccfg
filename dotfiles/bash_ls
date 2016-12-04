@@ -1,6 +1,37 @@
 #!/usr/bin/env bash
 # for syntax highlightling in emacs, mostly
 
+# /bin/ls options:
+#
+# -b Force printing of non-printable characters (as defined by
+#    ctype(3) and current locale settings) in file names using
+#    C escape codes whenever possible, and otherwise as \xxx
+#    where xxx is the numeric value of the character in octal.
+#
+# -G Enable colorized output.  This option is equivalent to defining
+#    CLICOLOR in the environment.
+#
+# -l List in long format.  If the output is to a terminal, a total
+#    sum for all the file sizes is output on a line before the long
+#    listing.
+#
+# -h When used with the -l option, use unit suffixes: Byte, Kilobyte,
+#    Megabyte, Gigabyte, Terabyte and Petabyte in order to reduce the
+#    number of digits to three or less using base 2 for sizes.
+#
+# -e Print the Access Control List (ACL) associated with the file, if
+#    present, in long (-l) output.
+#
+# -O Include the file flags in a long (-l) output.
+#
+# -p Write a slash (`/') after each filename if that file is a directory.
+#
+# -H Symbolic links on the command line are followed.  This option is
+#    assumed if none of the -F, -d, or -l options are specified.
+
+alias ll='/bin/ls -bGlheOpH'
+alias ls='/bin/ls -bG'
+
 # LSCOLORS
 # The value of this variable describes what color to use for which
 # attribute when colors are enabled with CLICOLOR.  This string is a
