@@ -8,10 +8,21 @@ function is_git_p4_dir () {
     is_git_dir && git log -n 10 | grep -q '\[git-p4\:'
 }
 
+CHANGES=$(git status --short --untracked-files=no)
+if [[ "$CHANGES" != "" ]]; then
+    echo Stashing uncommitted changes
+    git stash
+fi
+
 if is_git_p4_dir; then
     echo "> git p4 rebase $*"
     git p4 rebase $*
 else
     echo "> git pull --rebase $*"
     git pull --rebase $*
+fi
+
+if [[ "$CHANGES" != "" ]]; then
+    echo Popping stashed changes
+    git stash pop
 fi
