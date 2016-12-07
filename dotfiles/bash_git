@@ -12,7 +12,12 @@ export USE_LIBPCRE=yes
 
 GIT_BIN=$(which git)
 HOMEBREW_CELLAR=$(lift_Cellar)
-GIT_VERSION=$($GIT_BIN --version | perl -pe 's/git\s+version\s+//;')
+if readlink $GIT_BIN | grep -q 'Cellar/git'; then
+    GIT_VERSION=$(readlink $GIT_BIN | \
+        perl -pe 's{.*Cellar/git/}{}; s{/bin/git}{};')
+else
+    GIT_VERSION=$($GIT_BIN --version | perl -pe 's/git\s+version\s+//;')
+fi
 GIT_ROOT=$HOMEBREW_CELLAR/git/$GIT_VERSION
 GIT_CORE=$GIT_ROOT/libexec/git-core
 export PATH=$PATH:$GIT_CORE
