@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+FILE="${@: -1}" # LAST argument
+
+printf '\e]0;%s\007' "less $@" # set title
+
+while [ ! -f $FILE ]; do sleep 1; done
+
+less +F $@

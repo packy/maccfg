@@ -1,13 +1,10 @@
 #!/usr/bin/env bash
 
-FILE="${@: -1}"
-
+CMD=
 TMP=/tmp/xless_$$.sh
 
-echo FILE=$FILE > $TMP
-echo "printf '\e]0;%s\007' \"less $@\"" >> $TMP
-echo "while [ ! -f \$FILE ]; do sleep 1; done" >> $TMP
-echo "less +F $@" >> $TMP
+echo "#!$(which bash)" > $TMP
+echo "$(which lesswait) \"$@\""  >> $TMP
 echo "rm -f $TMP" >> $TMP
 chmod +x $TMP
 
