@@ -1,7 +1,12 @@
 #!/bin/bash
 #
-export EDITOR=xemacs
-alias xe=xemacs
+if is_local; then
+    export EDITOR=xemacs
+    alias xe=xemacs
+else
+    export EDITOR=emacs
+    alias xe=emacs
+fi
 
 export GREP_COLOR='30;43'
 export GREP_OPTIONS='--color=auto'

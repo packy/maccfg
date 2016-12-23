@@ -7,6 +7,14 @@ function is_interactive() {
     [[ $- == *i* ]]
 }
 
+function is_local() {
+    if [[ "$LOGIN_FROM" == "" ]]; then
+        TTY=$(tty | sed -e "s/.*tty\(.*\)/\1/")
+        LOGIN_FROM=$(w | grep $TTY | awk '{ print $3 }')
+    fi
+    [[ "$LOGIN_FROM" == "-" ]]
+}
+
 function scroll_if_at_bottom () {
     is_interactive && printf "\n\e[1A" # newline, cursor up 1 line
 }
