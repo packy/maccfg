@@ -25,24 +25,3 @@ alias eject="osascript -e 'tell application \"Finder\" to eject (every disk whos
 alias rsync_pwd_to='rsync -avz .'
 
 # aliases specific to my workplace
-
-alias dcp='dcompile; push'
-alias dcpna='dcompile; push --noagents'
-alias gsa='gsquash --auto'
-
-alias      b4='go b4'
-alias     mgr='go packymgr'
-alias    mgr2='go packymgr-release'
-alias     agt='go rh5-si-336'
-alias    agt2='go rh6-si-370'
-alias     ibr='go 10.100.5.110'
-alias markmgr='go rh6-ma-211'
-
-alias sapdown='cd ~/SAP_Downloads/Download_Manager;
-              java -classpath DLManager.jar dlmanager.Application;
-              cd -'
-
-# experimental, not working yet on Windows side
-alias pacander='ssh -v adprod\\pacander@W-PACANDER-20.gridapp-dev.com'
-
-
