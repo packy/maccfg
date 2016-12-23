@@ -2,6 +2,7 @@
 
 PERLBREW=$1
 
+
 if [[ ! -x "$PERLBREW" ]]; then 
     curl -L http://install.perlbrew.pl | bash 
 fi 
@@ -15,3 +16,6 @@ fi
 if [[ ! -x "$HOME/perl5/perlbrew/bin/cpanm" ]]; then
     perlbrew install-cpanm
 fi
+
+# install modules in current perl
+cat $HOME/git/maccfg/perlbrew/module_list | cpanm
