@@ -16,7 +16,7 @@ ${gitdir}/z:
 	git clone https://github.com/rupa/z.git ${gitdir}/z
 
 perlbrew:
-	@${gitdir}/maccfg/install_perlbrew ${PERLBREW}
+	@${gitdir}/maccfg/perlbrew/install ${PERLBREW}
 
 HOMEBREWED = bash fpp pcre git libpng node switchaudio-osx xz coreutils freetype icu4c mysql openssl homebrew/php/php70 unixodbc findutils gettext jpeg nmap p7zip readline wget
 
