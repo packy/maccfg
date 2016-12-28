@@ -25,13 +25,19 @@ export PATH=$PATH:$GIT_CORE
 export LESS=FRX
 alias gb='git branch'
 export GITDIR=$HOME/git
-alias ggs='cd "$GITDIR"/scriptlib; gp' # go go gadget scriptlib!  ... what?
-alias ggm='cd "$GITDIR"/manager_scripts; gp'
-alias gge='cd "$GITDIR"/extraclarity; gp'
-alias ggg='cd "$GITDIR"/mgmt; gp'
-alias ggq='cd "$GITDIR"/qa; gp'
-alias ggc='cd "$GITDIR"/compliance; gp'
-alias ggmac='cd "$GITDIR"/maccfg; gp'
+
+function gg () { # go git
+    cd $GITDIR/$1
+}
+
+function gg_autocomplete () {
+    complete -W "$( ls -F $GITDIR | grep '\/$' | sed 's/\/$//' )" gg
+}
+gg_autocomplete
+
+# keep two of the short aliases I use a lot
+alias ggs='gg scriptlib' # go go gadget scriptlib!  ... what?
+alias ggg='gg mgmt'
 
 alias ccolab=/Applications/ccollab_client/ccollab
 
@@ -88,11 +94,6 @@ function make_git_titlebar {
     ;;
   esac
 }
-
-function make_git_prompt () {
-  source "$GITDIR"/bash-git-prompt/gitprompt.sh
-}
-alias gp=make_git_prompt
 
 newbranch () {
     if is_git_dir; then
