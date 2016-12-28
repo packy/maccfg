@@ -232,7 +232,8 @@ sub commit_review {
     my $review = shift;
     # I don't want to edit this, so I want to just touch the file and move on
     $ENV{EDITOR} = 'sleep-toucher';
-    my $command = join q{ }, $CCOLLAB, 'commit', $review;
+    my $command =
+        join q{ }, 'EDITOR=sleep-toucher', $CCOLLAB, 'commit', $review;
     run_filtered({ command => $command });
 }
 
