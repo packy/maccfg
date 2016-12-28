@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 
-CMD=
+if [[ "$(which lesswait)" == "" ]]; then
+    echo "lesswait is not installed in the path as an executable!"
+    exit 1
+fi
+
 TMP=/tmp/xless_$$.sh
 
 echo "#!$(which bash)" > $TMP
-echo "$(which lesswait) \"$@\""  >> $TMP
+echo "cd $(pwd)" >> $TMP
+echo "$(which lesswait) \"$@\"" >> $TMP
 echo "rm -f $TMP" >> $TMP
 chmod +x $TMP
 
