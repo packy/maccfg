@@ -210,13 +210,14 @@ syncall () {
 
 commit_matching ()
 {
-    MATCHES=$(git status | perl -e '
+    MATCHES=$(git status --porcelain | perl -e '
         $match = shift @ARGV;
         $match = qr/$match/;
         while (<STDIN>) {
             if ( m{$match} ) {
                 chomp;
-                s/\#\s+modified:\s+/ /;
+                substr($_, 0, 3, q{});
+                s/.+\s+->//;
                 print;
             }
         }' $1)
