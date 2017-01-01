@@ -286,6 +286,9 @@ sub write_hostmap {
 
 sub get_os {
     my ($target) = @_;
+    return q{} unless $push_cmds; # the OS is irrelevant if we're not pushing
+                                  # any commands to the remote host
+
     $target = lc $target;
 
     return 'rhel'    if $target =~ /^rh\d+/;
