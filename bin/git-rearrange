@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+git_commits_ahead () {
+    DELTA=/tmp/git_upstream_status_delta.$$
+
+    git for-each-ref --format="%(refname:short) %(upstream:short)" $(git-symbolic-ref HEAD) > $DELTA
+    read local remote < $DELTA
+    if [ ! -z "$remote" ]; then
+        # this branch has an upstream remote
+        git rev-list --left-right ${local}...${remote} -- 2>/dev/null >$DELTA || continue
+        echo $(grep -c '^<' $DELTA)
+    else
+        git rev-list --left-right master..${local} -- 2>/dev/null >$DELTA || continue
+        echo $(grep -c '^>' $DELTA)
+    fi
+    rm -f $DELTA
+}
+
+AHEAD=$(git_commits_ahead)
+
+if [ $AHEAD == 0 ]; then
+    echo "All commits have been pushed to the repo!" > /dev/stderr
+    exit 1
+fi
+
+CHANGES=$(git status --short --untracked-files=no)
+if [[ "$CHANGES" != "" ]]; then
+    echo Stashing uncommitted changes
+    git stash
+fi
+
+git rebase -i HEAD~$AHEAD
+
+if [[ "$CHANGES" != "" ]]; then
+    echo Popping stashed changes
+    git stash pop
+fi

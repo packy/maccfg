@@ -236,3 +236,19 @@ alias p4noedit='P4EDITOR=sleep-toucher git p4 submit'
 restore_cursor_clear_down
 source_file $GIT_ROOT/etc/bash_completion.d/git-completion.bash
 source_file ~/bin/gitp4_auto # experimental
+
+git_commits_ahead () {
+    DELTA=/tmp/git_upstream_status_delta.$$
+
+    git for-each-ref --format="%(refname:short) %(upstream:short)" $(git-symbolic-ref HEAD) > $DELTA
+    read local remote < $DELTA
+    if [ ! -z "$remote" ]; then
+        # this branch has an upstream remote
+        git rev-list --left-right ${local}...${remote} -- 2>/dev/null >$DELTA || continue
+        echo $(grep -c '^<' $DELTA)
+    else
+        git rev-list --left-right master..${local} -- 2>/dev/null >$DELTA || continue
+        echo $(grep -c '^>' $DELTA)
+    fi
+    rm -f $DELTA
+}
