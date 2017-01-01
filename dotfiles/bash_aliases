@@ -5,6 +5,7 @@ if is_local; then
     alias xe=xemacs
 else
     export EDITOR=emacs
+    export GIT_EDITOR=emacs
     alias xe=emacs
 fi
 
