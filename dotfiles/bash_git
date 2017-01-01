@@ -53,16 +53,18 @@ unset P4N
 function git () {
     if [[ $EUID -eq 0 ]]; then
         echo "Don't run git as root!" 1>&2
+        bash -c "exit 1"; # so the status is 1
     else
-        /usr/local/bin/git $*
+        /usr/local/bin/git "$@"
     fi
 }
 
 function p4 () {
     if [[ $EUID -eq 0 ]]; then
         echo "Don't run perforce as root!" 1>&2
+        bash -c "exit 1"; # so the status is 1
     else
-        /usr/local/bin/p4 $*
+        /usr/local/bin/p4 "$@"
     fi
 }
 
@@ -97,7 +99,7 @@ function make_git_titlebar {
 
 newbranch () {
     if is_git_dir; then
-        git branch $*
+        git branch "$@"
         echo Created git branch \"$1\"
         git checkout $1
     else
@@ -106,13 +108,13 @@ newbranch () {
 }
 
 _make_branch_name () {
-    perl -e '$str = join "_", @ARGV; if ($ARGV[0] =~ /^\d+$/) { $str = "bug$str"; } print $str;' $*
+    perl -e '$str = join "_", @ARGV; if ($ARGV[0] =~ /^\d+$/) { $str = "bug$str"; } print $str;' "$@"
 }
 
 newbug () {
     if is_git_dir; then
         git checkout master
-        newbranch $(_make_branch_name $*)
+        newbranch $(_make_branch_name "$@")
     else
         echo Not a git dir: $(pwd)
     fi
@@ -124,7 +126,7 @@ mvbug () {
 
 renbug () {
     OLDBRANCH=$(parse_git_branch)
-    git branch -m $OLDBRANCH $(_make_branch_name $*)
+    git branch -m $OLDBRANCH $(_make_branch_name "$@")
 }
 
 delbug () {
@@ -151,7 +153,7 @@ last_sha () {
 }
 
 squash_last () {
-    git commit --fixup=$(last_sha) $*
+    git commit --fixup=$(last_sha) "$@"
 }
 
 gl () {
@@ -224,7 +226,7 @@ commit_matching ()
 if [[ -x /Applications/p4merge.app/Contents/Resources/launchp4merge ]]; then
 p4diff ()
 {
-    /Applications/p4merge.app/Contents/Resources/launchp4merge $* &
+    /Applications/p4merge.app/Contents/Resources/launchp4merge "$@" &
 }
 fi
 
