@@ -77,5 +77,3 @@ for MODULE in \
 done
 
 is_interactive && source "$GITDIR"/bash-git-prompt/gitprompt.sh # git prompt
-
-export EDITOR=xemacs-wait
