@@ -29,8 +29,10 @@
 # -H Symbolic links on the command line are followed.  This option is
 #    assumed if none of the -F, -d, or -l options are specified.
 
-alias ll='/bin/ls -bGlheOpH'
-alias ls='/bin/ls -bG'
+alias   ls='/bin/ls -bG'
+alias   ll='/bin/ls -bGlhOH'
+alias  lll='/bin/ls -bGlhOpH'
+alias llll='/bin/ls -bGlheOpH'
 
 # LSCOLORS
 # The value of this variable describes what color to use for which
