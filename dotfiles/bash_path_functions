@@ -9,7 +9,7 @@ unshift_path () {
     # get the dirs in $PATH that are not being put on the front
     my @PATH = grep { !/$add/ } split /$sep/, $ENV{PATH};
     print join $sep, @ARGV, @PATH;
-  ' $*)
+  ' "$@")
 }
 
 push_path () {
@@ -20,7 +20,7 @@ push_path () {
     # get the dirs in $PATH that are not being put on the end
     my @PATH = grep { !/$add/ } split /$sep/, $ENV{PATH};
     print join $sep, @PATH, @ARGV;
-  ' $*)
+  ' "$@")
 }
 
 uniq_path () {
@@ -29,7 +29,7 @@ uniq_path () {
     my %seen;
     my @PATH = grep { ! $seen{$_}++ } split /$sep/, $ENV{PATH};
     print join $sep, @PATH, @ARGV;
-  ' $*)
+  ' "$@")
 }
 
 explode_path () {
