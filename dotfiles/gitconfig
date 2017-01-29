@@ -98,6 +98,7 @@
 
 [git-p4]
 	skipSubmitEdit = true
+	autostash = True
 [user]
 	name = packy@cpan.org
 	email = packy@cpan.org

@@ -50,6 +50,8 @@ unset P4N
 # git customizations
 #
 
+git config --global git-p4.autostash True
+
 function git () {
     if [[ $EUID -eq 0 ]]; then
         echo "Don't run git as root!" 1>&2
