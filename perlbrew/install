@@ -1,18 +1,22 @@
 #!/bin/bash
 
-PERLBREW=$1
+# accept a parameter for where perlbrew is installed, but have the default
+PERLBREW=${1:-$HOME/perl5/perlbrew/bin/perlbrew}
 
-
+# if it's not installed already, install it
 if [[ ! -x "$PERLBREW" ]]; then 
     curl -L http://install.perlbrew.pl | bash 
 fi 
 
+# use it in this shell
 source $HOME/perl5/perlbrew/etc/bashrc 
 
 if [[ "$(perlbrew list)" == "" ]]; then
+    # no perlbrew perls installed, install the latest stable
     perlbrew install stable 
 fi
 
+# make sure cpanm is installed in a version-neutral location
 if [[ ! -x "$HOME/perl5/perlbrew/bin/cpanm" ]]; then
     perlbrew install-cpanm
 fi
