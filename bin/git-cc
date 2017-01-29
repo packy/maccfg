@@ -28,7 +28,7 @@ my @changes;
 GetOptions ( 'review=s'  => \$review,
              'change=i'  => \@changes,
              'verbose+'  => \$verbose,
-             'commit+'   => \$commit,
+             'submit|commit+'   => \$commit,
              'cchelp' => sub {
                  my $args = join q{ }, @ARGV;
                  exec "$CCOLLAB help addchangelist $args";
@@ -230,11 +230,20 @@ sub run_filtered {
 
 sub commit_review {
     my $review = shift;
+
+    # find out what the current editor setting is
+    (my $old_editor = `$CCOLLAB set`) =~ s/\A.+editor\s+=\s+([^\n]+).+\z/$1/ms;
+
     # I don't want to edit this, so I want to just touch the file and move on
-    $ENV{EDITOR} = 'sleep-toucher';
+    system "$CCOLLAB set editor sleep-toucher";
+
     my $command =
-        join q{ }, 'EDITOR=sleep-toucher', $CCOLLAB, 'commit', $review;
+        join q{ }, 'EDITOR=sleep-toucher', $CCOLLAB,
+                   'commit', $review, '--force';
     run_filtered({ command => $command });
+
+    # restore the old editor setting
+    system "$CCOLLAB set editor $old_editor";
 }
 
 __END__
@@ -245,7 +254,7 @@ git cc - submit changes to code collaborator
 
 =head1 SYNOPSIS
 
-git cc [options] 
+git cc [options]
 
  Options:
    --commit          Commit the completed review for this branch.
