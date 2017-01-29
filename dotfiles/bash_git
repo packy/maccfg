@@ -23,7 +23,6 @@ GIT_CORE=$GIT_ROOT/libexec/git-core
 export PATH=$PATH:$GIT_CORE
 
 export LESS=FRX
-alias gb='git branch'
 export GITDIR=$HOME/git
 
 function gg () { # go git
@@ -34,6 +33,10 @@ function gg_autocomplete () {
     complete -W "$( ls -F $GITDIR | grep '\/$' | sed 's/\/$//' )" gg
 }
 gg_autocomplete
+
+alias gb='git branch'
+alias gs='git status'
+alias gd='git diff'
 
 # keep two of the short aliases I use a lot
 alias ggs='gg scriptlib' # go go gadget scriptlib!  ... what?
