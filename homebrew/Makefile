@@ -7,3 +7,6 @@
 
 /usr/local/bin/diff-so-fancy:
 	brew install diff-so-fancy
+
+/usr/local/bin/hr:
+	brew install hr
