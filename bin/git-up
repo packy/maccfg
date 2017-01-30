@@ -9,20 +9,8 @@ function is_git_p4_dir () {
 }
 
 if is_git_p4_dir; then
-    # can remove code to stash once git on P4 machine can be upgraded
-    CHANGES=$(git status --short --untracked-files=no)
-    if [[ "$CHANGES" != "" ]]; then
-        echo Stashing uncommitted changes
-        git stash
-    fi
-
     echo "> git p4 rebase $*"
     git p4 rebase $*
-
-    if [[ "$CHANGES" != "" ]]; then
-        echo Popping stashed changes
-        git stash pop
-    fi
 else
     echo "> git pull --rebase $*"
     git pull --rebase --autostash $*
