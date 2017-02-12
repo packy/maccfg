@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use v5.010;
 
 use Config::General;
 use Data::Dumper::Concise;
@@ -19,6 +20,8 @@ Readonly my $scp     => '/usr/bin/scp -oStrictHostKeyChecking=no';
 my %hostmap;
 my $gorc         = $ENV{HOME}.'/.gorc';
 my $hostmap_file = $ENV{HOME}.'/.go_hostmap.txt';
+my $gitdir       = $ENV{GITDIR};
+my $godir        = $gitdir.'/mccfg/go';
 my @ADAPTERS     = qw/utun0 en5 en4 en0 en1/;
 my $push_cmds    = 1;
 my $def_user     = 'root';
@@ -82,16 +85,11 @@ while (@ARGV) {
     my $os = ($force_os) ? $force_os : get_os($target);
     print "OS: $os\n" if ($verbose);
 
-    my $commands = ($push_cmds) ? os_commands($os, $ip) : q{};
-    my $sshcmd   = ssh_command($target);
-    my $script   = new_terminal_applescript($sshcmd, $commands);
+    my $commands = os_commands( ($push_cmds ? $os : undef), $target );
+    my $script   = make_temp_osa( $target, new_terminal_applescript($commands) );
 
-    my $tmp      = make_temp($script);
-
-    if ($commands) {
-        copy_files_to_node($target, $os);
-    }
-    connect_to_target($target, $script, $tmp);
+    print `osascript $script` unless ($fake);
+    #connect_to_target($target, $script, $tmp);
 }
 
 sub next_target {
@@ -116,15 +114,12 @@ sub next_target {
 }
 
 sub new_terminal_applescript {
-    my ($sshcmd, $commands) = @_;
+    my ($cmd) = @_;
     if ($ENV{ITERM_SESSION_ID} =~ /:/) {
         # iTerm3 v3!
 return qq{
 tell application "iTerm2"
-  set newWindow to (create window with default profile command "$sshcmd")
-  tell current session of newWindow
-    $commands
-  end tell
+  set newWindow to (create window with default profile command "$cmd")
 end tell
 };
     }
@@ -135,8 +130,7 @@ return qq{tell application "iTerm"
   tell newterm
     set newsession to (make new session at the end of sessions)
     tell newsession
-      exec command "$sshcmd"
-      $commands
+      exec command "$cmd"
     end tell
   end tell
 end tell
@@ -144,13 +138,35 @@ end tell
     }
 }
 
-sub make_temp {
-    my($script) = @_;
+sub make_temp_osa {
+    my $target = shift;
+    my $script = join "\n", @_;
 
-    my $tmp = "/tmp/$$.osa";
+    my $tmp = sprintf '/tmp/go_%d_%s.osa', $$, $target;
     open my $out, '>', $tmp;
     print {$out} $script;
     close $out;
+
+    return $tmp;
+}
+
+sub make_temp_sh {
+    my $target = shift;
+    my $script = join "\n", @_;
+
+    my $tmp = sprintf '/tmp/go_%d_%s.sh', $$, $target;
+    open my $out, '>', $tmp;
+    print {$out} <<TEMP;
+#!/usr/local/bin/bash
+any () {
+  echo; read -n 1 -s -p "Press any key to exit"
+}
+
+$script
+TEMP
+    print {$out} sprintf "rm -f /tmp/go_%d_%s*\n", $$, $target;
+    close $out;
+    chmod 0775, $tmp;
 
     return $tmp;
 }
@@ -234,28 +250,51 @@ sub scp_command {
     }
 }
 
+sub echo {
+    my $str = shift // q{};
+    return q{} unless $verbose;
+    return qq{echo $str};
+}
+
 sub os_commands {
-    my ($os, $ip) = @_;
-    my $tmp = '/tmp/$$.sh';
-    if ($os eq 'rhel') {
-        return qq{
-write text "export PACKBOOK_IP=$ip"
-write text "source /tmp/packybin/linux_bash.sh"
-        };
+    my ($os, $target) = @_;
+
+    my $ssh  = ssh_command($target);
+    my $dest = '/tmp/packybin';
+
+    my @files  = ( "$godir/common/*" );
+#    my $source = "source /tmp/packybin/bashrc; bash -l";
+    my $source = "bash -l --rcfile /tmp/packybin/bashrc";
+
+    if (! defined $os) {
+        return make_temp_sh( $target, echo($ssh), $ssh );
+    }
+    elsif ($os eq 'rhel') {
+        push @files, "$godir/linux/*";
     }
     elsif ($os eq 'solaris') {
-        return qq{
-write text "exec bash"
-write text "export PACKBOOK_IP=$ip"
-write contents of file "/Users/packy/Sites/bash/solaris_bash_helpers.sh"
-        };
+        push @files, "$godir/solaris/*";
     }
     elsif ($os eq 'aix') {
-        return qq{
-write text "exec /usr/local/bin/dash"
-write contents of file "/Users/packy/Sites/bash/aix_dash_helpers.sh"
-        };
+        push @files, "$godir/aix/*";
+        # we have DASH on AIX
+        $source = "dash -l --rcfile /tmp/packybin/dashrc";
     }
+
+    my $mkdir  = qq{$ssh "mkdir -p $dest"};
+    my $scp    = scp_command($target, $dest, @files);
+    my $sshcmd = qq{$ssh -t "$source" || any};
+
+    my @commands = (
+        echo(qq{Making temporary directory on $target}),
+        echo($mkdir),  $mkdir,
+        echo(qq{Copying temporary scripts}),
+        echo($scp),    $scp,
+        echo(qq{Connecting to $target via SSH}),
+        echo($sshcmd), $sshcmd,
+    );
+
+    return make_temp_sh( $target, @commands );
 }
 
 sub is_up {

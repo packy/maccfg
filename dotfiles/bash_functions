@@ -1,17 +1,5 @@
 #!/bin/bash
 
-rclean () {
-    find . -name '*~' -o -name '.*~' | xargs rm -fv
-}
-
-xtitle () { printf "\e]0;%s\007" "$1"; }
-
-xsize () {
-    HEIGHT=${1:-"50"};
-    WIDTH=${2:-"80"};
-    printf "\e[8;%d;%dt" $HEIGHT $WIDTH;
-}
-
 xprofile () {
     PROFILE=${1:-"Default"};
     printf "\e]50;SetProfile=%s\a" "$PROFILE";
@@ -19,7 +7,7 @@ xprofile () {
 
 tlily () {
     xprofile tlily
-    xsize 70 80
+    xsize 80 70
     xtitle 'packy @ RPI'; /usr/local/bin/tlily
 }
 
@@ -75,31 +63,10 @@ pl2html () {
     (sleep 5; rm -f /tmp/$FILENAME.html) &
 }
 
-ts () {
-    export TS=$(date '+%Y-%m-%d %H:%M:%S')
-}
-
 get_front_window_bounds () {
     osascript -e "tell application \"$1\" to get bounds of the front window"
 }
 
 get_screen_resolution () {
     osascript -e "tell application \"Finder\" to get bounds of window of desktop" | perl -ne '(undef, undef, $x, $y) = split /,\s+/; print "$x x $y"'
-}
-
-# my usual crontab comment
-cron_header () {
-    echo "# min hr day mon     dow       command"
-    echo "# --- -- --- --- -----------  --------------------------------------------------"
-}
-
-# an alternate crontab comment I've played with
-cron_footer () {
-echo "
-# ^ ^ ^ ^ ^           ^- command to execute
-# │ │ │ │ └─ day of week (0 - 6) (0 to 6 are Sunday to Saturday)
-# │ │ │ └─── month (1 - 12)
-# │ │ └───── day of month (1 - 31)
-# │ └─────── hour (0 - 23)
-# └───────── min (0 - 59)"
 }
