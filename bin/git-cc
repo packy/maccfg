@@ -59,6 +59,7 @@ if ($commit) {
     }
 
     run_filtered({ command => "git p4 rebase" });
+    system "git config --unset branch.$branch.reviews";
     exit;
 }
 
@@ -88,13 +89,13 @@ foreach my $r (@reviews) {
 }
 
 my $reviews_json = encode_json(\%attachment);
-system "git config --add branch.$branch.reviews '$reviews_json'";
+system "git config branch.$branch.reviews '$reviews_json'";
 
 ###############################################################################
 
 sub p4_submit {
     # don't call up an editor
-    system "git config --add git-p4.skipSubmitEdit true";
+    system "git config git-p4.skipSubmitEdit true";
 
     my $command = 'git-p4-dirty submit --prepare-p4-only';
 
