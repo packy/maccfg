@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.010;
+
+use Data::Dumper::Concise;
+use Email::MIME;
+
+undef $/;
+
+my $msg = <>;
+
+my $email = Email::MIME->new($msg);
+
+say "{panel}";
+
+wiki_header( $email->header_obj );
+
+say "\n";
+
+$email->walk_parts(sub {
+    my ($part) = @_;
+    return if $part->subparts; # multipart
+
+    if ( $part->content_type =~ m[text/plain]i ) {
+        my @parts = split /\r\nFrom: /s, $part->body;
+        say shift @parts;
+        foreach my $subpart ( @parts ) {
+            say "----";
+            my $subpart_obj = Email::MIME->new("From: $subpart");
+            wiki_header( $subpart_obj->header_obj );
+            say $subpart_obj->body;
+        }
+    }
+});
+
+say "{panel}";
+
+
+sub wiki_header {
+    my $header = shift;
+    my @pairs = $header->header_raw_pairs;
+
+    while ( @pairs ) {
+        my $name  = shift @pairs;
+        my $value = shift @pairs;
+        next unless
+            $name eq 'Date'    ||
+            $name eq 'Subject' ||
+            $name eq 'From'    ||
+            $name eq 'To'      ||
+            $name eq 'CC';
+
+        if ( $name eq 'Date' || $name eq 'Subject' ) {
+            say "*$name:* $value";
+            next;
+        }
+
+        if ( $value =~ /\@/ ) {
+            # un-reverse names
+            $value =~ s/"([^,\s]+),\s+([^"\s]+)"/$2 $1/g;
+            if ( $value =~ /;/) {
+                $value =~ s/([^,\s]+),\s+([^;\s]+)/$2 $1/g;
+            }
+
+            my @addrs = split /\s*,\s*/, $value;
+
+            foreach my $addr ( @addrs ) {
+                $addr =~ s/^([^<]+)\s+<([^>]+)>/\[$1|mailto:$2]/;
+            }
+            say "*$name:* ".join q{, }, @addrs;
+        }
+        else {
+            # un-reverse names
+            $value =~ s/([^,\s]+),\s+([^;\s]+)/$2 $1/g;
+            say "*$name:* $value";
+        }
+    }
+}
