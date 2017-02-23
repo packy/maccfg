@@ -44,6 +44,19 @@ unless ($review =~ /^(?:\d+|new|ask|last)$/) {
     die "--review must be an integer review-id, 'new', 'ask', or 'last'\n";
 }
 
+unless ( logged_into_perforce() ) {
+    die "You must be logged into Perforce.\n";
+}
+
+if (@ARGV) {
+    if ( lc $ARGV[0] eq 'add' ) {
+        my %hash = ( $review => \@changes );
+        my $reviews_json = encode_json(\%hash);
+        system "git config branch.$branch.reviews '$reviews_json'";
+        exit;
+    }
+}
+
 if ($commit) {
     # ok, the code review is done!  Commit the code to Perforce!
 
@@ -52,6 +65,11 @@ if ($commit) {
     }
     elsif ($branch) {
         my $data = `git config branch.$branch.reviews`;
+        if (my $err = $?) {
+            print "git config branch.$branch.reviews = $data\n";
+            print "status: $err\n";
+            exit $err;
+        }
         my $reviews = decode_json($data);
         foreach my $review (keys %$reviews) {
             commit_review($review);
@@ -77,16 +95,13 @@ unless (@changes) {
 }
 
 my $url;
-my @reviews;
 my %attachment;
 make_reviews({ changes => \@changes,
-               reviews => \@reviews,
                attach  => \%attachment,
                url     => \$url });
 
-foreach my $r (@reviews) {
-    system "open ${url}ui#review:id=$r";
-}
+my($r) = keys %attachment;
+system "open ${url}ui#review:id=$r";
 
 my $reviews_json = encode_json(\%attachment);
 system "git config branch.$branch.reviews '$reviews_json'";
@@ -174,9 +189,9 @@ sub p4_submit {
 sub make_reviews {
     my $args = shift;
     my $changes = $args->{changes};
-    my $reviews = $args->{reviews};
     my $attach  = $args->{attach};
     my $url     = $args->{url};
+    my $revno;
 
     my $filter_state = 1;
 
@@ -185,16 +200,16 @@ sub make_reviews {
         if (my ($u) = $line =~ /Connecting to Collaborator Server (\S+)/i) {
             $$url = $u;
         }
-        if (my ($r) = $line =~ /Review \#(\d+):/i) {
-            push @$reviews, $r;
+        if (my ($r) = $line =~ /review (\d+)/i) {
+            $revno = $r;
         }
-        if (my($c, $r) =
-            $line =~ /\@(\d+) successfully attached to Review \#(\d+):/) {
-            push @{$attach->{$r}}, $c;
+        if (my($c) =
+            $line =~ /Processing change \@(\d+)/) {
+            push @{$changes}, $c;
         }
         if ($line =~ /^ERROR: Executing command/) {
             # end of the line! time to get off!
-            return 0;
+#            return 0;
         }
         print "$line\n";
         return 1;
@@ -204,7 +219,8 @@ sub make_reviews {
 
     run_filtered({ command => $command, filter => $filter });
 
-    @$reviews = uniq @$reviews;
+    @$changes = uniq @$changes;
+    $attach->{$revno} = $changes;
 
     return;
 }
@@ -236,7 +252,7 @@ sub commit_review {
     (my $old_editor = `$CCOLLAB set`) =~ s/\A.+editor\s+=\s+([^\n]+).+\z/$1/ms;
 
     # I don't want to edit this, so I want to just touch the file and move on
-    system "$CCOLLAB set editor sleep-toucher";
+    `$CCOLLAB set editor sleep-toucher`;
 
     my $command =
         join q{ }, 'EDITOR=sleep-toucher', $CCOLLAB,
@@ -244,7 +260,12 @@ sub commit_review {
     run_filtered({ command => $command });
 
     # restore the old editor setting
-    system "$CCOLLAB set editor $old_editor";
+    `$CCOLLAB set editor $old_editor`;
+}
+
+sub logged_into_perforce {
+    system "p4 login -s";
+    return $? ? 0 : 1;
 }
 
 __END__
