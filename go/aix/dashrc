@@ -1,0 +1,18 @@
+#!bash
+
+export PACKYBIN=/tmp/packybin
+source $PACKYBIN/setup_packybin.sh 2>/dev/null || \
+    echo ERROR: Unable to find $PACKYBIN/setup_packybin.sh >> /dev/stderr
+
+renamebin aix_less.bin less
+
+rs () {
+    for SERVICE in $@;
+    do
+        if [ -f /etc/rc.d/rc2.d/S$SERVICE ]; then
+            /etc/rc.d/rc2.d/S$SERVICE stop
+            /etc/rc.d/rc2.d/S$SERVICE start
+        fi
+    done
+}
+

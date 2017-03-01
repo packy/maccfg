@@ -1,0 +1,232 @@
+#!bash
+
+if [[ -d /app/clarity ]]; then
+    # common
+    export LD_LIBRARY_PATH=/app/clarity/lib
+    alias gaperl='/app/clarity/perl/bin/perl -MGridApp::Archive -MData::Dumper'
+
+    if [[ -d /opt/VRTSvcs/bin ]]; then
+        push_path /opt/VRTSvcs/bin
+    fi
+
+    function cdt () {
+        if [ "" == "$1" ]; then
+            ID=$(latest_job_id);
+        else
+            ID=$1;
+        fi;
+        if [ $ID -gt 0 ]; then
+            cd /app/clarity/var/tmp/$ID;
+            pwd
+        else
+            echo No job directories in /app/clarity/var/tmp/:
+            ls /app/clarity/var/tmp/
+        fi;
+    }
+
+    function cdtd () {
+        if [ "" == "$1" ]; then
+            ID=$(latest_job_id);
+        else
+            ID=$1;
+        fi;
+        if [ $ID -gt 0 ]; then
+            cd /app/clarity/var/tmp/$ID/data;
+            pwd
+        else
+            echo No job directories in /app/clarity/var/tmp/:
+            ls /app/clarity/var/tmp/
+        fi;
+    }
+
+    function latest_job_id () {
+        ls --color=tty /app/clarity/var/tmp/ | perl -ne '
+            BEGIN { $n = 0; }
+            chomp; $n = $_ if /^\d+$/ && $_ > $n;
+            END { print $n; }
+        '
+    }
+
+    function wait_file () {
+        FILE=$1
+        while [ ! -f $FILE ]; do
+            echo "$(date +'%F %T') Waiting for $FILE to be created..."
+            sleep 2
+        done
+    }
+
+    function log_less () {
+        LOG=${1:-$DEFAULT_LOG}
+        NAME=$(basename $LOG)
+        xtitle "$NAME @ $HOSTNAME"
+        wait_file $LOG
+        less +G -RX $LOG
+    }
+    alias mtl=log_less
+
+    function log_mark () {
+        TEXT="$1"
+        shift
+        LOG=${LOG:-$DEFAULT_LOG}
+        WIDTH="$(tput cols)"
+        while [[ "$1" != "" ]]; do
+            if [[ $1 =~ ^[0-9]+$ ]]; then
+                WIDTH=$1
+            else
+                LOG="$1"
+            fi
+            shift
+        done
+        MARK=$(TEXT="$TEXT" WIDTH=$WIDTH perl -e '
+            $str  = $ENV{TEXT};
+            $pad1 = int($ENV{WIDTH}/2) - int( ( length($str) + 4 ) / 2 );
+            $pad2 = ( ($pad1 + length($str) ) % 2) ? $pad1 : $pad1 + 1;
+            print q{=} x $pad1 . qq{ $str } . q{=} x $pad2 . qq{\n};
+        ')
+        printf "Appending to $LOG:\n$MARK\n";
+        echo $MARK >> $LOG
+    }
+
+    function pretty_print () {
+        gaperl -MGA::Util::XMLUtils -e '
+            undef $/;
+            my $xml = <STDIN>;
+
+            $xml =~ s/^[^<]+//;
+            $xml =~ s/\\n/\n/g;
+ 
+            my $orig = $xml;
+ 
+            $xml =~ s/^(?:result=\S+|data=)//mg;
+ 
+            print "\n";
+            eval {
+                print GA::Util::XMLUtils::pretty_print($xml);
+            };
+            if ($@) {
+                print $orig,"\n";
+            }
+        '
+    }
+
+    # manager-only
+    if [[ -d /app/clarity/dmanager ]]; then
+        export DEFAULT_LOG=/app/clarity/dmanager/var/log/MiddleTier.log
+
+        export MY_IP=$(perl -MSocket -e 'print inet_ntoa(inet_aton(@ARGV));' $HOSTNAME)
+        export MTD_CLIENT=/app/clarity/dmanager/bin/mtd_client
+        export CHECK_MTD_CLIENT_PRESENT="if [[ ! -f \$MTD_CLIENT ]]; then
+                echo \$MTD_CLIENT not available;
+                return;
+            fi"
+        alias psql='/usr/bin/psql -U tcrimi GridApp'
+
+        function upgrade_nightly () {
+            p4 login -s
+            if [[ $? -ne 0 ]]; then
+                echo Not logged into Perforce.
+                return
+            fi
+
+            TMP=/tmp/nightly$$
+            mkdir $TMP
+            cd $TMP
+            printf "\n" | /usr/bin/release.pl get nightly
+            /usr/bin/release.pl install *.xml --force --arch x86_64
+
+            cd - >/dev/null
+            rm -rf $TMP
+        }
+ 
+        function mtd_client_cmd () {
+            USER_NAME=${USER_NAME:-"sysadmin"}
+            echo $MTD_CLIENT user_name $USER_NAME user_ip $MY_IP "$@"
+        }
+
+        function mtd_client () {
+            eval $CHECK_MTD_CLIENT_PRESENT
+            
+            mtd_client_cmd "$@"
+            printf "\n\nStart: %s\n\n" "`date`"
+            OUTPUT=$( eval $( mtd_client_cmd "$@" ) )
+            echo $OUTPUT | perl -e '
+                undef $/;
+                $out = <STDIN>;
+                ($one, $two) = $out =~ /^([^<]+)(.*)/s;
+                print STDERR "$one";
+                $two =~ s/\\n/\n/g;
+                if ($one =~ /SUCCESS|xml/) {
+                   print $two;
+                }
+                else {
+                    print STDERR $two;
+                }
+            ' | pretty_print
+        }
+ 
+        function mtd_client_nowait () {
+            eval $CHECK_MTD_CLIENT_PRESENT
+
+            mtd_client_cmd "$@"
+            printf "\n\nStart: %s\n\n" "`date`"
+            eval $( mtd_client_cmd "$@" )
+        }
+
+        function setup_process () {
+            eval $CHECK_MTD_CLIENT_PRESENT
+
+            PROCESS=$1
+            XML_FILE=$2
+            XML=$( cat $XML_FILE )
+
+            mtd_client_cmd command setup_process name $1 xml $XML_FILE
+            printf "\n\nStart: %s\n\n" "`date`"
+            eval $( mtd_client_cmd command setup_process name $1 xml "$XML" )
+        }
+ 
+        function clone_process () {
+            mtd_client_nowait command clone_process jobid $1
+        }
+ 
+        function execute_process () {
+            mtd_client_nowait command execute_process jobid $1
+        }
+ 
+        function verify_process () {
+            mtd_client_nowait command verify_process jobid $1
+        }
+ 
+        function rerun_job () {
+            eval $CHECK_MTD_CLIENT_PRESENT
+            clone_process $(latest_job_id);
+            sleep 5;
+            execute_process $(latest_job_id)
+        }
+ 
+        function reverify_job () {
+            eval $CHECK_MTD_CLIENT_PRESENT
+            clone_process $(latest_job_id);
+            sleep 5;
+            verify_process $(latest_job_id)
+        }
+ 
+        function run_job () {
+            execute_process $(latest_job_id)
+        }
+ 
+        function verify_job () {
+            verify_process $(latest_job_id)
+        }
+
+        function syncop () {
+            mtd_client command sync opname "$@"
+        }
+
+    fi # manager-only
+
+    # agent-only
+    if [[ -d /app/clarity/dagent ]]; then
+        export DEFAULT_LOG=/app/clarity/dagent/var/log/master_trace.log
+
+    fi # agent-only
+fi

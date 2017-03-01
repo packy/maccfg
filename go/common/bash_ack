@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# for syntax highlightling in emacs, mostly
+
+export ACK_COLOR_FILENAME=red
+export ACK_PAGER='less -FRX'
+restore_cursor_clear_down
+source_file $PACKYBIN/completion.bash

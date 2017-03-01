@@ -1,0 +1,20 @@
+#!bash
+
+export PACKYBIN=/tmp/packybin
+source $PACKYBIN/setup_packybin.sh 2>/dev/null || \
+    echo ERROR: Unable to find $PACKYBIN/setup_packybin.sh >> /dev/stderr
+
+rs () {
+    for SERVICE in $@;
+    do
+        service $SERVICE restart;
+    done
+}
+
+#
+# Perforce stuff
+#
+export P4CLIENT=packy
+export P4PORT=lex-rnd-scm.bmc.com:4842
+export P4USER=pacander
+

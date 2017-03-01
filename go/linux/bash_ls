@@ -1,0 +1,32 @@
+#!bash
+
+# /bin/ls options:
+#
+# -b, --escape
+#        print octal escapes for nongraphic characters
+#
+# --color[=WHEN]
+#        colorize the output.  WHEN defaults to 'always' or can be
+#        'never' or 'auto'.  More info below
+#
+# -h, --human-readable
+#        with -l, print sizes in human readable format (e.g., 1K 234M 2G)
+#
+# -H, --dereference-command-line
+#        follow symbolic links listed on the command line
+#
+# -l     use a long listing format
+#
+# -p, --indicator-style=slash
+#        append / indicator to directories
+#
+#     Using color to distinguish file types is disabled both by default and
+#     with --color=never.  With --color=auto, ls emits color codes only when
+#     standard output is connected to a terminal.  The LS_COLORS environment
+#     variable can change the settings.  Use the dircolors command to set it.
+
+alias  ls='/bin/ls --color=auto --escape'
+alias  ll='/bin/ls --color=auto --escape --human-readable --dereference-command-line -l'
+alias lll='/bin/ls --color=auto --escape --human-readable --dereference-command-line --indicator-style=slash -l'
+
+export LS_COLORS='no=00:fi=00:di=01;34:ln=00;36:pi=40;33:so=00;35:bd=40;33;01:cd=40;33;01:or=01;05;37;41:mi=01;05;37;41:ex=00;32:*.cmd=00;32:*.exe=00;32:*.com=00;32:*.btm=00;32:*.bat=00;32:*.sh=00;32:*.csh=00;32:*.tar=00;31:*.tgz=00;31:*.arj=00;31:*.taz=00;31:*.lzh=00;31:*.zip=00;31:*.z=00;31:*.Z=00;31:*.gz=00;31:*.bz2=00;31:*.bz=00;31:*.tz=00;31:*.rpm=00;31:*.cpio=00;31:*.jpg=00;35:*.gif=00;35:*.bmp=00;35:*.xbm=00;35:*.xpm=00;35:*.png=00;35:*.tif=00;35:'

@@ -1,0 +1,1 @@
+../../../ack2/completion.bash

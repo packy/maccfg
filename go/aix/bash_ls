@@ -1,0 +1,26 @@
+#!bash
+
+# -b	Displays nonprintable characters in an octal (\nnn) notation.
+#
+# -H	If a symbolic link referencing a file of type directory is specified
+#       on the command line, the ls command shall evaluate the file
+#       information and file type to be those of the file referenced by the
+#       link, and not the link itself; however, the ls command shall write
+#       the name of the link itself and not the file referenced by the link.
+#
+# -k	Sets the block size for -s option and the per-directory block count
+#       written for -l, -n, -g, and -o options to 1024 bytes.
+#
+# -l    (Lower case L) Displays the mode, number of links, owner, group, size
+#       (in bytes), and time of last modification for each file. If the file
+#       is a special file, the size field contains the major and minor device
+#       numbers. If the time of last modification is greater than six months
+#       ago, the time field is shown in the format month date year where as
+#       files modified within six months the time field is shown as month
+#       date time format.
+#
+# -p	Puts a slash after each file name if that file is a directory.
+
+alias  ls='/bin/ls -b'
+alias  ll='/bin/ls -blHk'
+alias lll='/bin/ls -blHkP'

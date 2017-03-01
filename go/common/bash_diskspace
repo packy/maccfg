@@ -1,0 +1,29 @@
+#!bash
+
+function sort_gmk () {
+    perl -ne '
+chomp $_;
+my($size, $file) = split /\s+/, $_, 2;
+$sizes{$file} = $size;
+END {
+  foreach my $file (sort { $sizes{$a} <=> $sizes{$b} } keys %sizes) {
+    my $size = $sizes{$file};
+    if ($size  < 1024) { printf "%db  %s\n", $size, $file; next; }
+    my $kb = $size  / 1024;
+    if ($kb < 1024) { printf "%7.2fK  %s\n", $kb, $file; next; }
+    my $mb = $kb / 1024;
+    if ($mb < 1024) { printf "%7.2fM  %s\n", $mb, $file; next; }
+    my $gb = $mb / 1024;
+    if ($gb < 1024) { printf "%7.2fG  %s\n", $gb, $file; next; }
+    my $tb = $gb / 1024;
+    printf "%7.2fT  %s\n", $tb, $file;
+  }
+}
+'
+}
+
+disku () {
+    du -bx $* | sort_gmk
+    printf "\n"
+    df -hl
+}

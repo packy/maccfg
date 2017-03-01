@@ -1,0 +1,31 @@
+#!bash
+
+#
+# -b, --escape
+#      print octal escapes for nongraphic characters
+#
+# --color[=WHEN]
+#      control whether color is used to distinguish file types.
+#      WHEN may be 'never', 'always' or 'auto'.
+#
+# -h, --human-readable
+#      print sizes in human readable format (e.g., 1K 234M 2G)
+#
+# -l   use a long listing format
+#
+# -L, --dereference
+#      list entries pointed to by symbolic links
+#
+# -p, --file-type
+#      append indicator (one of /=@|) to entries
+#
+#      By default, color is not used to distinguish types of files.
+#      That is equivalent to using --color=none.  Using the --color
+#      option without the optional WHEN argument is  equivalent  to
+#      using  --color=always.   With  --color=auto, color codes are
+#      output only if standard output is connected  to  a  terminal
+#      (tty).
+
+alias  ls='/bin/ls --color=auto -b'
+alias  ll='/bin/ls --color=auto -blhL'
+alias lll='/bin/ls --color=auto -blhLp'
