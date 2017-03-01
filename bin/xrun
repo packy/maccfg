@@ -1,0 +1,60 @@
+#!/usr/bin/env perl 
+use strict;
+use warnings;
+use v5.010;
+
+use Cwd;
+use Getopt::Long qw( :config pass_through );
+
+my $clean = 1;
+my $pause = 1;
+my $title;
+
+GetOptions
+    'clean!'  => \$clean,
+    'pause!'  => \$pause,
+    'title=s' => \$title;
+
+shift @ARGV if $ARGV[0] eq '--';
+
+my $dir = '/tmp/xrun';
+system "mkdir -p $dir";
+
+my $cmd  = join q{ }, @ARGV;
+my $base = sprintf q{%s/xrun_%d}, $dir, $$;
+my $sh   = $base . '.sh';
+my $osa  = $base . '.osa';
+
+write_file($osa,
+           qq{tell application "iTerm2"},
+           qq{  set newWindow to (create window with }.
+           qq{default profile command "$sh")},
+           qq{end tell});
+
+unless (defined $title) {
+    $title = $cmd;
+}
+
+my @script = ( qq{#!/usr/local/bin/bash} );
+push @script, qq{cd }.getcwd();
+push @script, qq{printf "\e]0;%s\007" "$title"} if defined $title;
+push @script, $cmd;
+push @script, qq{echo; read -n 1 -s -p "Press any key to exit"} if $pause;
+push @script, qq{rm -f $base*} if $clean;
+
+# remove the directory if it's empty
+push @script, qq{[ "\$(ls -A $dir)" ] || rmdir $dir} if $clean;
+
+write_file($sh, @script);
+
+print `osascript $osa`;
+
+sub write_file {
+    my $file = shift;
+    open my $out, q{>}, $file;
+    foreach my $line ( @_ ) {
+        print {$out} "$line\n";
+    }
+    close $out;
+    chmod 0775, $file;
+}

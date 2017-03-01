@@ -11,15 +11,6 @@ tlily () {
     xtitle 'packy @ RPI'; /usr/local/bin/tlily
 }
 
-xrun () {
-    osascript \
-        -e 'on run the_command' \
-        -e 'tell application "iTerm"' \
-        -e 'create window with default profile command the_command' \
-        -e 'end tell' \
-        -e 'end run' "bash -c \"cd `pwd`; $*\""
-}
-
 authorize () {
   HOSTNAME=$(hostname -s)
   USER=$(whoami)
