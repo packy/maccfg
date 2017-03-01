@@ -263,23 +263,23 @@ sub os_commands {
     my $ssh  = ssh_command($target);
     my $dest = '/tmp/packybin';
 
-    my @files  = ( "$godir/common/*" );
+    my @files  = grep { ! /~$/ } glob "$godir/common/*";
 #    my $source = "source /tmp/packybin/bashrc; bash -l";
-    my $source = "bash -l --rcfile /tmp/packybin/bashrc";
+    my $source = "bash --rcfile /tmp/packybin/bashrc -l";
 
     if (! defined $os || $os eq 'none') {
         return make_temp_sh( $target, echo($ssh), $ssh );
     }
     elsif ($os eq 'rhel') {
-        push @files, "$godir/linux/*";
+        push @files, grep { ! /~$/ } glob "$godir/linux/*";
     }
     elsif ($os eq 'solaris') {
-        push @files, "$godir/solaris/*";
+        push @files, grep { ! /~$/ } glob "$godir/solaris/*";
     }
     elsif ($os eq 'aix') {
-        push @files, "$godir/aix/*";
+        push @files, grep { ! /~$/ } glob "$godir/aix/*";
         # we have DASH on AIX
-        $source = "dash -l --rcfile /tmp/packybin/dashrc";
+        $source = "dash --rcfile /tmp/packybin/dashrc -l";
     }
 
     my $mkdir  = qq{$ssh "mkdir -p $dest"};
