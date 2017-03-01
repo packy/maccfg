@@ -15,6 +15,9 @@ include ack2.mk
 ${gitdir}/z:
 	git clone https://github.com/rupa/z.git ${gitdir}/z
 
+recent:
+	defaults write com.apple.dock persistent-others -array-add '{ "tile-data" = {"list-type" = 1; }; "tile-type" = "recents-tile";}' && \killall Dock
+
 perlbrew:
 	@${gitdir}/maccfg/perlbrew/install ${PERLBREW}
 
@@ -37,6 +40,9 @@ emacs:
 
 git: USE_LIBPCRE=yes
 git: homebrew pcre 
+
+/usr/local/bin/ansi:
+	cd /usr/local/bin; curl -OL git.io/ansi; chmod 755 ansi
 
 bash: /etc/shells
 	@if ! grep -q "/usr/local/bin/bash" /etc/shells; then \
