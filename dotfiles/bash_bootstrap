@@ -1,0 +1,70 @@
+function is_interactive() {
+    [[ $- == *i* ]]
+}
+
+function scroll_if_at_bottom () {
+    is_interactive && printf "\n\e[1A" # newline, cursor up 1 line
+}
+scroll_if_at_bottom
+
+function save_cursor () {
+    is_interactive && printf "\e[s" # \e[s saves cursor position
+}
+
+function restore_cursor_clear_down () {
+    is_interactive && printf "\e[u\e[J" # restore cursor, clear screen from cursor down
+}
+
+function xtitle () {
+    printf "\e]0;%s\007" "$1";
+}
+
+function xsize () {
+    WIDTH=${1:-"80"};
+    HEIGHT=${2:-"50"};
+    printf "\e[8;%d;%dt" $HEIGHT $WIDTH;
+}
+
+function rclean () {
+    find . -name '*~' -o -name '.*~' | xargs rm -fv
+}
+
+function ts () {
+    export TS=$(date '+%Y-%m-%d %H:%M:%S')
+}
+
+function source_file () {
+    FILE=$1
+    PRINTERR=$2
+    if [[ -f $FILE ]]; then
+        save_cursor
+        is_interactive && printf "Sourcing %s ...\n" $FILE
+        source $FILE
+        restore_cursor_clear_down
+    elif [[ "$PRINTERR" != "" ]]; then
+        is_interactive && echo ERROR: Unable to find $FILE >> /dev/stderr
+    fi
+}
+
+# preferred prompt: "user@host: path" in title, $ or # on command line
+export PS1="\[\e]0;\u@\h: \w\007\]\\$ "
+
+export TZ=/usr/share/zoneinfo/America/New_York
+
+# my usual crontab comment
+cron_header () {
+    echo "# min hr day mon     dow       command"
+    echo "# --- -- --- --- -----------  --------------------------------------------------"
+}
+
+# an alternate crontab comment I've played with
+cron_footer () {
+echo "
+# ^ ^ ^ ^ ^           ^- command to execute
+# │ │ │ │ └─ day of week (0 - 6) (0 to 6 are Sunday to Saturday)
+# │ │ │ └─── month (1 - 12)
+# │ │ └───── day of month (1 - 31)
+# │ └─────── hour (0 - 23)
+# └───────── min (0 - 59)"
+}
+

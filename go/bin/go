@@ -21,7 +21,7 @@ my %hostmap;
 my $gorc         = $ENV{HOME}.'/.gorc';
 my $hostmap_file = $ENV{HOME}.'/.go_hostmap.txt';
 my $gitdir       = $ENV{GITDIR};
-my $godir        = $gitdir.'/mccfg/go';
+my $godir        = $gitdir.'/maccfg/go';
 my @ADAPTERS     = qw/utun0 en5 en4 en0 en1/;
 my $push_cmds    = 1;
 my $def_user     = 'root';
@@ -60,6 +60,7 @@ GetOptions
     "hostmap=s"  => \$hostmap_file,
     "commands!"  => \$push_cmds,
     "os=s"       => \$force_os,
+    "noos"       => sub { $force_os = 'none' },
     "verbose+"   => \$verbose,
     "fake!"      => \$fake,
     "username=s" => \&set_option_readonly,
@@ -266,7 +267,7 @@ sub os_commands {
 #    my $source = "source /tmp/packybin/bashrc; bash -l";
     my $source = "bash -l --rcfile /tmp/packybin/bashrc";
 
-    if (! defined $os) {
+    if (! defined $os || $os eq 'none') {
         return make_temp_sh( $target, echo($ssh), $ssh );
     }
     elsif ($os eq 'rhel') {
