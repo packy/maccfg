@@ -101,7 +101,7 @@ make_reviews({ changes => \@changes,
                url     => \$url });
 
 my($r) = keys %attachment;
-system "open ${url}ui#review:id=$r";
+#system "open ${url}ui#review:id=$r"; # ccollab is opening the browser itself
 
 my $reviews_json = encode_json(\%attachment);
 system "git config branch.$branch.reviews '$reviews_json'";

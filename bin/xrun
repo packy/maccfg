@@ -36,6 +36,7 @@ unless (defined $title) {
 }
 
 my @script = ( qq{#!/usr/local/bin/bash} );
+push @script, qq{source \$HOME/.bashrc};
 push @script, qq{cd }.getcwd();
 push @script, qq{printf "\e]0;%s\007" "$title"} if defined $title;
 push @script, $cmd;
