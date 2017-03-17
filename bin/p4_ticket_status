@@ -1,0 +1,17 @@
+#!/bin/bash
+
+FILE=~/.p4_ticket_status
+ERR=~/.p4_ticket_error
+source ~/git/bash-git-prompt/prompt-colors.sh
+
+function echoc() {
+  echo -e "${1}$2${ResetColor}" | sed 's/\\\]//g'  | sed 's/\\\[//g'
+}
+
+STATUS=$(cat $FILE)
+if [[ -s $ERR ]]; then
+    echoc $BoldRed "$STATUS"
+else
+    echoc $Green "$STATUS"
+fi
+
