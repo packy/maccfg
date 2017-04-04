@@ -4,6 +4,8 @@ export PACKYBIN=/tmp/packybin
 source $PACKYBIN/setup_packybin.sh 2>/dev/null || \
     echo ERROR: Unable to find $PACKYBIN/setup_packybin.sh >> /dev/stderr
 
+export LD_LIBRARY_PATH=/app/clarity/lib
+
 rs () {
     for SERVICE in $@;
     do
@@ -18,3 +20,41 @@ export P4CLIENT=packy
 export P4PORT=lex-rnd-scm.bmc.com:4842
 export P4USER=pacander
 
+__prompt_command () {
+    local EXIT="$?";
+    local STATUS;
+    if [ $EXIT == 0 ]; then
+        STATUS="\[\e[0;32m\]✔";
+    else
+        STATUS="\[\e[0;31m\]✘-$EXIT";
+    fi;
+    export PS1="\[\e]0;\u@\h: \w\007$STATUS \[\e[1;34m\]$(date +%H:%M)\[\e[0;0m\] \\$ "
+}
+PROMPT_COMMAND=__prompt_command
+export PS1="\[\e]0;\u@\h: \w\007\\$ "
+
+source $PACKYBIN/bash_ls
+
+if [[ -d /app/clarity/dmanager ]]; then
+    source $PACKYBIN/bash_manager_functions
+elif [[ -d /app/clarity/dagent ]]; then
+    source $PACKYBIN/bash_dagent_functions
+fi
+
+alias clean='rm -fv *~ .*~'
+alias rclean='find . -name '\''*~'\'' -exec rm -fv {} \;'
+alias gaperl='/app/clarity/perl/bin/perl -MGridApp::Archive -MData::Dumper'
+alias which=type
+alias xe=emacs
+
+xtitle () {
+    perl -e 'printf "%c]0;%s%c", 27, $ARGV[0], 7;' "$*"
+}
+
+log_less () {
+    LOG=${1:-$DEFAULT_LOG_LESS_FILE}
+    NAME=$(basename $LOG)
+    HOST=$(hostname -s)
+    xtitle "$NAME @ $HOST"
+    less +G -RX $LOG
+}

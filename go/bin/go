@@ -265,7 +265,7 @@ sub os_commands {
 
     my @files  = grep { ! /~$/ } glob "$godir/common/*";
 #    my $source = "source /tmp/packybin/bashrc; bash -l";
-    my $source = "bash --rcfile /tmp/packybin/bashrc -l";
+    my $source = "bash --rcfile /tmp/packybin/bashrc";
 
     if (! defined $os || $os eq 'none') {
         return make_temp_sh( $target, echo($ssh), $ssh );
