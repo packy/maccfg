@@ -1,4 +1,5 @@
 #!/bin/sh
+osascript -e 'tell application "Emacs"' -e 'activate' -e 'end tell'
 $HOME/bin/xemacs-start-server
 EMACSCLIENT=/Applications/Emacs.app/Contents/MacOS/bin/emacsclient
 
