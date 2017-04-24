@@ -25,4 +25,6 @@ alias eject="osascript -e 'tell application \"Finder\" to eject (every disk whos
 
 alias rsync_pwd_to='rsync -avz .'
 
+alias vbox=/Applications/VirtualBox.app/Contents/Resources/VirtualBoxVM.app/Contents/MacOS/VBoxManage
+
 # aliases specific to my workplace
