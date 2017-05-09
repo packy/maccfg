@@ -1,3 +1,4 @@
+export emacsdir := $(HOME)/.emacs.d
 modes := $(filter-out $(wildcard *~), $(wildcard modes/*))
 elpa  := $(filter-out $(wildcard *~), $(wildcard elpa/*))
 pwd   := $(shell pwd)
