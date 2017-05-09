@@ -4,7 +4,9 @@
 function is_local() {
     if [[ "$LOGIN_FROM" == "" ]]; then
         TTY=$(tty | sed -e "s/.*tty\(.*\)/\1/")
-        LOGIN_FROM=$(w | grep $TTY | awk '{ print $3 }')
+        if [[ "$TTY" != "" ]]; then
+            LOGIN_FROM=$(w | grep $TTY | awk '{ print $3 }')
+        fi
     fi
     [[ "$LOGIN_FROM" == "-" ]]
 }
