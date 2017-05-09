@@ -1,3 +1,10 @@
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -107,7 +114,7 @@
   (smart-split)
 )
 ;-------------------------------------------------------------------------------
-(defun vast-split ()
+(defun mega-split ()
   "Split the frame into four 80-column, 60-row sub-windows"
   (interactive)
   ;(set-frame-position (selected-frame) 594 640)
@@ -179,11 +186,11 @@
 )
 
 (eval (car (read-from-string
-            (shell-command-to-string "/Users/packy/bin/get_emacs_center_elisp"))))
+            (shell-command-to-string (substitute-in-file-name "$HOME/bin/get_emacs_center_elisp")))))
 
 ;-------------------------------------------------------------------------------
 
-(add-to-list 'load-path "/Users/packy/.emacs.d/modes")
+(add-to-list 'load-path (substitute-in-file-name "$HOME/.emacs.d/modes"))
 
 (setq-default fill-column 80)
 (setq fci-rule-width 1)
