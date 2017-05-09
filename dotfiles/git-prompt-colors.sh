@@ -16,8 +16,8 @@ override_git_prompt_colors() {
   GIT_PROMPT_BRANCH="${Yellow}"
 
   GIT_PROMPT_END_COMMON="_LAST_COMMAND_INDICATOR_ ${BoldBlue}${Time12a}${ResetColor}"
-  GIT_PROMPT_END_USER="\n\$(p4_ticket_status_git_only)${GIT_PROMPT_END_COMMON} $ "
-  GIT_PROMPT_END_ROOT="\n\$(p4_ticket_status_git_only)${GIT_PROMPT_END_COMMON} # "
+  GIT_PROMPT_END_USER="\n${GIT_PROMPT_END_COMMON} $ "
+  GIT_PROMPT_END_ROOT="\n${GIT_PROMPT_END_COMMON} # "
 
   GIT_PROMPT_START="\[\e]0;\u@\h: \w\007\]"
   PROMPT_START="\[\e]0;\u@\h: \w\007\]"
