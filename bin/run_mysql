@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+if [[ $BASH_VERSION < 4.0 ]]; then
+    echo $0 requires bash 4 or later; exit 1
+fi
+
+PASSWORD_FILE=$HOME/.mysql_passwords
+
+if [[ -f $PASSWORD_FILE ]]; then
+    if [[ "$(stat -f %Sp $PASSWORD_FILE | sed 's/\(....\)//')" = "------" ]]; then
+        source $PASSWORD_FILE
+    else
+        echo $PASSWORD_FILE has permissions for group or other
+        ls -l $PASSWORD_FILE
+        exit 1
+    fi
+else
+    echo Cannot find required file $PASSWORD_FILE
+    echo
+    echo Format:
+    echo "  declare -A MYSQL_PASSWORDS=("
+    echo "    [user1]=password1"
+    echo "    [user2]=password2"
+    echo "  )"
+    echo
+    echo "declare MYSQL_DEFAULT_USER=user1"
+    exit 1
+fi
+
+USER=${1:-$MYSQL_DEFAULT_USER}
+SCRIPT=$2
+
+echo USER:   $USER
+echo SCRIPT: $SCRIPT
+
+if [[ "$USER" == "" ]]; then
+    echo No mysql user specified and the \$MYSQL_DEFAULT_USER variable is not
+    echo defined in $PASSWORD_FILE
+fi
+
+if [[ "$USER" == "root" ]]; then
+    DB=mysql
+else
+    DB=$USER
+fi
+
+if [[ "$SCRIPT" == "" ]]; then
+    echo "> mysql -u $USER $DB"
+    mysql -v -u $USER --password=${MYSQL_PASSWORDS[$USER]} $DB
+else
+    echo "> mysql -u $USER -v $DB < $SCRIPT"
+    mysql -v -u $USER --password=${MYSQL_PASSWORDS[$USER]} $DB < $SCRIPT
+fi
