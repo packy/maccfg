@@ -103,3 +103,6 @@
 [user]
 	name = Packy Anderson
 	email = packy@cpan.org
+
+[svn]
+        rmdir = true
