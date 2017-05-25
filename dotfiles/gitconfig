@@ -101,6 +101,5 @@
 	skipSubmitEdit = true
 	autostash = True
 [user]
-	name = packy@cpan.org
-	email = packy@cpan.org
 	name = Packy Anderson
+	email = packy@cpan.org
