@@ -196,6 +196,7 @@
 (setq fci-rule-width 1)
 (setq fci-rule-color "darkblue")
 (require 'fill-column-indicator)
+(require 'window-numbering)
 
 ;; Local Variables:
 ;; mode: emacs-lisp
