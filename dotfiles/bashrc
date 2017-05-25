@@ -37,7 +37,7 @@ unshift_path $HOME/bin
 uniq_path # remove any duplicates in the PATH
 
 # finally, load all the bash customizations
-for DOTFILE in functions aliases ls perforce aws git ack bmc ; do
+for DOTFILE in functions aliases ls perforce aws git ack aim ; do
     source_file $HOME/.bash_$DOTFILE
 done
 
