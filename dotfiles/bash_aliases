@@ -29,4 +29,12 @@ alias rsync_pwd_to='rsync -avz .'
 
 alias vbox=/Applications/VirtualBox.app/Contents/Resources/VirtualBoxVM.app/Contents/MacOS/VBoxManage
 
+# aliases to AppleScripts to open Google Tools
+
+export MY_APPLESCRIPTS="$GITDIR/maccfg/AppleScript"
+
+alias inbox='osascript "$MY_APPLESCRIPTS/Open Google Inbox.scpt"'
+alias music='osascript "$MY_APPLESCRIPTS/Open Google Play Music.scpt"'
+alias play='osascript "$MY_APPLESCRIPTS/Open Google Play Music.scpt"'
+
 # aliases specific to my workplace
