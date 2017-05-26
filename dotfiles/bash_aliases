@@ -33,8 +33,8 @@ alias vbox=/Applications/VirtualBox.app/Contents/Resources/VirtualBoxVM.app/Cont
 
 export MY_APPLESCRIPTS="$GITDIR/maccfg/AppleScript"
 
-alias inbox='osascript "$MY_APPLESCRIPTS/Open Google Inbox.scpt"'
-alias music='osascript "$MY_APPLESCRIPTS/Open Google Play Music.scpt"'
-alias play='osascript "$MY_APPLESCRIPTS/Open Google Play Music.scpt"'
+alias inbox='osascript "$MY_APPLESCRIPTS/Open Google Inbox.applescript"'
+alias music='osascript "$MY_APPLESCRIPTS/Open Google Play Music.applescript"'
+alias play='osascript "$MY_APPLESCRIPTS/Open Google Play Music.applescript"'
 
 # aliases specific to my workplace
