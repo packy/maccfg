@@ -5,12 +5,12 @@ EMACSCLIENT=/Applications/Emacs.app/Contents/MacOS/bin/emacsclient
 
 if [[ $1 == "-r" ]]; then
     shift
-    for FILE in $*; do
+    for FILE in "$@"; do
         $EMACSCLIENT -n --eval "(find-file-read-only \"$FILE\")"
     done
 
 else
-    for FILE in $*; do
-        $EMACSCLIENT -n $FILE
+    for FILE in "$@"; do
+        $EMACSCLIENT -n "$FILE"
     done
 fi
