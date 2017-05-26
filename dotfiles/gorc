@@ -1,0 +1,28 @@
+<hosts>
+    <speedy.home.packay.com>
+        default_username = packy
+        method           = publickey
+    </speedy.home.packay.com>
+
+    <kirby.home.packay.com>
+        default_username = packy
+        method           = publickey
+    </kirby.home.packay.com>
+
+    <www.dardan.com>
+        default_username = dardanco
+        method           = publickey
+    </www.dardan.com>
+
+    <psd-11.aim.hosting>
+        default_username = jp1070
+        method           = publickey
+    </psd-11.aim.hosting>
+</hosts>
+
+<aliases>
+    speedy   = speedy.home.packay.com
+    kirby    = kirby.home.packay.com
+    bluehost = www.dardan.com
+    psd11    = psd-11.aim.hosting
+</aliases>

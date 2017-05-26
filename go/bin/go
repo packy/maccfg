@@ -10,19 +10,21 @@ use Proc::ProcessTable;
 use Readonly;
 use Scalar::Readonly ':all';
 use Term::ReadKey;
+use List::Util qw( max min );
 use List::MoreUtils qw( any );
 
 Readonly my $iTerm2  => '^/.+\.app/Contents/MacOS/iTerm2';
+Readonly my $bash    => '/usr/local/bin/bash';
 Readonly my $sshpass => '/usr/local/bin/sshpass';
-Readonly my $ssh     => '/usr/bin/ssh -oStrictHostKeyChecking=no -oServerAliveInterval=60';
+Readonly my $ssh     => '/usr/bin/ssh -oStrictHostKeyChecking=no '
+                     . '-oServerAliveInterval=60';
 Readonly my $scp     => '/usr/bin/scp -oStrictHostKeyChecking=no';
+Readonly my $dest    => '/tmp/packybin';
 
 my %hostmap;
 my $gorc         = $ENV{HOME}.'/.gorc';
-my $hostmap_file = $ENV{HOME}.'/.go_hostmap.txt';
 my $gitdir       = $ENV{GITDIR};
 my $godir        = $gitdir.'/maccfg/go';
-my @ADAPTERS     = qw/utun0 en5 en4 en0 en1/;
 my $push_cmds    = 1;
 my $def_user     = 'root';
 my $method       = 'password';
@@ -31,6 +33,157 @@ my $fake         = 0;
 my $force_os;
 my $def_passwd;
 my %config;
+
+process_command_line();
+
+while (@ARGV) {
+    my $target = next_target();
+    open_new_terminal( $target );
+}
+
+sub next_target {
+    my $target = shift @ARGV;
+
+    if (exists $config{aliases} && exists $config{aliases}->{$target}) {
+        print "ALIAS: $target => ".$config{aliases}->{$target}."\n" if $verbose;
+        $target = $config{aliases}->{$target};
+    }
+
+    unless (is_up($target)) {
+        print "$target is down!\n" if $target;
+        exit;
+    }
+
+    if (exists $config{hosts}) {
+        if (exists $config{hosts}->{$target}) {
+            set_from_rc_data($config{hosts}->{$target});
+        }
+    }
+
+    return $target;
+}
+
+sub open_new_terminal {
+    my $target   = shift;
+    print "TARGET: $target\n" if $verbose;
+    my $commands = shell_commands( $target );
+    my $script   = new_terminal_applescript( $commands );
+    my $tempfile = make_temp_osa( $target, $script );
+
+    print `osascript $tempfile` unless ($fake);
+}
+
+sub shell_commands {
+    my ($target) = @_;
+
+    my @after_ssh;
+    my @commands;
+
+    if (0) { # future reimplementation of push commands
+    }
+
+    push @after_ssh, q{|| any};
+
+    my $sshcmd = ssh_command($target, @after_ssh);
+
+    push @commands, (
+        echo(qq{Connecting to $def_user\@$target via SSH}),
+        echo($sshcmd),  $sshcmd
+    );
+
+    return make_temp_sh( $target, @commands );
+}
+
+sub ssh_command {
+    my $target = shift @_;
+    my $cmd;
+    if ($method eq 'password') {
+        $cmd = qq{$sshpass -p $def_passwd $ssh $def_user\@$target};
+    }
+    else {
+        $cmd = qq{$ssh $def_user\@$target};
+    }
+    if (@_) {
+        $cmd .= q{ } . join q{ }, @_;
+    }
+    return $cmd;
+}
+
+
+sub make_temp_osa {
+    my $target = shift;
+    my $script = join "\n", @_;
+
+    my $tmp = tempfile($target, 'applescript');
+    open my $out, '>', $tmp;
+    print {$out} $script;
+    close $out;
+
+    return $tmp;
+}
+
+sub make_temp_sh {
+    my $target = shift;
+    my $script = join "\n", @_;
+
+    my $tmp = tempfile($target, 'sh');
+    open my $out, '>', $tmp;
+    print {$out}  de_indent(qq[
+        #!$bash
+        any () {
+          echo; read -n 1 -s -p "Press any key to exit"
+        }
+
+        $script
+    ]);
+
+    print {$out} "\n\nrm -f ", tempfile($target, '*'), "\n";
+    close $out;
+    chmod 0775, $tmp;
+
+    return $tmp;
+}
+
+sub tempfile {
+    my ($target, $ext) = @_;
+    return sprintf '/tmp/go_%d_%s.%s', $$, $target, $ext;
+}
+
+sub echo {
+    my $str = shift // q{};
+    return q{} unless $verbose;
+    return qq{echo $str};
+}
+
+sub is_up {
+    my $target = shift;
+    my $output = `ping -c 1 -t 5 $target`;
+    my ($up)   = $output =~ /1 packets transmitted, 1 packets received/;
+    return $up if $up;
+
+    if ($output =~ /^PING\s+(\S+)\s+/) {
+        $target = $1;
+    }
+    print STDERR "$target is down!\n";
+    return;
+}
+
+#
+# AppleScript generating subroutines
+#
+
+sub new_terminal_applescript {
+    my ($cmd) = @_;
+    return de_indent(qq{
+      tell application "iTerm2"
+        set newWindow to (create window with default profile command "$cmd")
+      end tell
+    });
+}
+
+#
+# command line processing
+#
 
 sub set_option_readonly {
     my ($key, $value) = @_;
@@ -54,189 +207,135 @@ sub set_option_readonly {
     }
 }
 
-GetOptions
-    "rc=s"       => \$gorc,
-    "adapter=s"  => \@ADAPTERS,
-    "hostmap=s"  => \$hostmap_file,
-    "commands!"  => \$push_cmds,
-    "os=s"       => \$force_os,
-    "noos"       => sub { $force_os = 'none' },
-    "verbose+"   => \$verbose,
-    "fake!"      => \$fake,
-    "username=s" => \&set_option_readonly,
-    "publickey"  => \&set_option_readonly,
-    "password"   => \&set_option_readonly,
-    "hostbased"  => \&set_option_readonly,
-    "prompt"     => \&set_option_readonly;
-
-if (-f $gorc) {
-    my $conf = Config::General->new($gorc);
-    %config  = $conf->getall;
-    set_from_rc_data(\%config);
-}
-
-my $ip = get_ip();
-
-read_hostmap();
-
-while (@ARGV) {
-
-    my $target = next_target();
-
-    my $os = ($force_os) ? $force_os : get_os($target);
-    print "OS: $os\n" if ($verbose);
-
-    my $commands = os_commands( ($push_cmds ? $os : undef), $target );
-    my $script   = make_temp_osa( $target, new_terminal_applescript($commands) );
-
-    print `osascript $script` unless ($fake);
-    #connect_to_target($target, $script, $tmp);
-}
-
-sub next_target {
-    my $target = shift @ARGV;
-
-    if (exists $config{aliases} && exists $config{aliases}->{$target}) {
-        $target = $config{aliases}->{$target};
+sub set_from_rc_data {
+    my $config = shift;
+    print '$config = '.Dumper($config) if $verbose;
+    if (exists $config->{default_password}) {
+        $def_passwd = $config->{default_password}
+            unless readonly($def_passwd);
     }
 
-    unless (is_up($target)) {
-        print "$target is down!\n" if $target;
-        exit;
+    if (exists $config->{default_username}) {
+        $def_user = $config->{default_username}
+            unless readonly($def_user);
     }
 
-    if (exists $config{hosts}) {
-        if (exists $config{hosts}->{$target}) {
-            set_from_rc_data($config{hosts}->{$target});
+    if (exists $config->{commands}) {
+        ($push_cmds) = ($config->{commands} !~ /^(no|0)$/i);
+    }
+
+    if (exists $config->{method} && ! readonly($method)) {
+        foreach ($config->{method}) {
+            /publickey/ && do { $method = 'publickey'; last };
+            /password/  && do { $method = 'password';  last };
+            /hostbased/ && do { $method = 'hostbased'; last };
         }
     }
 
-    return $target;
 }
 
-sub new_terminal_applescript {
-    my ($cmd) = @_;
-    if ($ENV{ITERM_SESSION_ID} =~ /:/) {
-        # iTerm3 v3!
-return qq{
-tell application "iTerm2"
-  set newWindow to (create window with default profile command "$cmd")
-end tell
-};
-    }
-    else {
-return qq{tell application "iTerm"
-  set oldterm to current terminal
-  set newterm to (make new terminal)
-  tell newterm
-    set newsession to (make new session at the end of sessions)
-    tell newsession
-      exec command "$cmd"
-    end tell
-  end tell
-end tell
-};
+sub process_command_line {
+    GetOptions
+#        "commands!"  => \$push_cmds,
+#        "os=s"       => \$force_os,
+#        "noos"       => sub { $force_os = 'none' },
+        "rc=s"       => \$gorc,
+        "verbose+"   => \$verbose,
+        "fake!"      => \$fake,
+        "username=s" => \&set_option_readonly,
+        "publickey"  => \&set_option_readonly,
+        "password"   => \&set_option_readonly,
+        "hostbased"  => \&set_option_readonly,
+        "prompt"     => \&set_option_readonly;
+
+    if (-f $gorc) {
+        my $conf = Config::General->new($gorc);
+        %config  = $conf->getall;
+        set_from_rc_data(\%config);
     }
 }
 
-sub make_temp_osa {
-    my $target = shift;
-    my $script = join "\n", @_;
+#
+# utility functions
+#
 
-    my $tmp = sprintf '/tmp/go_%d_%s.osa', $$, $target;
-    open my $out, '>', $tmp;
-    print {$out} $script;
-    close $out;
-
-    return $tmp;
-}
-
-sub make_temp_sh {
-    my $target = shift;
-    my $script = join "\n", @_;
-
-    my $tmp = sprintf '/tmp/go_%d_%s.sh', $$, $target;
-    open my $out, '>', $tmp;
-    print {$out} <<TEMP;
-#!/usr/local/bin/bash
-any () {
-  echo; read -n 1 -s -p "Press any key to exit"
-}
-
-$script
-TEMP
-    print {$out} sprintf "rm -f /tmp/go_%d_%s*\n", $$, $target;
-    close $out;
-    chmod 0775, $tmp;
-
-    return $tmp;
-}
-
-sub connect_to_target {
-    my($target, $script, $tmp) = @_;
-
-    print "Connecting to $target ";
-    print qq{using command "$ssh" } if ($verbose);
-    print "...\n";
-    print $script if ($verbose > 1);
-    print `osascript $tmp` unless ($fake);
-    unlink $tmp;
-}
-
-sub copy_files_to_node {
-    my ($target, $os) = @_;
-    my (@files, $dest);
-
-    my @existing = existing_sessions();
-    if ( any { $_ =~ /$target/ } @existing ) {
-        print "Existing session on $target; skipping file copy.\n";
-        return;
+sub min_length {
+    my $length = ~0; # maximum unsigned integer
+    foreach my $str ( @_ ) {
+        next unless defined $str;
+        $length = min($length, length $str);
     }
+    return $length != ~0 ? $length : 0;
+}
 
-    $dest = '/tmp/packybin';
-    if ($os eq 'rhel') {
-        @files = ( '~/Sites/bash/linux_bash.sh',
-                   '~/Sites/bash/aix_less.bin' );
-    }
-    elsif ($os eq 'aix') {
-        @files = ( '~/Sites/bash/aix_dash.sh',
-                   '~/Sites/bash/aix_less.bin' );
-    }
+sub de_indent {
+    my $text = shift;
 
-    if (@files) {
-        print "Making temporary directory on $target ";
-        my $cmd = ssh_command($target);
-        if ($verbose) {
-            my $files = join q{ }, @files;
-            print qq{using $cmd "mkdir -p $dest"};
+    $text =~ s/\A\s*\n//s;  # remove leading blank line
+    $text =~ s/\s+\z//s;    # remove trailing whitespace
+
+    my @lines = split /\n/, $text;
+
+    # determine the minimum indentation
+    my $indent = min_length( map { /^(\s+)/; $1 } grep { ! /^\s*$/ } @lines );
+
+    # trim off the minimum indentation
+    my $sindent = '\s' x $indent;
+
+    $text =~ s/^$sindent//msxg;
+
+    return $text;
+}
+
+##############################################################################
+
+__END__
+
+##############################################################################
+
+sub shell_commands_future {
+    my ($target) = @_;
+
+    my @commands;
+
+    my $sshcmd = qq{$ssh || any};
+
+    if (0) { # future reimplementation of push commands
+        my $source = "bash --rcfile /tmp/packybin/bashrc";
+
+        my @files = grep { ! /~$/ } glob "$godir/common/*";
+
+        if ($os eq 'rhel') {
+            push @files, grep { ! /~$/ } glob "$godir/linux/*";
         }
-        print "...\n";
-        print `$cmd "mkdir -p $dest"`;
-
-        my $cp = scp_command($target, $dest, @files);
-        print "Copying files to $target ";
-        if ($verbose) {
-            my $files = join q{ }, @files;
-            print qq{using $scp $files $def_user\@$target:$dest};
+        elsif ($os eq 'solaris') {
+            push @files, grep { ! /~$/ } glob "$godir/solaris/*";
         }
-        print "...\n";
-        print `$cp`;
-    }
-}
+        elsif ($os eq 'aix') {
+            push @files, grep { ! /~$/ } glob "$godir/aix/*";
+            # we have DASH on AIX
+            $source = "dash --rcfile /tmp/packybin/dashrc -l";
+        }
 
-sub ssh_command {
-    my $target = shift @_;
-    my $cmd;
-    if ($method eq 'password') {
-        $cmd = qq{$sshpass -p $def_passwd $ssh $def_user\@$target};
+        my $mkdir = qq{$ssh "mkdir -p $dest"};
+        my $scp   = scp_command($target, $dest, @files);
+
+        push @commands, (
+            echo(qq{Making temporary directory on $target}),
+            echo($mkdir),  $mkdir,
+            echo(qq{Copying temporary scripts}),
+            echo($scp),    $scp,
+        );
+
+        $sshcmd = qq{$ssh -t "$source" || any};
     }
-    else {
-        $cmd = qq{$ssh $def_user\@$target};
-    }
-    if (@_) {
-        $cmd .= q{ } . join q{ }, @_;
-    }
-    return $cmd;
+
+    push @commands, (
+        echo(qq{Connecting to $target via SSH}),
+        echo($sshcmd),  $sshcmd
+    );
+
+    return make_temp_sh( $target, @commands );
 }
 
 sub scp_command {
@@ -251,10 +350,98 @@ sub scp_command {
     }
 }
 
-sub echo {
-    my $str = shift // q{};
-    return q{} unless $verbose;
-    return qq{echo $str};
+sub existing_sessions {
+    my @sessions;
+    my $ps = Proc::ProcessTable->new->table;
+    my $match = qr{$iTerm2 --server.* $ssh};
+    foreach my $p ( @$ps ) {
+        next unless $p->cmndline =~ /$match/;
+        push @sessions, $p->cmndline;
+        $sessions[-1] =~ s/$match\s+//;
+    }
+    return @sessions;
+}
+
+#
+# for dealing with Cisco anyconnect, which I don't have to do anymore
+#
+
+sub add_search_domains {
+    my $file = "/tmp/scutil.$$.txt";
+    open my $fh, '>', $file;
+    print {$fh} qq{open\nd.init\nget State:/Network/Service/com.cisco.anyconnect/DNS\n};
+    foreach my $domain (@_) {
+        print {$fh} "d.add DomainName $domain\n"
+    }
+    print {$fh} qq{set State:/Network/Service/com.cisco.anyconnect/DNS\nquit\n};
+    close $fh;
+
+    print "Adding search domains!\n";
+    if ($verbose) {
+        print "sudo scutil < -\n" . `cat $file`;
+    }
+    `sudo scutil <$file`;
+    unlink $file;
+}
+
+sub get_search_domains {
+    my $ps = `ps -ef`;
+    my $service;
+    if ($ps =~ /Cisco AnyConnect Secure Mobility Client/) {
+    }
+    my $file = "/tmp/scutil.$$.txt";
+    my $cmds = qq{open\nget State:/Network/Service/com.cisco.anyconnect/DNS\nd.show\nquit\n};
+    open my $fh, '>', $file;
+    print {$fh} $cmds;
+    close $fh;
+
+    print "scutil < -\n$cmds\n" if ($verbose);
+    open my $pipe, "scutil <$file |";
+    my $mode;
+    my @list;
+    while (my $line = <$pipe>) {
+        print $line if ($verbose);
+        if ($line =~ /SearchDomains/) {
+            $mode = 'domainlist';
+            next;
+        }
+        next unless $mode;
+        last if $line =~ /\}/;
+        my($domain) = $line =~ /\d+\s+:\s+(\S+)\s*$/;
+        push @list, $domain;
+    }
+    close $pipe;
+    unlink $file;
+
+    return @list;
+}
+
+sub get_os {
+    my ($target) = @_;
+    return q{} unless $push_cmds; # the OS is irrelevant if we're not pushing
+                                  # any commands to the remote host
+
+    $target = lc $target;
+
+    return 'rhel'    if $target =~ /^rh\d+/;
+    return 'solaris' if $target =~ /^sl\d+/;
+    return 'aix'     if $target =~ /^ax\d+/;
+
+    if (exists $hostmap{$target}) {
+        if (exists $hostmap{$target}->{os}) {
+            return $hostmap{$target}->{os};
+        }
+    }
+    else {
+        print "Running nmap -O $target to determine OS...\n";
+        my $os   = 'unknown';
+        my $data = `sudo nmap -O $target`;
+        if ($data =~ /Running: Linux/) {
+            $os = 'rhel';
+        }
+        $hostmap{$target} = { os => $os, nmap => $data };
+        write_hostmap();
+    }
 }
 
 sub os_commands {
@@ -298,156 +485,45 @@ sub os_commands {
     return make_temp_sh( $target, @commands );
 }
 
-sub is_up {
-    my $target = \$_[0];
-    my $output = `ping -c 1 -t 5 $$target`;
-    ($$target) = $output =~ /^PING\s+(\S+)\s+/;
-    my ($up)   = $output =~ /1 packets transmitted, 1 packets received/;
-    return $up;
-}
+sub copy_files_to_node {
+    my ($target, $os) = @_;
+    my (@files, $dest);
 
-sub read_hostmap {
-    if (-e $hostmap_file) {
-        my $data;
-        open my $file, '<', $hostmap_file;
-        while (my $line = <$file>) {
-            $data .= $line;
+    my @existing = existing_sessions();
+    if ( any { $_ =~ /$target/ } @existing ) {
+        print "Existing session on $target; skipping file copy.\n";
+        return;
+    }
+
+    $dest = '/tmp/packybin';
+    if ($os eq 'rhel') {
+        @files = ( '~/Sites/bash/linux_bash.sh',
+                   '~/Sites/bash/aix_less.bin' );
+    }
+    elsif ($os eq 'aix') {
+        @files = ( '~/Sites/bash/aix_dash.sh',
+                   '~/Sites/bash/aix_less.bin' );
+    }
+
+    if (@files) {
+        print "Making temporary directory on $target ";
+        my $cmd = ssh_command($target);
+        if ($verbose) {
+            my $files = join q{ }, @files;
+            print qq{using $cmd "mkdir -p $dest"};
         }
-        close $file;
-        %hostmap = %{ eval $data };
-    }
-}
+        print "...\n";
+        print `$cmd "mkdir -p $dest"`;
 
-sub write_hostmap {
-    open my $file, '>', $hostmap_file;
-    print {$file} Dumper(\%hostmap);
-    close $file;
-}
-
-sub get_os {
-    my ($target) = @_;
-    return q{} unless $push_cmds; # the OS is irrelevant if we're not pushing
-                                  # any commands to the remote host
-
-    $target = lc $target;
-
-    return 'rhel'    if $target =~ /^rh\d+/;
-    return 'solaris' if $target =~ /^sl\d+/;
-    return 'aix'     if $target =~ /^ax\d+/;
-
-    if (exists $hostmap{$target}) {
-        if (exists $hostmap{$target}->{os}) {
-            return $hostmap{$target}->{os};
+        my $cp = scp_command($target, $dest, @files);
+        print "Copying files to $target ";
+        if ($verbose) {
+            my $files = join q{ }, @files;
+            print qq{using $scp $files $def_user\@$target:$dest};
         }
-    }
-    else {
-        print "Running nmap -O $target to determine OS...\n";
-        my $os   = 'unknown';
-        my $data = `sudo nmap -O $target`;
-        if ($data =~ /Running: Linux/) {
-            $os = 'rhel';
-        }
-        $hostmap{$target} = { os => $os, nmap => $data };
-        write_hostmap();
+        print "...\n";
+        print `$cp`;
     }
 }
 
-sub get_ip {
-    foreach my $adapter (@ADAPTERS) {
-        my $data = `ifconfig $adapter 2>/dev/null`;
-        if (my($ip) = $data =~ /inet\s+(\d+\.\d+\.\d+\.\d+)/) {
-            return $ip;
-        }
-    }
-}
 
-sub set_from_rc_data {
-    my $config = shift;
-    print '$config = '.Dumper($config) if $verbose;
-    if (exists $config->{default_password}) {
-        $def_passwd = $config->{default_password}
-            unless readonly($def_passwd);
-    }
-
-    if (exists $config->{default_username}) {
-        $def_user = $config->{default_username}
-            unless readonly($def_user);
-    }
-
-    if (exists $config->{commands}) {
-        ($push_cmds) = ($config->{commands} !~ /^(no|0)$/i);
-    }
-
-    if (exists $config->{method} && ! readonly($method)) {
-        foreach ($config->{method}) {
-            /publickey/ && do { $method = 'publickey'; last };
-            /password/  && do { $method = 'password';  last };
-            /hostbased/ && do { $method = 'hostbased'; last };
-        }
-    }
-
-}
-
-sub get_search_domains {
-    my $ps = `ps -ef`;
-    my $service;
-    if ($ps =~ /Cisco AnyConnect Secure Mobility Client/) {
-    }
-    my $file = "/tmp/scutil.$$.txt";
-    my $cmds = qq{open\nget State:/Network/Service/com.cisco.anyconnect/DNS\nd.show\nquit\n};
-    open my $fh, '>', $file;
-    print {$fh} $cmds;
-    close $fh;
-
-    print "scutil < -\n$cmds\n" if ($verbose);
-    open my $pipe, "scutil <$file |";
-    my $mode;
-    my @list;
-    while (my $line = <$pipe>) {
-        print $line if ($verbose);
-        if ($line =~ /SearchDomains/) {
-            $mode = 'domainlist';
-            next;
-        }
-        next unless $mode;
-        last if $line =~ /\}/;
-        my($domain) = $line =~ /\d+\s+:\s+(\S+)\s*$/;
-        push @list, $domain;
-    }
-    close $pipe;
-    unlink $file;
-
-    return @list;
-}
-
-sub add_search_domains {
-    my $file = "/tmp/scutil.$$.txt";
-    open my $fh, '>', $file;
-    print {$fh} qq{open\nd.init\nget State:/Network/Service/com.cisco.anyconnect/DNS\n};
-    foreach my $domain (@_) {
-        print {$fh} "d.add DomainName $domain\n"
-    }
-    print {$fh} qq{set State:/Network/Service/com.cisco.anyconnect/DNS\nquit\n};
-    close $fh;
-
-    print "Adding search domains!\n";
-    if ($verbose) {
-        print "sudo scutil < -\n" . `cat $file`;
-    }
-    `sudo scutil <$file`;
-    unlink $file;
-}
-
-sub existing_sessions {
-    my @sessions;
-    my $ps = Proc::ProcessTable->new->table;
-    my $match = qr{$iTerm2 --server.* $ssh};
-    foreach my $p ( @$ps ) {
-        next unless $p->cmndline =~ /$match/;
-        push @sessions, $p->cmndline;
-        $sessions[-1] =~ s/$match\s+//;
-    }
-    return @sessions;
-}
-
-__END__
