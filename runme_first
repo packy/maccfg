@@ -16,3 +16,7 @@ if ! which brew; then
 else
     brew update
 fi
+
+# disable ^space as the shortcut for "select the previous input source"
+/usr/libexec/PlistBuddy -c "Set :AppleSymbolicHotKeys:60:enabled false" \
+                        ~/Library/Preferences/com.apple.symbolichotkeys.plist
