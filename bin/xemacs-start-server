@@ -1,8 +1,11 @@
 #!/bin/sh
 EMACSSERVER=$TMPDIR/emacs$EUID/server
 if [[ ! -e $EMACSSERVER ]]; then
-  # launch the editor
-  /Applications/Emacs.app/Contents/MacOS/Emacs $* &
-  # wait for the server to start up
-  while [[ ! -e $EMACSSERVER ]]; do sleep 1; done
+    # launch the editor
+    # /Applications/Emacs.app/Contents/MacOS/Emacs $* &
+    open -a emacs # let macOS take care of starting emacs if it isn't open
+
+    # wait for the server to start up
+    while [[ ! -e $EMACSSERVER ]]; do sleep 1; done
 fi
+osascript -e 'tell application "Emacs"' -e 'activate' -e 'end tell'

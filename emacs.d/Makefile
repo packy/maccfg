@@ -3,6 +3,8 @@ modes := $(filter-out $(wildcard *~), $(wildcard modes/*))
 elpa  := $(filter-out $(wildcard *~), $(wildcard elpa/*))
 pwd   := $(shell pwd)
 
+$(modes) $(elpa):
+
 .PHONY: install
 install: $(modes) $(elpa)
 	@echo Symlinking Emacs Modes...

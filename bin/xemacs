@@ -1,6 +1,5 @@
 #!/bin/sh
 $HOME/bin/xemacs-start-server
-osascript -e 'tell application "Emacs"' -e 'activate' -e 'end tell'
 EMACSCLIENT=/Applications/Emacs.app/Contents/MacOS/bin/emacsclient
 
 if [[ $1 == "-r" ]]; then
