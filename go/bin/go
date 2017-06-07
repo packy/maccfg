@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use v5.010;
 
+use Carp;
 use Config::General;
 use Data::Dumper::Concise;
 use Getopt::Long;
@@ -28,6 +29,7 @@ my $godir        = $gitdir.'/maccfg/go';
 my $push_cmds    = 1;
 my $def_user     = 'root';
 my $method       = 'password';
+my $check_if_up  = 1;
 my $verbose      = 0;
 my $fake         = 0;
 my $force_os;
@@ -49,15 +51,16 @@ sub next_target {
         $target = $config{aliases}->{$target};
     }
 
-    unless (is_up($target)) {
-        print "$target is down!\n" if $target;
-        exit;
-    }
-
     if (exists $config{hosts}) {
         if (exists $config{hosts}->{$target}) {
             set_from_rc_data($config{hosts}->{$target});
         }
+    }
+
+    print "CHECK_IF_UP: $check_if_up\n" if $verbose;
+    if ( $check_if_up && is_up($target) ) {
+        confess "$target is down!\n" if $target;
+        exit;
     }
 
     return $target;
@@ -164,7 +167,6 @@ sub is_up {
     if ($output =~ /^PING\s+(\S+)\s+/) {
         $target = $1;
     }
-    print STDERR "$target is down!\n";
     return;
 }
 
@@ -209,7 +211,7 @@ sub set_option_readonly {
 
 sub set_from_rc_data {
     my $config = shift;
-    print '$config = '.Dumper($config) if $verbose;
+    print '$config_from_rc_data = '.Dumper($config) if $verbose;
     if (exists $config->{default_password}) {
         $def_passwd = $config->{default_password}
             unless readonly($def_passwd);
@@ -232,6 +234,19 @@ sub set_from_rc_data {
         }
     }
 
+    if (exists $config->{check_is_up}) {
+        if ( ! $config->{check_if_up} ||
+               $config->{check_if_up} =~ /^f(?:alse)?/ ) {
+            $check_if_up = 0;
+        }
+    }
+    print 'results => '.Dumper({
+        def_password  => $def_passwd,
+        def_user      => $def_user,
+        push_commands => $push_cmds,
+        method        => $method,
+        check_if_up   => $check_if_up,
+    }) if $verbose;
 }
 
 sub process_command_line {
