@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use v5.010;
 
-use Carp;
 use Config::General;
 use Data::Dumper::Concise;
 use Getopt::Long;
@@ -59,7 +58,7 @@ sub next_target {
 
     print "CHECK_IF_UP: $check_if_up\n" if $verbose;
     if ( $check_if_up && is_up($target) ) {
-        confess "$target is down!\n" if $target;
+        print STDERR "$target is down!\n" if $target;
         exit;
     }
 
