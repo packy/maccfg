@@ -82,40 +82,60 @@ alias llll='/bin/ls -bGlheOpH'
 # background for setuid executables, etc.
 
 export  CLICOLOR=1
-export  LSCOLORS=ExfxFxdxCxehbhabagacad
+export  LSCOLORS=ExFxfxdxCxehbhBxGxDcDx
+#export LSCOLORS=ExfxFxdxCxehbhabagacad
 #export LSCOLORS=ExfxFxdxCxGgDdabagacad
 #export LSCOLORS=Exfxcxdxbxegedabagacad
 
 function demo_ls_colors () {
-    echo Generate new spec with http://geoff.greer.fm/lscolors/
-    echo
-    DIR=/tmp/color_demo
-    FORMAT01=" 1 - directory (%s):           "; FILE01=$DIR/directory
-    FORMAT02=" 2 - symbolic link (%s):       "; FILE02=$DIR/symbolic_link
-    FORMAT03=" 3 - socket (%s):              "; FILE03=$DIR/socket
-    FORMAT04=" 4 - pipe (%s):                "; FILE04=$DIR/pipe
-    FORMAT05=" 5 - executable (%s):          "; FILE05=$DIR/executable
-    FORMAT06=" 6 - block special (%s):       "; FILE06=/dev/disk0
-    FORMAT07=" 7 - character special (%s):   "; FILE07=/dev/console
-    FORMAT08=" 8 - executable
-     with setuid bit set (%s): ";               FILE08=${FILE05}_w_setuid
-    FORMAT09=" 9 - executable
-     with setgid bit set (%s): ";               FILE09=${FILE05}_w_setgid
-    FORMAT10="10 - directory writable to others,
-         with sticky bit (%s): ";               FILE10=${FILE01}_w_sticky_bit
-    FORMAT11="11 - directory writable to others,
-      without sticky bit (%s): ";               FILE11=${FILE01}_wo_sticky_bit
+    #
+    # define examples
+    #
+    local DIR=/tmp/cdemo
+    local FILE01=1-directory
+    local FILE02=2-symbolic_link
+    local FILE03=3-socket
+    local FILE04=4-pipe
+    local FILE05=5-executable
+    local FILE06=/dev/disk0
+    local FILE07=/dev/console
+    local FILE08=8-exe_setuid
+    local FILE09=9-exe_setgid
+    local FILE10=A-dir_writeothers_stickybit
+    local FILE11=B-dir_writeothers_NOsticky
 
-    mkdir -p   $FILE01 $FILE10 $FILE11
-    chmod 1777 $FILE10
-    chmod 2777 $FILE11
+    #
+    # make examples
+    #
+    mkdir -p $DIR; cd $DIR
+    mkdir -p $FILE01
     ln -s /tmp $FILE02
     python -c "import socket as s; sock = s.socket(s.AF_UNIX); sock.bind('$FILE03')"
     mkfifo $FILE04
-    touch  $FILE05 ; chmod 0755 $FILE05
-    touch  $FILE08 ; chmod 4755 $FILE08
-    touch  $FILE09 ; chgrp everyone $FILE09 ; chmod 2755 $FILE09
-    ls -Gl $DIR
+    touch    $FILE05 ;                          chmod u+x    $FILE05
+    touch    $FILE08 ;                          chmod u+sx   $FILE08
+    touch    $FILE09 ; chgrp everyone $FILE09 ; chmod g+sx   $FILE09
+    mkdir -p $FILE10 ;                          chmod o+w,+t $FILE10
+    mkdir -p $FILE11 ;                          chmod o+w    $FILE11
+
+    echo
+    echo Generate new spec with http://geoff.greer.fm/lscolors/
+    echo
+    local  FORMAT01=" 1 - directory (%s):                                "
+    local  FORMAT02=" 2 - symbolic link (%s): . . . . . . . . . . . . .  "
+    local  FORMAT03=" 3 - socket (%s):                                   "
+    local  FORMAT04=" 4 - pipe (%s):  . . . . . . . . . . . . . . . . .  "
+    local  FORMAT05=" 5 - executable (%s):                               "
+    local  FORMAT06=" 6 - block special (%s): . . . . . . . . . . . . .  "
+    local  FORMAT07=" 7 - character special (%s):                        "
+    local  FORMAT08=" 8 - executable with setuid bit set (%s):  . . . .  "
+    local  FORMAT09=" 9 - executable with setgid bit set (%s):           "     
+    local  FORMAT10=" A - dir writeable to others, with sticky bit (%s): "
+    local  FORMAT11=" B - dir writeable to others, NO sticky bit (%s):   "
+
+    # display colors!
+    ls -Glnhd * $FILE06 $FILE07
+
     echo
     echo LSCOLORS=$LSCOLORS yields:
     for i in 1 2 3 4 5 6 7 8 9 10 11; do
@@ -124,5 +144,7 @@ function demo_ls_colors () {
         CODE=$(perl -e 'print substr($ENV{LSCOLORS}, ($ARGV[0]-1) * 2, 2)' $i)
         printf "$FORMAT" $CODE; ls -Gd $FILE
     done
+    echo
+    cd - >/dev/null
     rm -rf $DIR
 }
