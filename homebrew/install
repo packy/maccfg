@@ -1,0 +1,41 @@
+#!/bin/bash
+
+mkdir -p .d
+
+#
+# make sure /usr/local is writable
+#
+USER=$(whoami)
+if [[ ! -w /usr/local ]]; then
+    echo Error: The /usr/local directory is not writable.
+    echo running sudo chown -R $USER:admin /usr/local
+    sudo chown -R $USER:admin /usr/local
+fi
+
+#
+# check to see if homebrew is installed
+#
+if ! which brew >/dev/null 2>&1; then
+    URL=https://raw.githubusercontent.com/Homebrew/install/master/install
+    ruby -e "$(curl -fsSL $URL)"
+fi
+
+#
+# make sure Caskroom is installed
+#
+if [[ ! -d /usr/local/Caskroom ]]; then
+    brew tap caskroom/cask
+fi
+if [[ -d /usr/local/Caskroom ]]; then
+    touch .d/caskroom
+fi
+
+#
+# dependency files
+#
+if which brew >/dev/null 2>&1; then
+    touch .d/homebrew
+    brew list      | while read PKG; do touch .d/$PKG.brew; done
+    brew cask list | while read PKG; do touch .d/$PKG.cask; done
+fi
+

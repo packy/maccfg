@@ -1,29 +1,44 @@
+$(shell mkdir -p .d)
+
 .PHONY: install
-install: iterm keka diff-so-fancy hr
+install: homebrew iterm2 keka diff-so-fancy hr screenresolution pcre readline git
 
-/usr/local/Caskroom:
-	brew tap caskroom/cask
+homebrew:         .d/homebrew
+apr-util:         .d/apr-util.brew
+apr:              .d/apr.brew
+bash:             .d/bash.brew
+diff-so-fancy:    .d/diff-so-fancy.brew
+emacs:            .d/emacs.cask
+git:              .d/git.brew
+hr:               .d/hr.brew
+iterm2:           .d/iterm2.cask
+keka:             .d/keka.cask
+mysql:            .d/mysql.brew
+openssl:          .d/openssl.brew
+pcre:             .d/pcre.brew
+perl:             .d/perl.brew
+readline:         .d/readline.brew
+screenresolution: .d/screenresolution.brew
+sqlite:           .d/sqlite.brew
+subversion:       .d/subversion.brew
+wget:             .d/wget.brew
 
-iterm: /Applications/iTerm.app
+.d/homebrew:
+	@./install
 
-/Applications/iTerm.app: /usr/local/Caskroom
-	brew cask install iterm2
+.d/caskroom:
+	@./install
 
-#/usr/local/bin/sshpass: /usr/local/Cellar/sshpass/1.06/bin/sshpass
-#	brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb
+.d/%.cask: .d/caskroom
+	brew cask install $*
+	@./install
 
-keka: /Applications/Keka.app
+.d/%.brew:
+	brew install $*
+	@./install
 
-/Applications/Keka.app: /usr/local/Caskroom
-	brew cask install keka
-
-diff-so-fancy: /usr/local/bin/diff-so-fancy
-
-/usr/local/bin/diff-so-fancy: /usr/local/Caskroom
-	brew install diff-so-fancy
-
-hr: /usr/local/bin/hr
-
-/usr/local/bin/hr: /usr/local/Caskroom
-	brew install hr
+sshpass: .d/sshpass.brew
+.d/sshpass.brew:
+	brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb
+	@./install
 
