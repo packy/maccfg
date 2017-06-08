@@ -1,7 +1,8 @@
 $(shell mkdir -p .d)
 
 .PHONY: install
-install: homebrew iterm2 keka diff-so-fancy hr screenresolution pcre readline git
+install: homebrew iterm2 keka diff-so-fancy hr screenresolution pcre \
+         readline git quicklook
 
 homebrew:         .d/homebrew
 apr-util:         .d/apr-util.brew
@@ -10,6 +11,7 @@ bash:             .d/bash.brew
 diff-so-fancy:    .d/diff-so-fancy.brew
 emacs:            .d/emacs.cask
 git:              .d/git.brew
+highlight:        .d/highlight.brew
 hr:               .d/hr.brew
 iterm2:           .d/iterm2.cask
 keka:             .d/keka.cask
@@ -21,7 +23,13 @@ readline:         .d/readline.brew
 screenresolution: .d/screenresolution.brew
 sqlite:           .d/sqlite.brew
 subversion:       .d/subversion.brew
+virtualbox:       .d/virtualbox.cask
 wget:             .d/wget.brew
+
+quicklook: .d/betterzipql.cask .d/quicklook-csv.cask qlcolorcode \
+           .d/quicklook-json.cask .d/webpquicklook.cask 
+
+qlcolorcode: highlight .d/qlcolorcode.cask
 
 .d/homebrew:
 	@./install
