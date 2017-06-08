@@ -256,6 +256,7 @@ sub process_command_line {
         "rc=s"       => \$gorc,
         "verbose+"   => \$verbose,
         "fake!"      => \$fake,
+        "check!"     => \$check_if_up,
         "username=s" => \&set_option_readonly,
         "publickey"  => \&set_option_readonly,
         "password"   => \&set_option_readonly,
