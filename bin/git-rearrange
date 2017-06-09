@@ -1,19 +1,7 @@
 #!/usr/bin/env bash
-git_commits_ahead () {
-    DELTA=/tmp/git_upstream_status_delta.$$
-
-    git for-each-ref --format="%(refname:short) %(upstream:short)" $(git-symbolic-ref HEAD) > $DELTA
-    read local remote < $DELTA
-    if [ ! -z "$remote" ]; then
-        # this branch has an upstream remote
-        git rev-list --left-right ${local}...${remote} -- 2>/dev/null >$DELTA || continue
-        echo $(grep -c '^<' $DELTA)
-    else
-        git rev-list --left-right master..${local} -- 2>/dev/null >$DELTA || continue
-        echo $(grep -c '^>' $DELTA)
-    fi
-    rm -f $DELTA
-}
+if ! function_exists git_commits_ahead; then
+    source $HOME/.bash_git
+fi
 
 AHEAD=$(git_commits_ahead)
 

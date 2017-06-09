@@ -11,10 +11,6 @@ else
     alias xe=emacs
 fi
 
-export GREP_COLOR='30;43'
-export GREP_OPTIONS='--color=auto'
-#alias grep='grep --color=auto'
-
 alias clean='rm -fv *~ .*~'
 
 alias clear='printf "\e[2J"'
@@ -27,7 +23,9 @@ alias eject="osascript -e 'tell application \"Finder\" to eject (every disk whos
 
 alias rsync_pwd_to='rsync -avz .'
 
-alias vbox=/Applications/VirtualBox.app/Contents/Resources/VirtualBoxVM.app/Contents/MacOS/VBoxManage
+if [[ -d /Applications/VirtualBox.app ]]; then
+    alias vbox=/Applications/VirtualBox.app/Contents/Resources/VirtualBoxVM.app/Contents/MacOS/VBoxManage
+fi
 
 # aliases to AppleScripts to open Google Tools
 
@@ -36,5 +34,3 @@ export MY_APPLESCRIPTS="$GITDIR/maccfg/AppleScript"
 alias inbox='osascript "$MY_APPLESCRIPTS/Open Google Inbox.applescript"'
 alias music='osascript "$MY_APPLESCRIPTS/Open Google Play Music.applescript"'
 alias play='osascript "$MY_APPLESCRIPTS/Open Google Play Music.applescript"'
-
-# aliases specific to my workplace
