@@ -1,4 +1,5 @@
 .d
+Applescript/*.app
 go/linux/discovery.pl
 go/linux/mtd_client
 go/linux/mtd_client.sh
