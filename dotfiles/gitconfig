@@ -96,6 +96,7 @@
 
 [log]
 	date = local
+	decorate = auto
 
 [git-p4]
 	skipSubmitEdit = true
