@@ -74,6 +74,10 @@
 (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
 (add-to-list 'auto-mode-alist '("\\.inc$" . php-mode))
 
+(autoload 'applescript-mode "applescript-mode"
+   "Major mode for editing AppleScript source." t)
+ (add-to-list 'auto-mode-alist '("\\.applescript$" . applescript-mode))
+
 ;; Change title bar to ~/file-directory if the current buffer is a
 ;; real file or buffer name if it is just a buffer.
 (setq frame-title-format
