@@ -105,3 +105,7 @@ fi
 function function_exists () {
     type $1 | grep -q 'is a function'
 }
+
+function ssid () {
+    /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | perl -ne 'print $1 if /^\s+SSID:\s+(.+)$/;'
+}
