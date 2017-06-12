@@ -25,6 +25,7 @@
 
 [rebase]
         autosquash = true
+        autostash = true
 
 [pretty]
         jira = format:Author: %aN <%aE>%nDate:   %ci%n%n%w(73,1,2)%+s%n%+b%x1B
@@ -46,7 +47,7 @@
 [color "branch"]
         current = yellow bold
         local = yellow
-        remote = red
+        remote = red bold
 
 [color "diff"]
 	meta = yellow
