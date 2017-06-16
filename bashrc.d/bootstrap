@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# for syntax highlightling in emacs, mostly
+
+function function_exists () {
+    type $1 | grep -q 'is a function'
+}
+
+function is_local() {
+    if [[ "$LOGIN_FROM" == "" ]]; then
+        TTY=$(tty | sed -e "s/.*tty\(.*\)/\1/")
+        if [[ "$TTY" != "" ]]; then
+            LOGIN_FROM=$(w | grep $TTY | awk '{ print $3 }')
+        fi
+    fi
+    [[ "$LOGIN_FROM" == "-" ]]
+}
+
+function is_interactive() {
+    [[ $- == *i* ]]
+}
+
+function ts () {
+    export TS=$(date '+%Y-%m-%d %H:%M:%S')
+}
+
+function source_file () {
+    FILE=$1
+    PRINTERR=$2
+    if [[ -f $FILE ]]; then
+        save_cursor
+        is_interactive && printf "Sourcing %s ...\n" $FILE
+        source $FILE
+        restore_cursor_clear_down
+    elif [[ "$PRINTERR" != "" ]]; then
+        is_interactive && echo ERROR: Unable to find $FILE >> /dev/stderr
+    fi
+}
+
+# preferred prompt: "user@host: path" in title, $ or # on command line
+export PS1="\[\e]0;\u@\h: \w\007\]\\$ "
+
+export TZ=/usr/share/zoneinfo/America/New_York
+

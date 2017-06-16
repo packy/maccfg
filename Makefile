@@ -52,6 +52,7 @@ bash: /etc/shells
 
 .PHONY: install
 install: ack
+	@ln -fs ${gitdir}/bashrc.d $(HOME)/.bashrc.d
 	@cd dotfiles && $(MAKE)
 	@cd bin      && $(MAKE)
 	@cd emacs.d  && $(MAKE)

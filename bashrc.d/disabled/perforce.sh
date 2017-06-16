@@ -10,9 +10,30 @@ alias p4noedit=$P4N
 alias p4n=$P4N
 unset P4N
 
-if [ -f $HOME/.bash_perforce_functions ]; then
-    source $HOME/.bash_perforce_functions
-fi
+p4vars () {
+    set | grep ^P4
+}
+
+p4l () {
+    PASSWORD=$(perl -e '
+use Net::Netrc;
+exit unless $ENV{P4PORT};
+my ($host) = split /:/, $ENV{P4PORT};
+my $entry = Net::Netrc->lookup($host);
+print $entry->password;
+')
+    if [[ "$PASSWORD" != "" ]]; then
+        echo "$PASSWORD" | p4 login >/dev/null
+    else
+        p4 login
+    fi
+    ~/BitBar/PerforceTicketStatus.1m.sh
+}
+
+p4_revertall () {
+    p4 opened | perl -ne 's/\#.*$//; print;' | xargs p4 revert
+}
+
 
 #
 # git customizations
@@ -27,6 +48,10 @@ function p4 () {
     else
         /usr/local/bin/p4 "$@"
     fi
+}
+
+function is_git-p4_repo () {
+    git rev-parse --symbolic --remotes 2>/dev/null | grep ^p4/
 }
 
 function is_git_p4_dir () {

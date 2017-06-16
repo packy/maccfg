@@ -1,15 +1,19 @@
 #!/usr/bin/env bash
 # for syntax highlightling in emacs, mostly
 
-source $HOME/.bash_bootstrap 2>/dev/null || \
-    echo ERROR: Unable to find $HOME/.bash_bootstrap >> /dev/stderr
+BOOTSTRAP=$HOME/.bashrc.d/bootstrap
+source $BOOTSTRAP 2>/dev/null || \
+    echo ERROR: Unable to find $BOOTSTRAP >> /dev/stderr
 
 export LOAD_COMPOSED_FUNCTIONS=0
-source $HOME/bin/composure.sh
+source_file $HOME/.bashrc.d/composure.sh
 
 # turn monitor mode OFF and
 # suppress "[#] Done  /foo/bar" messages
 set +o monitor
+
+# no more annoying !
+set +H
 
 if [[ "$TERM" = "dumb" ]] ; then
   export TERM=xterm
@@ -17,6 +21,18 @@ fi
 
 # I want to manipulate the path first
 source_file $HOME/.bash_path_functions print_err_if_not_found
+
+# finally, load all the bash customizations
+for DOTFILE in functions    ; do
+    source_file $HOME/.bash_$DOTFILE
+done
+
+if [[ -e "$HOME/.bashrc.d" ]]; then
+    SCRIPTS=$(find "$HOME/.bashrc.d/enabled" -name "*.sh" -print | sort)
+    for SCRIPT in $SCRIPTS; do
+        source_file $SCRIPT
+    done
+fi
 
 # add dirs to the FRONT of the PATH
 unshift_path /usr/local/sbin
@@ -28,16 +44,3 @@ unshift_path $HOME/bin
 # push_path
 
 uniq_path # remove any duplicates in the PATH
-
-# finally, load all the bash customizations
-for DOTFILE in functions git ls perforce aws ack aliases aim ; do
-    source_file $HOME/.bash_$DOTFILE
-done
-
-for MODULE in \
-    $HOME/.iterm2_shell_integration.bash \
-    $HOME/perl5/perlbrew/etc/bashrc ; do
-    source_file $MODULE
-done
-
-is_interactive && source "$GITDIR"/bash-git-prompt/gitprompt.sh # git prompt

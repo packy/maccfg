@@ -12,6 +12,7 @@ else
 fi
 
 alias clean='rm -fv *~ .*~'
+alias rclean="find . -name '*~' -o -name '.*~' | xargs rm -fv"
 
 alias clear='printf "\e[2J"'
 
