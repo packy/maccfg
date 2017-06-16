@@ -30,6 +30,14 @@
         default_username = jp1070
         method           = publickey
         check_is_up      = false
+        color = 000000
+        color = 660000
+        color = 000044
+        color = 004400
+        color = 005566
+        color = 660066
+        color = 660055
+        color = 555500
     </psd-11.aim.hosting>
 
     <backup-01.aim.hosting>
@@ -37,6 +45,12 @@
         method           = publickey
         check_is_up      = false
     </backup-01.aim.hosting>
+
+    <172.16.10.85>
+        default_username = root
+        method           = publickey
+        check_is_up      = false
+    </172.16.10.85>
 </hosts>
 
 <aliases>
@@ -51,4 +65,5 @@
     psd-11   = psd-11.aim.hosting
     backup01 = backup-01.aim.hosting
     backup-01 = backup-01.aim.hosting
+    psd-vm01 = 172.16.10.85
 </aliases>

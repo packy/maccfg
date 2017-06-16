@@ -31,6 +31,7 @@ my $method       = 'password';
 my $check_if_up  = 1;
 my $verbose      = 0;
 my $fake         = 0;
+my $color;
 my $force_os;
 my $def_passwd;
 my %config;
@@ -117,6 +118,7 @@ sub make_temp_osa {
     my $script = join "\n", @_;
 
     my $tmp = tempfile($target, 'applescript');
+    print "-"x50, "\n", $script, "\n" ,"-"x50,"\n" if $verbose;
     open my $out, '>', $tmp;
     print {$out} $script;
     close $out;
@@ -175,11 +177,34 @@ sub is_up {
 
 sub new_terminal_applescript {
     my ($cmd) = @_;
+
+    my $color_script = q{};
+
+    if ($color) {
+        my($r,$g,$b) = $color =~ /(..)(..)(..)/;
+        $color_script = set_term_bgcolor(hex($r),hex($g),hex($b));
+    }
+
     return de_indent(qq{
       tell application "iTerm2"
         set newWindow to (create window with default profile command "$cmd")
+        $color_script
       end tell
     });
+}
+
+sub set_term_bgcolor {
+    my ($R, $G, $B) = @_;
+    $R *= 65535/255;
+    $G *= 65535/255;
+    $B *= 65535/255;
+    return de_indent(qq[
+      tell current session of newWindow to set background color to {$R,$G,$B}
+    ]);
+
+#      tell current session of current window
+#        set background color to {$R,$G,$B}
+#      end tell
 }
 
 #
@@ -239,12 +264,24 @@ sub set_from_rc_data {
             $check_if_up = 0;
         }
     }
+
+    if (exists $config->{color}) {
+        my $col = $config->{color};
+        if (ref $col eq 'ARRAY') {
+            $color = $col->[int(rand(scalar @$col))];
+        }
+        else {
+            $color = $col;
+        }
+    }
+
     print 'results => '.Dumper({
         def_password  => $def_passwd,
         def_user      => $def_user,
         push_commands => $push_cmds,
         method        => $method,
         check_if_up   => $check_if_up,
+        color         => $color,
     }) if $verbose;
 }
 
@@ -254,6 +291,7 @@ sub process_command_line {
 #        "os=s"       => \$force_os,
 #        "noos"       => sub { $force_os = 'none' },
         "rc=s"       => \$gorc,
+        "color=s"    => \$color,
         "verbose+"   => \$verbose,
         "fake!"      => \$fake,
         "check!"     => \$check_if_up,
