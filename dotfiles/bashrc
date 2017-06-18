@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 # for syntax highlightling in emacs, mostly
 
+export LOAD_COMPOSED_FUNCTIONS=0
 BOOTSTRAP=$HOME/.bashrc.d/bootstrap
 source $BOOTSTRAP 2>/dev/null || \
     echo ERROR: Unable to find $BOOTSTRAP >> /dev/stderr
-
-export LOAD_COMPOSED_FUNCTIONS=0
-source_file $HOME/.bashrc.d/composure.sh
 
 # turn monitor mode OFF and
 # suppress "[#] Done  /foo/bar" messages
@@ -19,28 +17,27 @@ if [[ "$TERM" = "dumb" ]] ; then
   export TERM=xterm
 fi
 
-# I want to manipulate the path first
-source_file $HOME/.bash_path_functions print_err_if_not_found
-
-# finally, load all the bash customizations
-for DOTFILE in functions    ; do
-    source_file $HOME/.bash_$DOTFILE
-done
-
+# finally, load all my bash customizations
 if [[ -e "$HOME/.bashrc.d" ]]; then
     SCRIPTS=$(find "$HOME/.bashrc.d/enabled" -name "*.sh" -print | sort)
     for SCRIPT in $SCRIPTS; do
         source_file $SCRIPT
     done
 fi
+restore_cursor_clear_line
 
-# add dirs to the FRONT of the PATH
-unshift_path /usr/local/sbin
-unshift_path /usr/local/bin
-unshift_path /usr/local/opt/findutils/libexec/gnubin
-unshift_path $HOME/bin
+if function_exists unshift_path; then
+    # add dirs to the FRONT of the PATH
+    unshift_path /usr/local/sbin
+    unshift_path /usr/local/bin
+    unshift_path /usr/local/opt/findutils/libexec/gnubin
+    unshift_path $HOME/bin
+else
+    (>&2 echo "Unable to add directories to front of path; unshift_path() not loaded")
+fi
 
-# push dirs to the END of the PATH
-# push_path
-
-uniq_path # remove any duplicates in the PATH
+if function_exists uniq_path; then
+    uniq_path # remove any duplicates in the PATH
+else
+    (>&2 echo "Unable to remove duplicate directories from path; uniq_path() not loaded")    
+fi

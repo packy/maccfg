@@ -3,8 +3,7 @@
 
 export ACK_COLOR_FILENAME=red
 export ACK_PAGER='less -FRX'
-restore_cursor_clear_down
-source_file $HOME/git/ack2/completion.bash
+re_source_file $HOME/git/ack2/completion.bash
 
 # also, let's put grep configuration in here
 

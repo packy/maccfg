@@ -172,9 +172,8 @@ commit_matching ()
     git commit $MATCHES
 }
 
-restore_cursor_clear_down
-source_file $GIT_ROOT/etc/bash_completion.d/git-completion.bash
-source_file ~/bin/gitp4_auto # experimental
+re_source_file $GIT_ROOT/etc/bash_completion.d/git-completion.bash
+re_source_file ~/bin/gitp4_auto # experimental
 
 git_commits_ahead () {
     DELTA=/tmp/git_upstream_status_delta.$$

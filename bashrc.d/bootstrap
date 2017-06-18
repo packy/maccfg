@@ -23,18 +23,37 @@ function ts () {
     export TS=$(date '+%Y-%m-%d %H:%M:%S')
 }
 
+source $HOME/.bashrc.d/xterm.sh
+save_cursor
+
 function source_file () {
     FILE=$1
     PRINTERR=$2
     if [[ -f $FILE ]]; then
-        save_cursor
-        is_interactive && printf "Sourcing %s ...\n" $FILE
+        is_interactive && save_cursor
+        is_interactive && printf "Sourcing %s ..." $(basename $FILE)
+        is_interactive && clear_line_cursor_right
         source $FILE
-        restore_cursor_clear_down
+        is_interactive && restore_cursor
     elif [[ "$PRINTERR" != "" ]]; then
-        is_interactive && echo ERROR: Unable to find $FILE >> /dev/stderr
+        is_interactive && (>&2 echo ERROR: Unable to find $FILE )
     fi
 }
+
+function re_source_file () {
+    FILE=$1
+    PRINTERR=$2
+    if [[ -f $FILE ]]; then
+        is_interactive && restore_cursor
+        is_interactive && printf "Sourcing %s ..." $(basename $FILE)
+        is_interactive && clear_line_cursor_right
+        source $FILE
+    elif [[ "$PRINTERR" != "" ]]; then
+        is_interactive && (>&2 echo ERROR: Unable to find $FILE )
+    fi
+}
+
+source_file $HOME/.bashrc.d/composure.sh
 
 # preferred prompt: "user@host: path" in title, $ or # on command line
 export PS1="\[\e]0;\u@\h: \w\007\]\\$ "
