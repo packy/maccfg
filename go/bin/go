@@ -53,7 +53,7 @@ sub next_target {
 
     if (exists $config{hosts}) {
         if (exists $config{hosts}->{$target}) {
-            set_from_rc_data($config{hosts}->{$target});
+            $target = set_from_rc_data($target, $config{hosts}->{$target});
         }
     }
 
@@ -234,6 +234,7 @@ sub set_option_readonly {
 }
 
 sub set_from_rc_data {
+    my $target = shift;
     my $config = shift;
     print '$config_from_rc_data = '.Dumper($config) if $verbose;
     if (exists $config->{default_password}) {
@@ -275,6 +276,12 @@ sub set_from_rc_data {
         }
     }
 
+    if (exists $config->{address}) {
+        my $cmd = $config->{address};
+        $target = eval $cmd;
+        chomp $target;
+    }
+
     print 'results => '.Dumper({
         def_password  => $def_passwd,
         def_user      => $def_user,
@@ -283,6 +290,8 @@ sub set_from_rc_data {
         check_if_up   => $check_if_up,
         color         => $color,
     }) if $verbose;
+
+    return $target;
 }
 
 sub process_command_line {

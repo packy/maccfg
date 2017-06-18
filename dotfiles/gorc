@@ -46,11 +46,12 @@
         check_is_up      = false
     </backup-01.aim.hosting>
 
-    <172.16.10.85>
+    <vm01>
+        address = `/Applications/VirtualBox.app/Contents/Resources/VirtualBoxVM.app/Contents/MacOS/VBoxManage guestproperty get "psd-vm01" "/VirtualBox/GuestInfo/Net/0/V4/IP" | awk '{ print \\$2 }'`
         default_username = root
         method           = publickey
         check_is_up      = false
-    </172.16.10.85>
+    </vm01>
 </hosts>
 
 <aliases>
@@ -65,5 +66,4 @@
     psd-11   = psd-11.aim.hosting
     backup01 = backup-01.aim.hosting
     backup-01 = backup-01.aim.hosting
-    psd-vm01 = 172.16.10.85
 </aliases>
