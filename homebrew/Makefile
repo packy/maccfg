@@ -2,7 +2,7 @@ $(shell mkdir -p .d)
 
 .PHONY: install
 install: homebrew iterm2 keka diff-so-fancy hr screenresolution pcre \
-         readline git quicklook
+         readline git p7zip quicklook
 
 homebrew:         .d/homebrew
 apr-util:         .d/apr-util.brew
@@ -17,6 +17,7 @@ iterm2:           .d/iterm2.cask
 keka:             .d/keka.cask
 mysql:            .d/mysql.brew
 openssl:          .d/openssl.brew
+p7zip:            .d/p7zip.brew
 pcre:             .d/pcre.brew
 perl:             .d/perl.brew
 readline:         .d/readline.brew
