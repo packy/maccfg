@@ -26,10 +26,6 @@ alias rsync_pwd_to='rsync -avz .'
 
 alias airport='/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport'
 
-if [[ -d /Applications/VirtualBox.app ]]; then
-    alias vbox=/Applications/VirtualBox.app/Contents/Resources/VirtualBoxVM.app/Contents/MacOS/VBoxManage
-fi
-
 # aliases to AppleScripts to open Google Tools
 
 export MY_APPLESCRIPTS="$GITDIR/maccfg/AppleScript"
