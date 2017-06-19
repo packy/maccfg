@@ -280,6 +280,8 @@ sub set_from_rc_data {
         my $cmd = $config->{address};
         $target = eval $cmd;
         chomp $target;
+        die "$cmd did not yield an IP address:\n    $target\n"
+            unless $target =~ m{^\d+\.\d+\.\d+\.\d+$};
     }
 
     print 'results => '.Dumper({

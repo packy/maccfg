@@ -47,7 +47,7 @@
     </backup-01.aim.hosting>
 
     <vm01>
-        address = `/Applications/VirtualBox.app/Contents/Resources/VirtualBoxVM.app/Contents/MacOS/VBoxManage guestproperty get "psd-vm01" "/VirtualBox/GuestInfo/Net/0/V4/IP" | awk '{ print \\$2 }'`
+        address = `vbox-guest-ip "psd-vm01" 2>&1`
         default_username = root
         method           = publickey
         check_is_up      = false

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+source $HOME/.bashrc.d/enabled/VirtualBox.sh
+vbox-guest-ip "$@"

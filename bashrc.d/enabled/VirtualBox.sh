@@ -53,7 +53,7 @@ EOF
         local VM="$1"
         local LOG=$(vbox-log-file $VM)
         echo Powering off... | tee -a $LOG
-        $VBoxManage controlvm "$@" acpipowerbutton |& tee -a $LOG
+        $VBoxManage controlvm "$VM" acpipowerbutton |& tee -a $LOG
         date +'== Stopped %Y-%m-%d %H:%M:%S ==' >> $LOG
     }
 
@@ -63,5 +63,15 @@ EOF
 
     function vbox-running () {
         $VBoxManage list runningvms
+    }
+
+    function vbox-guest-ip () {
+        local VM="$1"
+        if vbox-running | grep -q "$VM"; then
+            local GuestIP="/VirtualBox/GuestInfo/Net/0/V4/IP"
+            $VBoxManage guestproperty get "$VM" "$GuestIP" | awk '{ print $2 }'
+        else
+            (>&2 echo $VM is not running)
+        fi
     }
 fi
