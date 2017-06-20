@@ -1,3 +1,6 @@
 [submodule "emacs.d/modes/cperl-mode"]
 	path = emacs.d/modes/cperl-mode
 	url = git@github.com:packy/cperl-mode.git
+[submodule "submodules/bash-spinner"]
+	path = submodules/bash-spinner
+	url = git@github.com:packy/bash-spinner.git
