@@ -58,6 +58,7 @@ EOF
             (nohup bash -c "$VBoxHeadless --startvm \"$VM\" 2>&1" >> $LOG &)
 
             # wait for the guest to have an IPv4 address
+            select_spinner circle2
             start_spinner "Starting vm $VM..."
             while ! vbox-vm-is-booted "$VM"; do
                 sleep 0.5
@@ -75,6 +76,7 @@ EOF
             echo Powering off... | tee -a $LOG
             $VBoxManage controlvm "$VM" acpipowerbutton 2>&1 | tee -a $LOG
             # wait for the guest to have an IPv4 address
+            select_spinner circle2
             start_spinner "Stopping vm $VM..."
             while vbox-running | grep -q "$VM"; do
                 sleep 0.5
