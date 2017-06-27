@@ -6,12 +6,13 @@ use v5.010;
 use Config::General;
 use Data::Dumper::Concise;
 use Getopt::Long;
+use List::MoreUtils qw( any );
+use List::Util qw( max min );
+use Pod::Usage;
 use Proc::ProcessTable;
 use Readonly;
 use Scalar::Readonly ':all';
 use Term::ReadKey;
-use List::Util qw( max min );
-use List::MoreUtils qw( any );
 
 Readonly my $iTerm2  => '^/.+\.app/Contents/MacOS/iTerm2';
 Readonly my $bash    => '/usr/local/bin/bash';
@@ -297,6 +298,9 @@ sub set_from_rc_data {
 }
 
 sub process_command_line {
+    my $help;
+    my $man;
+
     GetOptions
 #        "commands!"  => \$push_cmds,
 #        "os=s"       => \$force_os,
@@ -310,7 +314,12 @@ sub process_command_line {
         "publickey"  => \&set_option_readonly,
         "password"   => \&set_option_readonly,
         "hostbased"  => \&set_option_readonly,
-        "prompt"     => \&set_option_readonly;
+        "prompt"     => \&set_option_readonly,
+        "help|?"     => \$help,
+      or pod2usage(2);
+
+    pod2usage(1) if $help;
+    pod2usage(-exitval => 0, -verbose => 2) if $man;
 
     if (-f $gorc) {
         my $conf = Config::General->new($gorc);
@@ -354,6 +363,42 @@ sub de_indent {
 ##############################################################################
 
 __END__
+
+=head1 NAME
+
+go - a quick and dirty utility to open connections to remote hosts in new iTerm2 windows
+
+=head1 SYNOPSIS
+
+go [options] host [host [host ...]]
+
+Options:
+
+  --check      Check to see if the host answers to ping before
+               attempting to connect.  Negatable with --nocheck.
+
+  --color      Set the background color of the terminal in #RRGGBB format.
+
+  --rc         Loads the specified rc file instead of the default,
+               $HOME/.gorc
+
+  --username   Connects to the host with the username specified.
+
+  --publickey  Connects using publickey authentication.
+               This is the default.
+
+  --hostbased  Connects using hostbased authentication.
+
+  --password   Connects using password authentication.
+
+  --prompt     Prompts for the password for the user on the remote host.
+
+  --verbose    Prints out debugging information showing what it is doing.
+
+  --fake       Walks through the steps for connecting to a remote host,
+               but does not actually connect.
+
+=cut
 
 ##############################################################################
 
@@ -589,5 +634,3 @@ sub copy_files_to_node {
         print `$cp`;
     }
 }
-
-
