@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+my $mount       = "afp://file-01.aim.hosting";
+my $mount_point = $ENV{HOME}.'/jp1070';
+
+unless ( -d $mount_point ) {
+    mkdir $mount_point or die "Unable to create $mount_point: $!";
+    my $file = join '/', $mount_point, 'Not mounted!';
+    print "touching $file\n";
+    open my $fh, '>', $file;
+    print $fh "\n";
+    close $fh;
+}
+
+print qq{>mount_afp "$mount" $mount_point\n};
+system qq{mount_afp "$mount" $mount_point};
+
+system "open $mount_point";

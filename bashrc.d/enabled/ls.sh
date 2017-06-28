@@ -34,6 +34,8 @@ alias   ll='/bin/ls -bGlhOH'
 alias  lll='/bin/ls -bGlhOpH'
 alias llll='/bin/ls -bGlheOpH'
 
+alias llrt='/bin/ls -bGlhOHrt'
+
 # LSCOLORS
 # The value of this variable describes what color to use for which
 # attribute when colors are enabled with CLICOLOR.  This string is a

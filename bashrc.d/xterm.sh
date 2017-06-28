@@ -2,6 +2,10 @@
 
 # http://hackipedia.org/Protocols/Terminal,%20DEC%20VT100/html/VT100%20Escape%20Codes.html
 
+function clear () {
+    is_interactive && printf "\e[2J"
+}
+
 # cursor manipulation
 
 function save_cursor () {

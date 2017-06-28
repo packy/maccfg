@@ -1,17 +1,12 @@
 #!/bin/bash
 
-lift_Cellar () {
-    if [[ ! -h $HOME/.homebrew_cellar ]]; then
-        ln -sf $(brew --config | grep HOMEBREW_CELLAR | awk '{print $2}') $HOME/.homebrew_cellar
-    fi
-    readlink $HOME/.homebrew_cellar
-}
+export GITDIR=$HOME/git
+export MACCFGBIN=$GITDIR/maccfg/bin
 
 # so Homebrew compiles git with PCRE
 export USE_LIBPCRE=yes
 
 GIT_BIN=$(which git)
-HOMEBREW_CELLAR=$(lift_Cellar)
 if readlink $GIT_BIN | grep -q 'Cellar/git'; then
     GIT_VERSION=$(readlink $GIT_BIN | \
         perl -pe 's{.*Cellar/git/}{}; s{/bin/git}{};')
@@ -23,14 +18,13 @@ GIT_CORE=$GIT_ROOT/libexec/git-core
 export PATH=$PATH:$GIT_CORE
 
 export LESS=FRX
-export GITDIR=$HOME/git
 
 function gg () { # go git
     cd $GITDIR/$1
 }
 
 function gg_autocomplete () {
-    complete -W "$( ls -F $GITDIR | grep '\/$' | sed 's/\/$//' )" gg
+    complete -W "$( ls -F $GITDIR | grep '\/$' | sed 's|/$||' )" gg
 }
 gg_autocomplete
 
