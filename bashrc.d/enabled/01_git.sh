@@ -1,4 +1,7 @@
 #!/bin/bash
+if function_exists unshift_path; then # add dirs to the FRONT of the PATH
+    unshift_path /usr/local/bin
+fi
 
 export GITDIR=$HOME/git
 export MACCFGBIN=$GITDIR/maccfg/bin
