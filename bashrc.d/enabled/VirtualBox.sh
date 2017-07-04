@@ -55,7 +55,7 @@ EOF
 
     function vbox-vm-is-booted () {
         local VM="$1"
-        vbox-vm-prop "$VM" NoLoggedInUsers |& grep -q 'Value: '
+        vbox-vm-prop "$VM" NoLoggedInUsers | grep -q 'Value: '
     }
 
     function vbox-log-file () {
