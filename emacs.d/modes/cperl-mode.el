@@ -1,1 +1,1 @@
-cperl-mode/cperl-mode.el
+../../submodules/cperl-mode/cperl-mode.el
