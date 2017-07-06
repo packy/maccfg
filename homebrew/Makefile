@@ -10,6 +10,7 @@ apr:              .d/apr.brew
 bash:             .d/bash.brew
 diff-so-fancy:    .d/diff-so-fancy.brew
 emacs:            .d/emacs.cask
+gimp:             .d/gimp.cask
 git:              .d/git.brew
 highlight:        .d/highlight.brew
 hr:               .d/hr.brew
@@ -28,7 +29,7 @@ virtualbox:       .d/virtualbox.cask
 wget:             .d/wget.brew
 
 quicklook: .d/betterzipql.cask .d/quicklook-csv.cask qlcolorcode \
-           .d/quicklook-json.cask .d/webpquicklook.cask 
+           .d/quicklook-json.cask .d/webpquicklook.cask
 
 qlcolorcode: highlight .d/qlcolorcode.cask
 
@@ -50,4 +51,3 @@ sshpass: .d/sshpass.brew
 .d/sshpass.brew:
 	brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb
 	@./install
-
