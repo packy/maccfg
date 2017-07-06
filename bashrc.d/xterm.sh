@@ -6,6 +6,10 @@ function clear () {
     is_interactive && printf "\e[2J"
 }
 
+function cleartop () {
+    is_interactive && printf "\e[2J\e[H"
+}
+
 # cursor manipulation
 
 function save_cursor () {
