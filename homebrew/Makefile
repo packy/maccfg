@@ -7,6 +7,7 @@ install: homebrew iterm2 keka diff-so-fancy hr screenresolution pcre \
 homebrew:         .d/homebrew
 apr-util:         .d/apr-util.brew
 apr:              .d/apr.brew
+atom:             .d/atom.cask
 bash:             .d/bash.brew
 diff-so-fancy:    .d/diff-so-fancy.brew
 emacs:            .d/emacs.cask
@@ -37,6 +38,12 @@ qlcolorcode: highlight .d/qlcolorcode.cask
 	@./install
 
 .d/caskroom:
+	@./install
+
+.d/atom.cask:
+	@brew cask install atom
+	@apm install sync-settings
+	@./write_atom_config.pl
 	@./install
 
 .d/%.cask: .d/caskroom
