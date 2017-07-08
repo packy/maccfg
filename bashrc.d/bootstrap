@@ -36,7 +36,7 @@ function source_file () {
         source $FILE
         is_interactive && restore_cursor
     elif [[ "$PRINTERR" != "" ]]; then
-        is_interactive && (>&2 echo ERROR: Unable to find $FILE )
+        is_interactive && echoerr ERROR: Unable to find $FILE
     fi
 }
 
@@ -49,7 +49,7 @@ function re_source_file () {
         is_interactive && clear_line_cursor_right
         source $FILE
     elif [[ "$PRINTERR" != "" ]]; then
-        is_interactive && (>&2 echo ERROR: Unable to find $FILE )
+        is_interactive && echoerr ERROR: Unable to find $FILE
     fi
 }
 
