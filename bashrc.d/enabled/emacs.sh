@@ -1,5 +1,8 @@
 #!bash # for emacs highlighting
 
+# to load the is_local function
+source $HOME/.bashrc.d/bootstrap
+
 APP=/Applications/Emacs.app/Contents/MacOS
 export EMACSCLIENT=$APP/bin/emacsclient
 

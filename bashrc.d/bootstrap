@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # for syntax highlightling in emacs, mostly
 
-function function_exists () {
-    type $1 | grep -q 'is a function'
-}
+if type function_exists | grep -q 'is a function'; then
+    # this file has already been sourced
+    return
+fi
 
 function is_local() {
     if [[ "$LOGIN_FROM" == "" ]]; then
@@ -60,3 +61,8 @@ export PS1="\[\e]0;\u@\h: \w\007\]\\$ "
 
 export TZ=/usr/share/zoneinfo/America/New_York
 
+# leave this function as the last function in the file so we can test
+# for its existence as a test of whether this file has been loaded
+function function_exists () {
+    type $1 | grep -q 'is a function'
+}
