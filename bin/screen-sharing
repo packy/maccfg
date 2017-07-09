@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+LAUNCHD_DIR=/var/db/launchd.db/com.apple.launchd
+ORIDE_PLIST=$LAUNCHD_DIR/overrides.plist
+SSHARING_PLIST=/System/Library/LaunchDaemons/com.apple.screensharing.plist
+
+SCREENSHARING="defaults write $ORIDE_PLIST com.apple.screensharing"
+
+case "$1" in
+  enable)
+    sudo $SCREENSHARING -dict Disabled -bool false
+    sudo launchctl load -w $SSHARING_PLIST
+    ;;
+  disable)
+    sudo $SCREENSHARING -dict Disabled -bool true
+    sudo launchctl unload $SSHARING_PLIST
+    ;;
+  *)
+    >&2 echo "Usage: $(basename $0) enable|disable"
+    exit 1
+    ;;
+esac
