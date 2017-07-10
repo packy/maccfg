@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # for syntax highlightling in emacs, mostly
 
-if type function_exists | grep -q 'is a function'; then
+if type function_exists 2>/dev/null | grep -q 'is a function'; then
     # this file has already been sourced
     return
 fi
