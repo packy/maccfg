@@ -1,0 +1,90 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.010;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my $n = 'h';
+
+GetOptions
+    'foreground'          => sub { $n = 'g' },
+    'background'          => sub { $n = 'h' },
+    'bold-color'          => sub { $n = 'i' },
+    'selection-color'     => sub { $n = 'j' },
+    'selected-text-color' => sub { $n = 'k' },
+    'cursor'              => sub { $n = 'l' },
+    'cursor-text'         => sub { $n = 'm' },
+    'verbose+' => \my $verbose,
+    'help|?'   => \my $help,
+    'man'      => \my $man,
+    or pod2usage(2);
+
+pod2usage(-exitval => 0, -verbose => 2) if $man;
+pod2usage(0) if $help;
+pod2usage(1) unless @ARGV == 1;
+
+my $color = shift @ARGV;
+
+my($r,$g,$b) = $color =~ /^([0-f]{2})([0-f]{2})([0-f]{2})$/;
+unless (defined $r && defined $g && defined $b) {
+  if ( ($r,$g,$b) = $color =~ /^([0-f]{1})([0-f]{1})([0-f]{1})$/ ) {
+    ($r,$g,$b) = ( $r x 2, $g x 2, $b x 2 );
+  }
+}
+
+if ( defined $r && defined $g && defined $b ) {
+  print "^[]P$n$r$g$b^[\\\n" if $verbose;
+  print "\033]P$n$r$g$b\033\\";
+}
+else {
+  print STDERR "Unknown color specification: '$color'\n";
+}
+
+=head1 NAME
+
+set_term_color_palette
+
+=head1 SYNOPSIS
+
+B<Usage:> set_term_color_palette [options] RRGGBB
+
+B<Options:>
+
+  --foreground
+  --background
+  --bold-color
+  --selection-color
+  --selected-text-color
+  --cursor
+  --cursor-text
+
+  --help
+  --man'
+
+  RR, GG, BB are 2-digit hex values
+
+=head1 DETAILS
+
+From https://www.iterm2.com/documentation-escape-codes.html
+
+Change the color palette
+
+  ^[]Pnrrggbb^[\
+
+Replace "n" with:
+
+    0-f (hex) = ansi color
+    g = foreground
+    h = background
+    i = bold color
+    j = selection color
+    k = selected text color
+    l = cursor
+    m = cursor text
+
+rr, gg, bb are 2-digit hex value (for example, "ff").
+Example in bash that changes the foreground color blue:
+
+  echo -e "\033]Pg4040ff\033\\"

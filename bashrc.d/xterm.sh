@@ -72,3 +72,47 @@ end tell
 )
 ' "$@" | osascript
 }
+
+function set_term_titlecolor () {
+  perl -e '
+my $color = shift @ARGV;
+my($r,$g,$b) = $color =~ /^([0-f]{2})([0-f]{2})([0-f]{2})$/;
+unless (defined $r && defined $g && defined $b) {
+  if ( ($r,$g,$b) = $color =~ /^([0-f]{1})([0-f]{1})([0-f]{1})$/ ) {
+    ($r,$g,$b) = ( $r x 2, $g x 2, $b x 2 );
+  }
+}
+if ( defined $r && defined $g && defined $b ) {
+  ($r,$g,$b) = ( hex($r), hex($g), hex($b) );
+  print "\033]6;1;bg;red;brightness;$r\a"
+      . "\033]6;1;bg;green;brightness;$g\a"
+      . "\033]6;1;bg;blue;brightness;$b\a"
+}
+elsif ( $color =~ /^d?e?f?a?u?l?t?/i ) {
+  print "\033]6;1;bg;*;default\a";
+}
+else {
+  print STDERR "Unknown color specification: '$color'\n";
+  exit 1;
+}
+' "$@"
+}
+
+function cycle_term_bgcolor () {
+  local DEFAULT_LIST="000000:770000:000044:004400:005566:660066:660055:555500"
+  local DEFAULT_COLOR="000000"
+  export TERM_BGCOLOR_LIST=${TERM_BGCOLOR_LIST:-$DEFAULT_LIST}
+  export TERM_BGCOLOR=${TERM_BGCOLOR:-$DEFAULT_COLOR}
+  IFS=':' read -r -a array <<< "$TERM_BGCOLOR_LIST"
+  for index in "${!array[@]}"; do
+    if [[ "${array[index]}" == "$TERM_BGCOLOR" ]]; then
+      i=$(( (index + 1) % ${#array[@]} ))
+      export TERM_BGCOLOR="${array[i]}"
+      set_term_color_palette --background $TERM_BGCOLOR
+      return
+    fi
+  done
+  # we didn't find the current color on the list
+  export TERM_BGCOLOR="${array[0]}"
+  set_term_color_palette --background $TERM_BGCOLOR
+}
