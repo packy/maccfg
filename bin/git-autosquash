@@ -1,10 +1,25 @@
-#!/bin/sh
-# Auto-squashes 
-# eg 
+#!/usr/bin/env bash
+# Auto-squashes
+# eg
 #   git autosquash
 
 dirty="$(git diff --name-only --exit-code HEAD)"
 
+# I have to deal with an upstream SVN repository that's... interestingly configured
+branch_has_no_tracking_information () {
+  [[ $(git remote show | wc -l) -eq 0 ]]
+}
+
+if branch_has_no_tracking_information; then
+  N=$(git log --format=%H | egrep -v -f <(git log --format=%H "--grep=git-svn-id") | wc -l)
+  RANGE="HEAD~$((N))"
+else
+  RANGE=
+fi
+
+echo GIT_EDITOR=$HOME/bin/sleep-toucher git rebase --interactive --autosquash $RANGE
+
 ( test -z "$dirty" || git stash ) &&
-  GIT_EDITOR=$HOME/bin/sleep-toucher git rebase --interactive --autosquash &&
-  ( test -z "$dirty" || git stash pop )
+  GIT_EDITOR=$HOME/bin/sleep-toucher \
+  git rebase --interactive --autosquash $RANGE &&
+( test -z "$dirty" || git stash pop )

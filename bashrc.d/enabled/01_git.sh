@@ -132,6 +132,16 @@ squash_last () {
     git commit --fixup=$(last_sha) "$@"
 }
 
+local_commit_count () {
+  echo $(git log --format=%H | \
+            grep -v -f <(git log --format=%H "--grep=git-svn-id") | wc -l)
+}
+
+local_commits_only () {
+  local N=$(local_commit_count)
+  echo HEAD~$((N))..HEAD
+}
+
 gl () {
    git log $(local_commits_only)
    printf "\n"
@@ -151,6 +161,10 @@ glnb () {
    BUG=parse_git_branch | perl -ne 'chomp; s/bug/bug /; print qq{$_};'
    git log --name-only --grep "$BUG"
    printf "\n"
+}
+
+branch_has_no_tracking_information () {
+  [[ $(git remote show | wc -l) -eq 0 ]]
 }
 
 commit_matching ()
