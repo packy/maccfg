@@ -54,6 +54,15 @@ function xsize () {
 
 # iTerm2 manipulation
 
+function iTerm2_1337 ()       { printf "\033]1337;%s\a" "$@"; }
+function steal_focus ()       { iTerm2_1337 StealFocus; }
+function clear_scroll_back () { iTerm2_1337 ClearScrollback; }
+function notification ()      { printf "\033]9;%s\a" "$@"; }
+function iTerm2_CurrentDir () { iTerm2_1337 CurrentDir=$PWD; }
+function iTerm2_SetProfile () { iTerm2_1337 SetProfile="$@"; }
+function iTerm2_BounceIcon () { iTerm2_1337 RequestAttention=yes; }
+function iTerm2_UnBounceIcon () { iTerm2_1337 RequestAttention=no; }
+
 function set_term_profile () {
     PROFILE=${1:-"Default"};
     is_interactive && printf "\e]50;SetProfile=%s\a" "$PROFILE";
