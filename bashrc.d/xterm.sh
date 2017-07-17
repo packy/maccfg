@@ -54,74 +54,38 @@ function xsize () {
 
 # iTerm2 manipulation
 
-function iTerm2_1337 ()       { printf "\033]1337;%s\a" "$@"; }
-function steal_focus ()       { iTerm2_1337 StealFocus; }
-function clear_scroll_back () { iTerm2_1337 ClearScrollback; }
-function notification ()      { printf "\033]9;%s\a" "$@"; }
-function iTerm2_CurrentDir () { iTerm2_1337 CurrentDir=$PWD; }
-function iTerm2_SetProfile () { iTerm2_1337 SetProfile="$@"; }
-function iTerm2_BounceIcon () { iTerm2_1337 RequestAttention=yes; }
+function iTerm2_1337         () { printf "\033]1337;%s\a" "$@"; }
+function steal_focus         () { iTerm2_1337 StealFocus; }
+function clear_scroll_back   () { iTerm2_1337 ClearScrollback; }
+function iTerm2_CurrentDir   () { iTerm2_1337 CurrentDir=$PWD; }
+function iTerm2_SetProfile   () { iTerm2_1337 SetProfile="$@"; }
+function iTerm2_BounceIcon   () { iTerm2_1337 RequestAttention=yes; }
 function iTerm2_UnBounceIcon () { iTerm2_1337 RequestAttention=no; }
+function iTerm2_notification () { printf "\033]9;%s\a" "$@"; }
+function iTerm2_titlecolor   () { it2setcolor tab "$@"; }
+function iTerm2_bgcolor      () { it2setcolor bg "$@"; }
 
-function set_term_profile () {
-    PROFILE=${1:-"Default"};
-    is_interactive && printf "\e]50;SetProfile=%s\a" "$PROFILE";
-}
+function iTerm2_cycle_bgcolor () {
+  local DEFAULT_LIST DEFAULT_COLOR
+  DEFAULT_LIST=000:333:400:600:800:020:030:220:330:440:002:004:008
+  DEFAULT_LIST=$DEFAULT_LIST:022:044:202:404:606:313:424:535:326:548
+  DEFAULT_LIST=$DEFAULT_LIST:407:515:516:518:627:620:630:640
+  DEFAULT_COLOR=000
 
-function set_term_bgcolor () {
-    perl -e '
-my $color = shift @ARGV;
-my($r,$g,$b) = $color =~ /(..)(..)(..)/;
-($r,$g,$b) = ( hex($r) * 65535/255, hex($g) * 65535/255, hex($b) * 65535/255 );
-print qq(tell application "iTerm2"
-  tell current session of current window
-    set background color to {$r,$g,$b} # color $color
-  end tell
-end tell
-)
-' "$@" | osascript
-}
-
-function set_term_titlecolor () {
-  perl -e '
-my $color = shift @ARGV;
-my($r,$g,$b) = $color =~ /^([0-f]{2})([0-f]{2})([0-f]{2})$/;
-unless (defined $r && defined $g && defined $b) {
-  if ( ($r,$g,$b) = $color =~ /^([0-f]{1})([0-f]{1})([0-f]{1})$/ ) {
-    ($r,$g,$b) = ( $r x 2, $g x 2, $b x 2 );
-  }
-}
-if ( defined $r && defined $g && defined $b ) {
-  ($r,$g,$b) = ( hex($r), hex($g), hex($b) );
-  print "\033]6;1;bg;red;brightness;$r\a"
-      . "\033]6;1;bg;green;brightness;$g\a"
-      . "\033]6;1;bg;blue;brightness;$b\a"
-}
-elsif ( $color =~ /^d?e?f?a?u?l?t?/i ) {
-  print "\033]6;1;bg;*;default\a";
-}
-else {
-  print STDERR "Unknown color specification: '$color'\n";
-  exit 1;
-}
-' "$@"
-}
-
-function cycle_term_bgcolor () {
-  local DEFAULT_LIST="000000:770000:000044:004400:005566:660066:660055:555500"
-  local DEFAULT_COLOR="000000"
   export TERM_BGCOLOR_LIST=${TERM_BGCOLOR_LIST:-$DEFAULT_LIST}
   export TERM_BGCOLOR=${TERM_BGCOLOR:-$DEFAULT_COLOR}
+
   IFS=':' read -r -a array <<< "$TERM_BGCOLOR_LIST"
   for index in "${!array[@]}"; do
     if [[ "${array[index]}" == "$TERM_BGCOLOR" ]]; then
       i=$(( (index + 1) % ${#array[@]} ))
       export TERM_BGCOLOR="${array[i]}"
-      set_term_color_palette --background $TERM_BGCOLOR
+      iTerm2_bgcolor $TERM_BGCOLOR
       return
     fi
   done
+
   # we didn't find the current color on the list
   export TERM_BGCOLOR="${array[0]}"
-  set_term_color_palette --background $TERM_BGCOLOR
+  iTerm2_bgcolor $TERM_BGCOLOR
 }
