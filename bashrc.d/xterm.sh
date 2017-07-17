@@ -63,9 +63,12 @@ function iTerm2_BounceIcon   () { iTerm2_1337 RequestAttention=yes; }
 function iTerm2_UnBounceIcon () { iTerm2_1337 RequestAttention=no; }
 function iTerm2_notification () { printf "\033]9;%s\a" "$@"; }
 function iTerm2_titlecolor   () { it2setcolor tab "$@"; }
-function iTerm2_bgcolor      () { it2setcolor bg "$@"; }
+function iTerm2_bgcolor      () { it2setcolor bg "$@"; export TERM_BGCOLOR="$@"; }
 
 function iTerm2_cycle_bgcolor () {
+  if [[ "$1" == "auto" ]]; then
+    while true; do iTerm2_cycle_bgcolor; echo iTerm2_bgcolor $TERM_BGCOLOR; sleep 1; done
+  fi
   local DEFAULT_LIST DEFAULT_COLOR
   DEFAULT_LIST=000:333:400:600:800:020:030:220:330:440:002:004:008
   DEFAULT_LIST=$DEFAULT_LIST:022:044:202:404:606:313:424:535:326:548
@@ -79,8 +82,7 @@ function iTerm2_cycle_bgcolor () {
   for index in "${!array[@]}"; do
     if [[ "${array[index]}" == "$TERM_BGCOLOR" ]]; then
       i=$(( (index + 1) % ${#array[@]} ))
-      export TERM_BGCOLOR="${array[i]}"
-      iTerm2_bgcolor $TERM_BGCOLOR
+      iTerm2_bgcolor "${array[i]}"
       return
     fi
   done

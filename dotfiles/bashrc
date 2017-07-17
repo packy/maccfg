@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # for syntax highlightling in emacs, mostly
 
-# turn monitor mode OFF and
-# suppress "[#] Done  /foo/bar" messages
+export GITDIR=$HOME/git
+export CFGDIR=$GITDIR/maccfg
+export CFGBIN=$CFGDIR/bin
+
+# turn monitor mode OFF and suppress "[#] Done  /foo/bar" messages
 set +o monitor
 
 # no more annoying !
@@ -16,20 +19,20 @@ alias echoerr='>&2 echo'
 
 BASHRC_D=$HOME/.bashrc.d
 if [[ ! -e $BASHRC_D ]]; then
-    echoerr Synlinking $HOME/git/maccfg/bashrc.d to $BASHRC_D...
-    ln -fs $HOME/git/maccfg/bashrc.d $BASHRC_D
+    echoerr Symlinking $CFGDIR/bashrc.d to $BASHRC_D...
+    ln -fs $CFGDIR/bashrc.d $BASHRC_D
 fi
 
 export LOAD_COMPOSED_FUNCTIONS=0
-BOOTSTRAP=$HOME/.bashrc.d/bootstrap
+BOOTSTRAP=$BASHRC_D/bootstrap
 if ! source $BOOTSTRAP 2>/dev/null; then
     echoerr ERROR: Unable to find $BOOTSTRAP
     return
 fi
 
 # finally, load all my bash customizations
-if [[ -e "$HOME/.bashrc.d" ]]; then
-    SCRIPTS=$(find "$HOME/.bashrc.d/enabled" -name "*.sh" -print | sort)
+if [[ -e $BASHRC_D ]]; then
+    SCRIPTS=$(find $BASHRC_D/enabled -name "*.sh" -print | sort)
     for SCRIPT in $SCRIPTS; do
         source_file $SCRIPT
     done
