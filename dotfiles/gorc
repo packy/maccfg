@@ -53,10 +53,10 @@
         check_is_up      = false
     </vm01>
 
-    <G3QJ>
+    <192.168.1.8>
         default_username = jp1070
         method           = publickey
-    </G3QJ>
+    </192.168.1.8>
 </hosts>
 
 <aliases>
@@ -71,5 +71,6 @@
     psd-11    = psd-11.aim.hosting
     backup01  = backup-01.aim.hosting
     backup-01 = backup-01.aim.hosting
-    pacbook   = G3QJ
+    G3QJ      = 192.168.1.8
+    pacbook   = 192.168.1.8
 </aliases>
