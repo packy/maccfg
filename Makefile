@@ -16,7 +16,7 @@ ${gitdir}/z:
 	git clone https://github.com/rupa/z.git ${gitdir}/z
 
 recent:
-	defaults write com.apple.dock persistent-others -array-add '{ "tile-data" = {"list-type" = 1; }; "tile-type" = "recents-tile";}' && \killall Dock
+	source bashrc.d/enabled/Dock.sh; add-recent-applications-to-dock
 
 perlbrew:
 	@${gitdir}/maccfg/perlbrew/install ${PERLBREW}
@@ -39,7 +39,7 @@ emacs:
 	done
 
 git: USE_LIBPCRE=yes
-git: homebrew pcre 
+git: homebrew pcre
 
 /usr/local/bin/ansi:
 	cd /usr/local/bin; curl -OL git.io/ansi; chmod 755 ansi
@@ -57,4 +57,3 @@ install: ack
 	@cd bin      && $(MAKE)
 	@cd emacs.d  && $(MAKE)
 	@ln -vfs ${gitdir}/ack2/ack-standalone ${bindir}/ack; touch ${bindir}/ack
-
