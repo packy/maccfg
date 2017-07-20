@@ -1,6 +1,7 @@
 export emacsdir := $(HOME)/.emacs.d
 export gitdir   := $(HOME)/git
 export bindir   := $(HOME)/bin
+export cfgdir   := $(HOME)/git/maccfg
 
 DEPDIR := .d
 $(shell ./make_dependencies $(DEPDIR) )
@@ -16,27 +17,17 @@ ${gitdir}/z:
 	git clone https://github.com/rupa/z.git ${gitdir}/z
 
 recent:
-	source bashrc.d/enabled/Dock.sh; add-recent-applications-to-dock
+	source ${cfgdir}/bashrc.d/enabled/Dock.sh; add-recent-applications-to-dock
 
 perlbrew:
-	@${gitdir}/maccfg/perlbrew/install ${PERLBREW}
+	@${cfgdir}/perlbrew/install ${PERLBREW}
 
 HOMEBREWED = bash fpp pcre git libpng node switchaudio-osx xz coreutils freetype icu4c mysql openssl homebrew/php/php70 unixodbc findutils gettext jpeg nmap p7zip readline wget
 
 .ONESHELL:
 homebrewed:
-	@${gitdir}/maccfg/install_homebrew
-	@for PKG in $(HOMEBREWED); do \
-	    FILE=$(echo homebrew-$$PKG | sed -e '/-.*\/-/g') ;\
-	    if [[ ! -e $(DEPDIR)/$$FILE ]]; then \
-		brew install $$PKG ;\
-	    fi ;\
-	done
-
-emacs:
-	if [[ ! -e $(DEPDIR)/homebrew-emacs ]]; then \
-	    brew install emacs --with-cocca
-	done
+	@${cfgdir}/homebrew/install
+	@cd ${cfgdir}/homebrew; make
 
 git: USE_LIBPCRE=yes
 git: homebrew pcre
