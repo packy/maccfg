@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+# atom:set useSoftTabs tabLength=4 grammar=perl:
 use strict;
 use warnings;
 use v5.010;
