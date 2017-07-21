@@ -36,6 +36,25 @@ alias gs='git status'
 alias gd='git diff'
 
 #
+# git.io URL shortener
+#
+# https://github.com/blog/985-git-io-github-url-shortener
+function git.io () {
+  if [[ "$#" != 2 ]]; then
+    >&2 echo Usage: git.io short_code long_url
+    false
+    return
+  fi
+  CODE="$1"
+  URL="$2"
+  curl -s -i https://git.io -F "url=$URL" -F "code=$CODE" | perl -ne '
+    push @lines, $_;
+    print if /^Location/;
+    END { print "\n", @lines, "\n"}
+  '
+}
+
+#
 # git customizations
 #
 
