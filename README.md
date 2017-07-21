@@ -10,6 +10,4 @@ A project to make configuring my OS X machines easy
 \curl -L https://git.io/packymac | bash
 ```
 
-<div style="visibility: hidden">
-* https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
-</div>
+<a style="visibility: hidden" https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet />
