@@ -91,7 +91,9 @@ function iTerm2_cycle_bgcolor () {
   if [[ "$TERM_BGCOLOR_LIST" == "" ]]; then
     if display_is SE39UY04; then
       bgcolor_high_list
-    else
+    elif display_is DELL3007WFPHC; then
+      bgcolor_low_list
+    else # default for "Color LCD"
       bgcolor_low_list
     fi
   fi
