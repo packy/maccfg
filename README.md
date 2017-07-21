@@ -9,5 +9,3 @@ A project to make configuring my OS X machines easy
 ```
 \curl -L https://git.io/packymac | bash
 ```
-
-<a style="visibility: hidden" https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet />
