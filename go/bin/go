@@ -101,7 +101,7 @@ sub shell_commands {
 sub ssh_command {
     my $target = shift @_;
     my $cmd;
-    if ($method eq 'password') {
+    if ($method eq 'password' && defined $def_passwd) {
         $cmd = qq{$sshpass -p $def_passwd $ssh $def_user\@$target};
     }
     else {
