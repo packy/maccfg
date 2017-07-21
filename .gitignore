@@ -1,4 +1,5 @@
 .d
+.DS_Store
 Applescript/*.app
 go/linux/discovery.pl
 go/linux/mtd_client
@@ -6,4 +7,3 @@ go/linux/mtd_client.sh
 go/linux/mtd_client_nowait
 go/linux/pretty_print.pl
 go/linux/send_mgmt_command
-
