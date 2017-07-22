@@ -12,6 +12,6 @@ if is_git_p4_dir; then
     echo "> git p4 rebase $*"
     git p4 rebase $*
 else
-    echo "> git pull --rebase $*"
+    echo "> git pull --rebase --autostash $*"
     git pull --rebase --autostash $*
 fi
