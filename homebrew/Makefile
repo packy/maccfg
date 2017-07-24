@@ -2,14 +2,16 @@ $(shell mkdir -p .d)
 
 .PHONY: install
 install: homebrew iterm2 keka diff-so-fancy hr screenresolution pcre \
-         readline git p7zip quicklook
+         readline git p7zip quicklook bash highlight mas wget atom
 
 homebrew:         .d/homebrew
+appcleaner:       .d/appcleaner.brew
 apr-util:         .d/apr-util.brew
 apr:              .d/apr.brew
 atom:             .d/atom.cask
 bash:             .d/bash.brew
 diff-so-fancy:    .d/diff-so-fancy.brew
+disk-inventory-x: .d/disk-inventory-x.brew
 emacs:            .d/emacs.cask
 gimp:             .d/gimp.cask
 git:              .d/git.brew
@@ -17,6 +19,7 @@ highlight:        .d/highlight.brew
 hr:               .d/hr.brew
 iterm2:           .d/iterm2.cask
 keka:             .d/keka.cask
+mas:              .d/mas.brew
 mysql:            .d/mysql.brew
 openssl:          .d/openssl.brew
 p7zip:            .d/p7zip.brew
@@ -45,6 +48,9 @@ qlcolorcode: highlight .d/qlcolorcode.cask
 	@apm install sync-settings
 	@./write_atom_config.pl
 	@./install
+
+.d/git.brew: pcre
+	@export USE_LIBPCRE=yes; brew install --build-from-source git
 
 .d/%.cask: .d/caskroom
 	brew cask install $*
