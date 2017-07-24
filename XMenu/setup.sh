@@ -108,7 +108,7 @@ file_alias "$CHROME_APP/Default gbchcmhmhahfdphkhkmpfmihenigjmpp.app" "$RDC" Chr
 file_alias "/System/Library/CoreServices/Applications/Screen\ Sharing.app" "$RDC"
 
 # make aliases to other macs I own
-for HOST in speedy kirby; do
+for HOST in speedy kirby furball; do
   if [[ ! "$HOSTNAME" =~ "$HOST" ]]; then # don't alias our own host
     make_vncloc $HOST
   fi
