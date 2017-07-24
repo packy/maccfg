@@ -31,6 +31,7 @@ function dock-autohide-nodelay () {
 
 function dock-autohide-delay () {
   dock-defaults autohide-delay delete
+}
 
 function add-app-to-dock () {
   PATH="$1"
