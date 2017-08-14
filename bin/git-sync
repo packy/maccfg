@@ -13,12 +13,12 @@ function is_git_svn_dir () {
 }
 
 if is_git_p4_dir; then
-    echo "> git p4 rebase $@"
-    git p4 rebase "$@"
+    echo "> git p4 ??? $@"
+    #git p4 rebase "$@"
 elif is_git_svn_dir; then
-    echo "> git svn fetch $@"
-    git svn fetch "$@"
+    echo "> git svn dcommit $@"
+    git svn dcommit "$@"
 else
-    echo "> git pull --rebase --autostash $@"
-    git pull --rebase --autostash "$@"
+    echo "> git push $@"
+    git push "$@"
 fi
