@@ -54,10 +54,6 @@ function is_git-p4_repo () {
     git rev-parse --symbolic --remotes 2>/dev/null | grep ^p4/
 }
 
-function is_git_p4_dir () {
-    is_git_dir && git cat-file commit HEAD | grep -q git-p4
-}
-
 syncall () {
    CURDIR=`pwd`
    DIRS=$(find "$GITDIR" -maxdepth 1 -type d | sed -e "s:$GITDIR/::" | grep -v "$GITDIR")

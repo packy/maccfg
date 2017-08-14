@@ -67,9 +67,22 @@ function git () {
     fi
 }
 
+#
+# recognize use of git as front-end to certain other SCMs
+#
+
 function is_git_dir () {
     [ -d .git ] || [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == "true" ]
 }
+
+function is_git_p4_dir () {
+    is_git_dir && git cat-file commit HEAD | grep -q git-p4
+}
+
+function is_git_svn_dir () {
+    is_git_dir && git log -n 10 | grep -q git-svn-id
+}
+
 
 function parse_git_branch {
   WRAP=$1
@@ -219,4 +232,13 @@ git_commits_ahead () {
         echo $(grep -c '^>' $DELTA)
     fi
     rm -f $DELTA
+}
+
+git_is_dirty () {
+  __GIT_IS_DIRTY="$(git diff --name-only --exit-code HEAD)"
+  return [[ ! -z "$__GIT_IS_DIRTY" ]]
+}
+
+git_was_dirty () {
+  return [[ ! -z "$__GIT_IS_DIRTY" ]]
 }

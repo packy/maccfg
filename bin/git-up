@@ -1,23 +1,29 @@
 #!/bin/sh
 
-function is_git_dir () {
-    [ -d .git ] || [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == "true" ]
-}
-
-function is_git_p4_dir () {
-    is_git_dir && git log -n 10 | grep -q git-p4
-}
-
-function is_git_svn_dir () {
-    is_git_dir && git log -n 10 | grep -q git-svn-id
-}
+INC=$HOME/.bashrc.d/enabled
+source $INC/01_git.sh
 
 if is_git_p4_dir; then
     echo "> git p4 rebase $@"
     git p4 rebase "$@"
+
 elif is_git_svn_dir; then
+    if git_is_dirty; then
+        echo "> git stash"
+        git stash
+    fi
+
     echo "> git svn fetch $@"
     git svn fetch "$@"
+
+    echo "> git svn rebase"
+    git svn rebase
+
+    if git_was_dirty; then
+        echo "> git stash pop"
+        git stash pop
+    fi
+
 else
     echo "> git pull --rebase --autostash $@"
     git pull --rebase --autostash "$@"
