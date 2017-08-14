@@ -236,9 +236,9 @@ git_commits_ahead () {
 
 git_is_dirty () {
   __GIT_IS_DIRTY="$(git diff --name-only --exit-code HEAD)"
-  return [[ ! -z "$__GIT_IS_DIRTY" ]]
+  [[ ! -z "$__GIT_IS_DIRTY" ]]
 }
 
 git_was_dirty () {
-  return [[ ! -z "$__GIT_IS_DIRTY" ]]
+  [[ ! -z "$__GIT_IS_DIRTY" ]]
 }
