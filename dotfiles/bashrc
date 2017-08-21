@@ -36,6 +36,7 @@ if [[ -e $BASHRC_D ]]; then
     for SCRIPT in $SCRIPTS; do
         source_file $SCRIPT
     done
+    unset SCRIPT SCRIPTS
 fi
 
 restore_cursor_clear_line
