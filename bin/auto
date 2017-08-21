@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+# bash function scripts to include
+SCRIPTS="macos_networking.sh slack.sh skype.sh"
+for SCRIPT in $SCRIPTS; do
+  source $HOME/.bashrc.d/enabled/$SCRIPT
+done
+
+location=Unknown
+
+#
+# if we've got an SSID, use that
+#
+case $(ssid) in
+  TheCreativeAdvantage) location=620union  ;;
+  B8VYB)                location=home      ;;
+  "Anderson Home")      location=anderhome ;;
+  AmtrakConnect)        location=amtrak    ;;
+esac
+
+slack () {
+  echo "Setting slack status to $@"
+  slack_status_set "$@" > /dev/null
+}
+
+case $location in
+  620union)
+    set-location "620 Union"
+    slack-status-aim
+    skype-mood-aim
+  ;;
+  home)
+    set-location
+    slack-status-home
+    skype-mood-home
+  ;;
+  anderhome)
+    set-location
+    slack :house: "🐾 @ parents' house"
+    set-skype-mood "🏠 🐾 @ parents' house"
+  ;;
+  amtrak)
+    set-location
+    slack :house: "🐾 @ parents' house"
+    set-skype-mood "🏠 🐾 @ parents' house"
+  ;;
+  *)
+    echo Unknown location
+  ;;
+esac
+
+echo Done.
