@@ -39,9 +39,9 @@ alias gd='git diff'
 # git.io URL shortener
 #
 # https://github.com/blog/985-git-io-github-url-shortener
-function git.io () {
+function gitio () {
   if [[ "$#" != 2 ]]; then
-    >&2 echo Usage: git.io short_code long_url
+    >&2 echo "Usage: gitio short_code long_url"
     false
     return
   fi
