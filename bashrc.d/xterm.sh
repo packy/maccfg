@@ -105,6 +105,7 @@ function iTerm2_cycle_bgcolor () {
 
   export TERM_BGCOLOR_LIST=${TERM_BGCOLOR_LIST:-$DEFAULT_LIST}
   export TERM_BGCOLOR=${TERM_BGCOLOR:-$DEFAULT_COLOR}
+  export TERM_PREVIOUS_BGCOLOR=$TERM_BGCOLOR
 
   IFS=':' read -r -a array <<< "$TERM_BGCOLOR_LIST"
   for index in "${!array[@]}"; do
@@ -120,6 +121,7 @@ function iTerm2_cycle_bgcolor () {
   iTerm2_bgcolor $TERM_BGCOLOR
 }
 alias cycle_bgcolor=iTerm2_cycle_bgcolor
+function last_bgcolor () { iTerm2_bgcolor $TERM_PREVIOUS_BGCOLOR; }
 
 function bgcolor_high_list () {
   export TERM_BGCOLOR_LIST=000:555:666:600:800:040:050:004:005:006:007:008
@@ -131,4 +133,10 @@ function bgcolor_low_list () {
   export TERM_BGCOLOR_LIST=000:333:400:600:800:020:030:220:330:002:004:008
   TERM_BGCOLOR_LIST=$TERM_BGCOLOR_LIST:022:044:202:404:606:313:424:535:326:548
   TERM_BGCOLOR_LIST=$TERM_BGCOLOR_LIST:407:515:516:518:627:620:630:640
+}
+
+function reset () {
+  iTerm2_titlecolor default
+  iTerm2_bgcolor 000
+  /usr/bin/reset
 }
