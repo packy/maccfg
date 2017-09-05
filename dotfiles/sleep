@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# bash function scripts to include
+SCRIPTS="macos_networking.sh slack.sh skype.sh"
+for SCRIPT in $SCRIPTS; do
+  source $HOME/.bashrc.d/enabled/$SCRIPT
+done
+
+# if my mac is sleeping, I'm away
+set-skype-status away
+slack-away

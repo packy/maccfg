@@ -2,7 +2,8 @@ $(shell mkdir -p .d)
 
 .PHONY: install
 install: homebrew iterm2 keka diff-so-fancy hr screenresolution pcre \
-         readline git p7zip quicklook bash highlight mas wget atom
+         readline git p7zip quicklook bash highlight mas wget atom \
+         sleepwatcher
 
 homebrew:         .d/homebrew
 appcleaner:       .d/appcleaner.brew
@@ -27,6 +28,7 @@ pcre:             .d/pcre.brew
 perl:             .d/perl.brew
 readline:         .d/readline.brew
 screenresolution: .d/screenresolution.brew
+sleepwatcher:     .d/sleepwatcher.brew
 sqlite:           .d/sqlite.brew
 subversion:       .d/subversion.brew
 virtualbox:       .d/virtualbox.cask

@@ -38,11 +38,13 @@ case $location in
     set-location
     slack :house: "🐾 @ parents' house"
     set-skype-mood "🏠 🐾 @ parents' house"
+    slack-here
   ;;
   amtrak)
     set-location
-    slack :house: "🐾 @ parents' house"
-    set-skype-mood "🏠 🐾 @ parents' house"
+    slack :house: "on the train"
+    set-skype-mood "on the train"
+    slack-here
   ;;
   *)
     echo Unknown location
