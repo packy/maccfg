@@ -12,6 +12,9 @@ function is_git_svn_dir () {
     is_git_dir && git log -n 10 | grep -q git-svn-id
 }
 
+dirty="$(git diff --name-only --exit-code HEAD)"
+
+( test -z "$dirty" || git stash )
 if is_git_p4_dir; then
     echo "> git p4 ??? $@"
     #git p4 rebase "$@"
@@ -22,3 +25,4 @@ else
     echo "> git push $@"
     git push "$@"
 fi
+( test -z "$dirty" || git stash pop )
