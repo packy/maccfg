@@ -83,6 +83,7 @@ function iTerm2_notification () { printf "\033]9;%s\a" "$@"; }
 function iTerm2_titlecolor   () { it2setcolor tab "$@"; }
 function iTerm2_bgcolor      () { it2setcolor bg "$@"; export TERM_BGCOLOR="$@"; }
 alias bgcolor=iTerm2_bgcolor
+alias set_term_titlecolor=iTerm2_titlecolor
 
 function iTerm2_cycle_bgcolor () {
   if [[ "$1" == "auto" ]]; then
@@ -98,7 +99,7 @@ function iTerm2_cycle_bgcolor () {
     fi
   fi
   local DEFAULT_LIST DEFAULT_COLOR
-  DEFAULT_LIST=000:333:400:600:800:020:030:220:330:440:002:004:008
+  DEFAULT_LIST=000:333:400:600:020:030:220:330:440:002:004:008
   DEFAULT_LIST=$DEFAULT_LIST:022:044:202:404:606:313:424:535:326:548
   DEFAULT_LIST=$DEFAULT_LIST:407:515:516:518:627:620:630:640
   DEFAULT_COLOR=000
@@ -124,13 +125,13 @@ alias cycle_bgcolor=iTerm2_cycle_bgcolor
 function last_bgcolor () { iTerm2_bgcolor $TERM_PREVIOUS_BGCOLOR; }
 
 function bgcolor_high_list () {
-  export TERM_BGCOLOR_LIST=000:555:666:600:800:040:050:004:005:006:007:008
+  export TERM_BGCOLOR_LIST=000:555:666:600:040:050:004:005:006:007:008
   TERM_BGCOLOR_LIST=$TERM_BGCOLOR_LIST:044:055:066:505:606:707:808:708:809
   TERM_BGCOLOR_LIST=$TERM_BGCOLOR_LIST:718:627:620:970
 }
 
 function bgcolor_low_list () {
-  export TERM_BGCOLOR_LIST=000:333:400:600:800:020:030:220:330:002:004:008
+  export TERM_BGCOLOR_LIST=000:333:400:600:020:030:220:330:002:004:008
   TERM_BGCOLOR_LIST=$TERM_BGCOLOR_LIST:022:044:202:404:606:313:424:535:326:548
   TERM_BGCOLOR_LIST=$TERM_BGCOLOR_LIST:407:515:516:518:627:620:630:640
 }
