@@ -34,3 +34,8 @@ function skype-mood-pari () {
   set-skype-mood "👩🏻‍⚕️ @ 2-3PM medical appointment"
   set-skype-status away
 }
+
+function skype-mood-lunch () {
+  set-skype-mood "🍴 out to lunch"
+  set-skype-status away
+}

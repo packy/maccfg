@@ -54,7 +54,18 @@ function slack-status-aim () {
   slack-here
 }
 
+function slack-status-lunch () {
+  echo "Setting slack status to 🍴 out to lunch"
+  slack_status_set :fork-and-knife:‍ @ 2-3PM medical appointment > /dev/null
+  slack-away
+}
+
 function pari () {
   slack-status-pari
   skype-mood-pari
+}
+
+function lunch () {
+  slack-status-lunch
+  skype-mood-lunch
 }
