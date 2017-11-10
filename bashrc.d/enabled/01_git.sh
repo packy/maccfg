@@ -27,13 +27,20 @@ function gg () { # go git
 }
 
 function gg_autocomplete () {
-    complete -W "$( ls -F $GITDIR | grep '\/$' | sed 's|/$||' )" gg
+  #FILES=$( ls -F $GITDIR | grep '\/$' | sed 's|/$||' )
+  FILES=$(find $GITDIR -path "*/.git" -prune -o -type d -depth -4 | grep -v '/.git' | sed "s|^$GITDIR/||")
+  complete -W "$FILES" gg
 }
 gg_autocomplete
 
 alias gb='git branch'
 alias gs='git status'
 alias gd='git diff'
+alias gds='git diff --staged'
+alias ga='git autosquash'
+alias gf='git fixup'
+
+alias diffsf='git diff --no-index --color'
 
 #
 # git.io URL shortener
