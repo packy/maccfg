@@ -1,13 +1,13 @@
 <hosts>
-    <speedy.home.packay.com>
+    <speedy.local>
         default_username = packy
         method           = publickey
-    </speedy.home.packay.com>
+    </speedy.local>
 
-    <kirby.home.packay.com>
+    <kirby.local>
         default_username = packy
         method           = publickey
-    </kirby.home.packay.com>
+    </kirby.local>
 
     <www.dardan.com>
         default_username = dardanco
@@ -31,7 +31,6 @@
         method           = publickey
         check_is_up      = false
         color = 000000
-        color = 660000
         color = 000044
         color = 004400
         color = 005566
@@ -44,6 +43,30 @@
         method           = publickey
         check_is_up      = false
     </backup-01.aim.hosting>
+
+    <oms-01>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </oms-01>
+
+    <oms-02>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </oms-02>
+
+    <oms-db-01>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </oms-db-01>
+
+    <mgmt.las.aim.hosting>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </mgmt.las.aim.hosting>
 
     <vm01>
         address = `vbox-guest-ip "psd-vm01" 2>&1`
@@ -59,8 +82,8 @@
 </hosts>
 
 <aliases>
-    speedy    = speedy.home.packay.com
-    kirby     = kirby.home.packay.com
+    speedy    = speedy.local
+    kirby     = kirby.local
     bluehost  = www.dardan.com
     psd01     = psd-01.aim.hosting
     psd10     = psd-10.aim.hosting
@@ -70,6 +93,7 @@
     psd-11    = psd-11.aim.hosting
     backup01  = backup-01.aim.hosting
     backup-01 = backup-01.aim.hosting
+    mgmt-las  = mgmt.las.aim.hosting
     G3QJ      = 192.168.1.8
     pacbook   = 192.168.1.8
 </aliases>
