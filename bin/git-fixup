@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+REV=${1:-HEAD}; shift
+git commit --fixup=$REV "$@"

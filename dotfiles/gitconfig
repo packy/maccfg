@@ -9,7 +9,6 @@
         co = checkout
         ln = log --name-only
         uncommit = reset --mixed HEAD~1
-        fixup = commit --fixup=HEAD
         loggrep = log --perl-regexp --grep
         stashed = stash list --pretty=stashed
         jira = log --pretty=jira
@@ -76,13 +75,13 @@
 	default = simple
 
 #
-# Using p4merge as Git mergetool 
+# Using p4merge as Git mergetool
 #
 
 [merge]
         keepBackup = false
         tool = p4mergetool
-        
+
 [mergetool "p4mergetool"]
         cmd = /Applications/p4merge.app/Contents/Resources/launchp4merge "$PWD/$BASE" "$PWD/$REMOTE" "$PWD/$LOCAL" "$PWD/$MERGED"
         keepTemporaries = false
