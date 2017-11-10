@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+BRANCH=$1
+NAME=$(basename $BRANCH)
+git co -b svn/$NAME $BRANCH
