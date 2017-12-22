@@ -75,10 +75,10 @@
         check_is_up      = false
     </vm01>
 
-    <192.168.1.8>
+    <	G3QJ-WiFI>
         default_username = jp1070
         method           = publickey
-    </192.168.1.8>
+    </	G3QJ-WiFI>
 </hosts>
 
 <aliases>
@@ -94,6 +94,6 @@
     backup01  = backup-01.aim.hosting
     backup-01 = backup-01.aim.hosting
     mgmt-las  = mgmt.las.aim.hosting
-    G3QJ      = 192.168.1.8
-    pacbook   = 192.168.1.8
+    G3QJ      = G3QJ-WiFI
+    pacbook   = G3QJ-WiFI
 </aliases>
