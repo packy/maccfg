@@ -2,3 +2,5 @@
 # for syntax highlightling in emacs, mostly
 
 source $HOME/.bashrc
+
+alias gam="/Users/packy/bin/gam/gam"
