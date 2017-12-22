@@ -2,7 +2,7 @@ $(shell mkdir -p .d)
 
 .PHONY: install
 install: homebrew iterm2 keka diff-so-fancy hr screenresolution pcre \
-         readline git p7zip quicklook bash highlight mas wget atom \
+         readline git p7zip quicklook bash highlight mas wget atom hub \
          sleepwatcher
 
 homebrew:         .d/homebrew
@@ -18,6 +18,7 @@ gimp:             .d/gimp.cask
 git:              .d/git.brew
 highlight:        .d/highlight.brew
 hr:               .d/hr.brew
+hub:              .d/hub.brew
 iterm2:           .d/iterm2.cask
 keka:             .d/keka.cask
 mas:              .d/mas.brew
