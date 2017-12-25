@@ -128,7 +128,7 @@ file_alias "$CHROME_APP/Default gaedmjdfmmahhbjefcbgaolhhanlaolb.app" "$CUSTOM" 
 file_alias "$CHROME_APP/Default fahmaaghhglfmonjliepjlchgpgfmobi.app" "$CUSTOM" ChromeApp # Google Play Music
 file_alias "/Applications/Calculator.app"   "$CUSTOM"
 file_alias "/Applications/GIMP.app"         "$CUSTOM"
-file_alias "/Applications/KeePassX.app"     "$CUSTOM"
+file_alias "/Applications/KeePassXC.app"    "$CUSTOM"
 file_alias "/Applications/Keka.app"         "$CUSTOM"
 file_alias "/Applications/p4merge.app"      "$CUSTOM"
 file_alias "/Applications/Resilio Sync.app" "$CUSTOM"
