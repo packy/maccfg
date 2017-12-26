@@ -56,11 +56,53 @@
       check_is_up      = false
     </oms-02>
 
+    <oms-03>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </oms-03>
+
+    <oms-04>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </oms-04>
+
+    <oms-05>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </oms-05>
+
+    <oms-06>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </oms-06>
+
     <oms-db-01>
       default_username = jp1070
       method           = publickey
       check_is_up      = false
     </oms-db-01>
+
+    <oms-db-02>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </oms-db-02>
+
+    <oms-db-03>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </oms-db-03>
+
+    <oms-db-04>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </oms-db-04>
 
     <mgmt.las.aim.hosting>
       default_username = jp1070
