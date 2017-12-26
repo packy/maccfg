@@ -3,7 +3,7 @@
 --smart-case
 --type-add=rpmspec:match:\.spec\.in$
 --type-add=csv:ext:csv
---type-add=sql:ext:psql
+--type-add=psql:ext:psql
 --type-add=php:firstlinematch:/<[?]php/
 # JetBrains software
 --ignore-dir=.idea
