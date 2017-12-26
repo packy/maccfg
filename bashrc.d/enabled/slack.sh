@@ -17,28 +17,32 @@ function slack_status_set () {
   TEXT="$@"
   slacktoken=$(cat $HOME/.slack_token)
   apiurl=$(slack_api_url users.profile.set)
-  curl --silent --data-urlencode "profile={\"status_text\":\"$TEXT\",\"status_emoji\":\"$EMOJI\"}" $apiurl
+  curl --silent --data-urlencode "profile={\"status_text\":\"$TEXT\",\"status_emoji\":\"$EMOJI\"}" $apiurl &> /dev/null
 }
 
 function slack_presence_set () {
   TEXT=${1:-auto}
-  slacktoken=$(cat $HOME/.slack_token)
-  apiurl=$(slack_api_url users.setPresence)
-  echo "$apiurl\\&presence=$TEXT"
-  curl $apiurl\&presence=$TEXT
+  if [[ "$TEXT" == "away" || "$TEXT" == "auto" ]]; then
+    slacktoken=$(cat $HOME/.slack_token)
+    apiurl=$(slack_api_url users.setPresence)
+    echo "$apiurl\\&presence=$TEXT"
+    curl $apiurl\&presence=$TEXT
+  else
+    echo "Invalid presence '$TEXT'. Valid values are 'away' and 'auto'."
+  fi
 }
 
 function slack-away () {
-  slack_status_set away > /dev/null
+  slack_presence_set away > /dev/null
 }
 
 function slack-here () {
-  slack_status_set auto > /dev/null
+  slack_presence_set auto > /dev/null
 }
 
 function slack-status-pari () {
   echo "Setting slack status to 👩🏻‍⚕️ @ 2-3PM medical appointment"
-  slack_status_set :female-health-worker:‍ @ 2-3PM medical appointment > /dev/null
+  slack_status_set :female-health-worker:‍ @ 2-3PM medical appointment
   slack-away
 }
 
@@ -65,7 +69,21 @@ function pari () {
   skype-mood-pari
 }
 
+function pari-at () {
+  at $* <<PARI
+SCRIPTS="macos_networking.sh slack.sh skype.sh"
+for SCRIPT in $SCRIPTS; do
+  source $HOME/.bashrc.d/enabled/$SCRIPT
+done
+pari
+PARI
+}
+
 function lunch () {
   slack-status-lunch
   skype-mood-lunch
+}
+
+function msleep () {
+  $HOME/.sleep
 }

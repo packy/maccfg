@@ -3,21 +3,33 @@
 function set-skype-mood () {
   printf "Skype: "
   MOOD="$@"
-  APP="\"Skype\""
   COMMAND="\"set profile mood_text $MOOD\""
   SCRIPT="\"AppleScript Mood Setter\""
-  osascript \
-    -e "tell application $APP to send command $COMMAND script name $SCRIPT"
+  osascript <<SKYPE
+tell application "Skype" to activate
+tell application "Skype"
+  delay 2
+  tell application "System Events" to keystroke return
+end tell
+tell application "Skype" to send command $COMMAND script name $SCRIPT
+SKYPE
 }
 
 function set-skype-status () {
-  printf "Skype: "
   STATUS=$1
-  APP="\"Skype\""
+  case $STATUS in
+    online|away|dnd|invisible|offline) ;;
+    *) printf "Unknown user status. Known statuses are:"
+       printf "\n + online\n + away\n + dnd (Do Not Disturb)"
+       printf "\n + invisible\n + offline\n"
+       return ;;
+  esac
+  printf "Skype: "
   COMMAND="\"set USERSTATUS $STATUS\""
   SCRIPT="\"AppleScript Status Setter\""
-  osascript \
-    -e "tell application $APP to send command $COMMAND script name $SCRIPT"
+  osascript <<SKYPE
+tell application "Skype" to send command $COMMAND script name $SCRIPT
+SKYPE
 }
 
 function skype-mood-home () {
@@ -32,7 +44,7 @@ function skype-mood-aim () {
 
 function skype-mood-pari () {
   set-skype-mood "👩🏻‍⚕️ @ 2-3PM medical appointment"
-  set-skype-status away
+  set-skype-status dnd
 }
 
 function skype-mood-lunch () {
