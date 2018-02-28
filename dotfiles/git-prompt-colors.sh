@@ -1,4 +1,4 @@
-# This theme for gitprompt.sh is optimized for the "Solarized Dark" and 
+# This theme for gitprompt.sh is optimized for the "Solarized Dark" and
 # "Solarized Light" color schemes tweaked for Ubuntu terminal fonts
 
 override_git_prompt_colors() {
@@ -9,9 +9,11 @@ override_git_prompt_colors() {
   GIT_PROMPT_SUFFIX=""
 
   GIT_PROMPT_THEME_NAME="Solarized"
-  GIT_PROMPT_STAGED="${Yellow}●"
+  GIT_PROMPT_STAGED="${Yellow}≫"
+  GIT_PROMPT_CONFLICTS="${Red}✗"
   GIT_PROMPT_CHANGED="${BoldBlue}∆" # delta means change!
-  GIT_PROMPT_STASHED="${BoldMagenta}⚑ " # flag character
+  GIT_PROMPT_STASHED="${BoldMagenta}𝐒"
+  GIT_PROMPT_UNTRACKED="${Cyan}⊄" # not subset of
   GIT_PROMPT_CLEAN="${Green}✔"
   GIT_PROMPT_BRANCH="${Yellow}"
 
