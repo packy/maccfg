@@ -2,11 +2,13 @@
     <speedy.local>
         default_username = packy
         method           = publickey
+        check_is_up      = false
     </speedy.local>
 
     <kirby.local>
         default_username = packy
         method           = publickey
+        check_is_up      = false
     </kirby.local>
 
     <www.dardan.com>
@@ -103,6 +105,18 @@
       method           = publickey
       check_is_up      = false
     </oms-db-04>
+
+    <ci-01>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </ci-01>
+
+    <ci-02>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </ci-02>
 
     <mgmt.las.aim.hosting>
       default_username = jp1070
