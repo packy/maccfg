@@ -18,7 +18,7 @@
         whitespace = fix
 
 [core]
-	editor = atom
+	editor = atom --wait
 	excludesfile = ~/.gitignore
 	pager = diff-so-fancy | less --tabs=4 -RFX
 
