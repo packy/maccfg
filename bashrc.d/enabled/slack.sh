@@ -41,8 +41,8 @@ function slack-here () {
 }
 
 function slack-status-pari () {
-  echo "Setting slack status to 👩🏻‍⚕️ @ 2-3PM medical appointment"
-  slack_status_set :female-health-worker:‍ @ 2-3PM medical appointment
+  echo "Setting slack status to 👩🏻‍⚕️ @ 10-11AM medical appointment"
+  slack_status_set :female-health-worker:‍ @ 10-11AM medical appointment
   slack-away
 }
 
@@ -60,7 +60,7 @@ function slack-status-aim () {
 
 function slack-status-lunch () {
   echo "Setting slack status to 🍴 out to lunch"
-  slack_status_set :fork-and-knife:‍ @ 2-3PM medical appointment > /dev/null
+  slack_status_set :fork-and-knife:‍ @ Lunch! > /dev/null
   slack-away
 }
 

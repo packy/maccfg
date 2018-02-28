@@ -43,7 +43,7 @@ function skype-mood-aim () {
 }
 
 function skype-mood-pari () {
-  set-skype-mood "👩🏻‍⚕️ @ 2-3PM medical appointment"
+  set-skype-mood "👩🏻‍⚕️ @ 10-11AM medical appointment"
   set-skype-status dnd
 }
 
