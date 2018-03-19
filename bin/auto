@@ -9,14 +9,22 @@ done
 location=Unknown
 
 #
-# if we've got an SSID, use that
-#
-case $(ssid) in
-  TheCreativeAdvantage) location=620union  ;;
-  B8VYB)                location=home      ;;
-  "Anderson Home")      location=anderhome ;;
-  AmtrakConnect)        location=amtrak    ;;
-esac
+# first, let's check against attached Thunderbolt devices
+if tbolt-dev --match "CalDigit, Inc." --match "Thunderbolt Station 2"; then
+  location=home
+elif tbolt-dev --match "CalDigit, Inc." --match "Thunderbolt Station"; then
+  location=620union
+else
+  #
+  # if we've got an SSID, use that
+  #
+  case $(ssid) in
+    TheCreativeAdvantage) location=620union  ;;
+    B8VYB)                location=home      ;;
+    "Anderson Home")      location=anderhome ;;
+    AmtrakConnect)        location=amtrak    ;;
+  esac
+fi
 
 slack () {
   echo "Setting slack status to $@"

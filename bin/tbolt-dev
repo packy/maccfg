@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.010;
+
+use Getopt::Long;
+
+my @match;
+
+GetOptions
+    'match=s' => sub {
+      my($k,$v) = @_;
+      push @match, qr/$v/;
+    };
+
+# declare the record separator to be two newlines
+$/ = "\n\n";
+
+my $header;
+
+open my $filehandle, "system_profiler SPThunderboltDataType |";
+RECORD: while (my $record = <$filehandle>) {
+  chomp $record; # discard newlines at the end
+  next RECORD if $record =~ /\AThunderbolt:/;
+  unless ($header) {
+    $header = $record;
+    next RECORD;
+  }
+  if (@match) {
+    MATCH: foreach my $check ( @match ) {
+      next RECORD
+        unless ($record =~ /$check/);
+    }
+    # match for all regex found
+    exit 0;
+  }
+  else {
+    print $header,"\n\n",$record,"\n\n";
+  }
+  undef $header;
+}
+close $filehandle;
+
+exit 1 if @match;
