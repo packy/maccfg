@@ -15,6 +15,10 @@ if tbolt-dev --match "CalDigit, Inc." --match "Thunderbolt Station 2"; then
 elif tbolt-dev --match "CalDigit, Inc." --match "Thunderbolt Station"; then
   location=620union
 else
+  if wifi_is_off; then
+    enable_wifi
+    sleep 2
+  fi
   #
   # if we've got an SSID, use that
   #

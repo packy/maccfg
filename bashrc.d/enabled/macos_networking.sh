@@ -1,5 +1,13 @@
 #!bash # for emacs formatting
 
+function wifi_is_off () {
+  [[ "$(/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo)" = "AirPort: Off" ]]
+}
+
+function enable_wifi () {
+  networksetup -setairportpower en0 on
+}
+
 function ssid () {
     /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | perl -ne 'print $1 if /^\s+SSID:\s+(.+)$/;'
 }
