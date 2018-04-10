@@ -9,7 +9,7 @@ function slack_api_url () {
 function slack_status_get () {
   slacktoken=$(cat $HOME/.slack_token)
   apiurl=$(slack_api_url users.profile.set)
-  curl $apiurl
+  curl -sS $apiurl
 }
 
 function slack_status_set () {
@@ -17,7 +17,7 @@ function slack_status_set () {
   TEXT="$@"
   slacktoken=$(cat $HOME/.slack_token)
   apiurl=$(slack_api_url users.profile.set)
-  curl --silent --data-urlencode "profile={\"status_text\":\"$TEXT\",\"status_emoji\":\"$EMOJI\"}" $apiurl &> /dev/null
+  curl -sS --data-urlencode "profile={\"status_text\":\"$TEXT\",\"status_emoji\":\"$EMOJI\"}" $apiurl &> /dev/null
 }
 
 function slack_presence_set () {
@@ -26,7 +26,7 @@ function slack_presence_set () {
     slacktoken=$(cat $HOME/.slack_token)
     apiurl=$(slack_api_url users.setPresence)
     echo "$apiurl\\&presence=$TEXT"
-    curl $apiurl\&presence=$TEXT
+    curl -sS $apiurl\&presence=$TEXT
   else
     echo "Invalid presence '$TEXT'. Valid values are 'away' and 'auto'."
   fi
