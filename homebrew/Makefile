@@ -11,6 +11,7 @@ apr-util:         .d/apr-util.brew
 apr:              .d/apr.brew
 atom:             .d/atom.cask
 bash:             .d/bash.brew
+betterzip:        .d/betterzip.cask
 diff-so-fancy:    .d/diff-so-fancy.brew
 disk-inventory-x: .d/disk-inventory-x.brew
 emacs:            .d/emacs.cask
@@ -35,7 +36,7 @@ subversion:       .d/subversion.brew
 virtualbox:       .d/virtualbox.cask
 wget:             .d/wget.brew
 
-quicklook: .d/betterzipql.cask .d/quicklook-csv.cask qlcolorcode \
+quicklook: .d/betterzip.cask .d/quicklook-csv.cask qlcolorcode \
            .d/quicklook-json.cask .d/webpquicklook.cask
 
 qlcolorcode: highlight .d/qlcolorcode.cask
@@ -54,6 +55,9 @@ qlcolorcode: highlight .d/qlcolorcode.cask
 
 .d/git.brew: pcre
 	@export USE_LIBPCRE=yes; brew install --build-from-source git
+
+.d/betterzip.cask:
+	brew install caskroom/cask/betterzip
 
 .d/%.cask: .d/caskroom
 	brew cask install $*
