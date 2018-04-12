@@ -7,3 +7,6 @@
 [submodule "submodules/morgant-tools-osx"]
 	path = submodules/morgant-tools-osx
 	url = https://github.com/morgant/tools-osx
+[submodule "submodules/bash-git-prompt"]
+	path = submodules/bash-git-prompt
+	url = https://github.com/magicmonty/bash-git-prompt.git

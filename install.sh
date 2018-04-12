@@ -30,6 +30,17 @@ if ! which git; then
   brew install --build-from-source git
 fi
 
+# if I haven't generated an SSH key for this machine yet,
+# do so and prompt me to install it at GitHub
+cd $HOME/.ssh
+if [[ ! -f id_rsa ]]; then
+  ssh-keygen -t rsa
+  pbcopy < id_rsa.pub
+  open https://github.com/settings/ssh/new
+  echo "Your new ssh key is in the clipboard; add it to GitHub"
+  read -p "Press [Enter] to continue"
+fi
+
 # make a directory to hold git repos
 mkdir $HOME/git
 cd $HOME/git
