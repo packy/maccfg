@@ -4,6 +4,7 @@
 export GITDIR=$HOME/git
 export CFGDIR=$GITDIR/maccfg
 export CFGBIN=$CFGDIR/bin
+export CFGSUB=$CFGDIR/submodules
 
 # turn monitor mode OFF and suppress "[#] Done  /foo/bar" messages
 set +o monitor
