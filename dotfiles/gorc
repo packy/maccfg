@@ -11,6 +11,12 @@
         check_is_up      = false
     </kirby.local>
 
+    <slappy.local>
+        default_username = packy
+        method           = publickey
+        check_is_up      = false
+    </slappy.local>
+
     <www.dardan.com>
         default_username = dardanco
         method           = publickey
@@ -140,6 +146,7 @@
 <aliases>
     speedy    = speedy.local
     kirby     = kirby.local
+    slappy    = slappy.local
     bluehost  = www.dardan.com
     psd01     = psd-01.aim.hosting
     psd10     = psd-10.aim.hosting
