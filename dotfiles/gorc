@@ -137,10 +137,12 @@
         check_is_up      = false
     </vm01>
 
-    <	G3QJ-WiFI>
+    <G3QJ-WiFI>
+        address = `echo 192.168.1.16`
         default_username = jp1070
         method           = publickey
-    </	G3QJ-WiFI>
+        check_is_up      = false
+    </G3QJ-WiFI>
 </hosts>
 
 <aliases>
