@@ -48,6 +48,7 @@ if function_exists unshift_path; then
     unshift_path /usr/local/bin
     unshift_path /usr/local/opt/findutils/libexec/gnubin
     unshift_path $HOME/bin
+    [[ -d "$HOME/.pyenv/shims" ]] && unshift_path $HOME/.pyenv/shims
 else
     echoerr "Unable to add directories to front of path; unshift_path() not loaded"
 fi
