@@ -20,6 +20,7 @@
     <www.dardan.com>
         default_username = dardanco
         method           = publickey
+        check_is_up      = false
     </www.dardan.com>
 
     <psd-01.aim.hosting>
@@ -138,11 +139,18 @@
     </vm01>
 
     <G3QJ-WiFI>
-        address = `echo 192.168.1.16`
+        address = `dig \@192.168.1.1 G3QJ A +short`
         default_username = jp1070
         method           = publickey
         check_is_up      = false
     </G3QJ-WiFI>
+
+    <G3QJ-wired>
+        address = `dig \@192.168.1.1 G3QJ-wired A +short`
+        default_username = jp1070
+        method           = publickey
+        check_is_up      = false
+    </G3QJ-wired>
 </hosts>
 
 <aliases>
@@ -160,5 +168,5 @@
     backup-01 = backup-01.aim.hosting
     mgmt-las  = mgmt.las.aim.hosting
     G3QJ      = G3QJ-WiFI
-    pacbook   = G3QJ-WiFI
+    pacbook   = G3QJ-wired
 </aliases>
