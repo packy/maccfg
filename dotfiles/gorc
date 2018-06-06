@@ -131,6 +131,12 @@
       check_is_up      = false
     </mgmt.las.aim.hosting>
 
+    <test-01>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </test-01>
+
     <vm01>
         address = `vbox-guest-ip "psd-vm01" 2>&1`
         default_username = root
@@ -164,6 +170,7 @@
     psd-01    = psd-01.aim.hosting
     psd-10    = psd-10.aim.hosting
     psd-11    = psd-11.aim.hosting
+    test01    = test-01
     backup01  = backup-01.aim.hosting
     backup-01 = backup-01.aim.hosting
     mgmt-las  = mgmt.las.aim.hosting
