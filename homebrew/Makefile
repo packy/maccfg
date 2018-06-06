@@ -28,6 +28,7 @@ openssl:          .d/openssl.brew
 p7zip:            .d/p7zip.brew
 pcre:             .d/pcre.brew
 perl:             .d/perl.brew
+pyenv:            .d/pyenv.brew
 readline:         .d/readline.brew
 screenresolution: .d/screenresolution.brew
 sleepwatcher:     .d/sleepwatcher.brew
