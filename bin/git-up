@@ -10,24 +10,24 @@ if is_git_p4_dir; then
     echo "> git p4 rebase $@"
     git p4 rebase "$@"
 
-elif is_git_svn_dir; then
-    if git_is_dirty; then
-        echo "> git stash"
-        git stash
-    fi
-
-    echo "> git svn fetch $@"
-    git svn fetch "$@"
-
-    echo "> git svn rebase"
-    git svn rebase
-
-    if git_was_dirty; then
-        echo "> git stash pop"
-        git stash pop
-    fi
+# elif is_git_svn_dir; then
+#     if git_is_dirty; then
+#         echo "> git stash"
+#         git stash
+#     fi
+#
+#     echo "> git svn fetch $@"
+#     git svn fetch "$@"
+#
+#     echo "> git svn rebase"
+#     git svn rebase
+#
+#     if git_was_dirty; then
+#         echo "> git stash pop"
+#         git stash pop
+#     fi
 
 else
-    echo "> git pull --rebase --autostash $@"
-    git pull --rebase --autostash "$@"
+    echo "> git fetch && git rebase --autostash $@"
+    git fetch && git rebase --autostash "$@"
 fi
