@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+
+import sys, os, re
+from subprocess import check_output
+
+# Collect all the possible parameters
+commit_msg_filepath = sys.argv[1]
+
+if len(sys.argv) > 2:
+    commit_type = sys.argv[2]
+else:
+    commit_type = ''
+
+if len(sys.argv) > 3:
+    commit_hash = sys.argv[3]
+else:
+    commit_hash = ''
+
+# Figure out which branch we're on
+branch = check_output(
+    ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+    universal_newlines=True
+).strip()
+print('branch: '+branch)
+
+# preferred regex flags
+ims = re.I | re.M | re.S
+
+# regex to find messages starting with 'fixup!'
+fixup_regex = re.compile(r'^fixup!\s+', ims)
+
+# does the branch name have a JIRA issue number in it?
+JIRA_issue_regex = re.compile(r'(?:[^/]+/)*([a-z0-9]+\-\d+)', ims)
+branch_has_issue = re.match(JIRA_issue_regex, branch)
+
+if branch_has_issue:
+    issue = branch_has_issue.group(1)
+    print('issue: '+issue)
+
+    this_issue_regex = re.compile(
+       r'^(?:fixup!\s+)?' + # if 'fixup!' is at the start, ignore it
+       re.escape(issue)   + # escape the dash in the issue number
+       r'[:\s]\s*'          # allow a colon or whitespace to follow
+    , ims)
+
+
+    # read the file and see if it already has the issue number
+    # at the beginning of the commit message
+    with open(commit_msg_filepath, 'r+') as f:
+        content = f.read()
+
+        has_issue_already = re.match(this_issue_regex, content)
+
+        if not has_issue_already:
+            # rewrite the file to have the issue number at the beginning
+            f.seek(0, 0)
+            prefix = ''
+
+            # but if it starts with 'fixup!',
+            # keep that at the beginning
+            has_fixup = re.match(fixup_regex, content)
+            if has_fixup:
+                content = re.sub(fixup_regex, '', content)
+                prefix  = 'fixup! '
+
+            f.write("%s: %s" % (prefix + issue, content))
