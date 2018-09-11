@@ -70,6 +70,18 @@ function xsize () {
     is_interactive && printf "\e[8;%d;%dt" $HEIGHT $WIDTH;
 }
 
+function xwidth () {
+    WIDTH=${1:-"80"};
+    is_interactive && printf "\e[8;%d;%dt" $LINES $WIDTH;
+}
+alias xw=xwidth
+
+function xheight () {
+    HEIGHT=${1:-"50"};
+    is_interactive && printf "\e[8;%d;%dt" $HEIGHT $COLUMNS;
+}
+
+
 # iTerm2 manipulation
 
 function iTerm2_1337         () { printf "\033]1337;%s\a" "$@"; }
