@@ -41,8 +41,8 @@ function slack-here () {
 }
 
 function slack-status-pari () {
-  echo "Setting slack status to 👩🏻‍⚕️ @ 10-11AM medical appointment"
-  slack_status_set :female-health-worker:‍ @ 10-11AM medical appointment
+  echo "Setting slack status to 👩🏻‍⚕️ @ medical appointment"
+  slack_status_set :female-health-worker:‍ @ medical appointment
   slack-away
 }
 
@@ -53,8 +53,8 @@ function slack-status-home () {
 }
 
 function slack-status-aim () {
-  echo "Setting slack status to ⛪ @ 620 Union"
-  slack_status_set :church: @ 620 Union > /dev/null
+  echo "Setting slack status to 🏦  @ 120 Erie"
+  slack_status_set :bank: @ 120 Erie > /dev/null
   slack-here
 }
 

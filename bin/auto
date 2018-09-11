@@ -16,7 +16,7 @@ location=Unknown
 if tbolt-dev --match "CalDigit, Inc." --match "Thunderbolt Station 2"; then
   location=home
 elif tbolt-dev --match "CalDigit, Inc." --match "Thunderbolt Station"; then
-  location=620union
+  location=120erie
 else
   if wifi_is_off; then
     enable_wifi
@@ -27,6 +27,7 @@ else
   #
   case $(ssid) in
     TheCreativeAdvantage) location=620union  ;;
+    AIM_GUEST)            location=120erie   ;;
     B8VYB)                location=home      ;;
     "Anderson Home")      location=anderhome ;;
     AmtrakConnect)        location=amtrak    ;;
@@ -41,6 +42,12 @@ slack () {
 case $location in
   620union)
     set-location "620 Union"
+    slack-status-aim
+    [[ $(hostname) =~ $SKYPEHOST ]] && slack-here
+    [[ $(hostname) =~ $SKYPEHOST ]] && skype-mood-aim
+  ;;
+  120erie)
+    set-location "120 Erie"
     slack-status-aim
     [[ $(hostname) =~ $SKYPEHOST ]] && slack-here
     [[ $(hostname) =~ $SKYPEHOST ]] && skype-mood-aim
