@@ -35,6 +35,13 @@
         check_is_up      = false
     </psd-10.aim.hosting>
 
+    <oms-db-07.aim.hosting>
+        default_username = jp1070
+        method           = publickey
+        check_is_up      = false
+        color = 004400
+    </oms-db-07.aim.hosting>
+
     <psd-11.aim.hosting>
         default_username = jp1070
         method           = publickey
@@ -170,6 +177,7 @@
     psd-01    = psd-01.aim.hosting
     psd-10    = psd-10.aim.hosting
     psd-11    = psd-11.aim.hosting
+    oms-db-07 = oms-db-07.aim.hosting
     test01    = test-01
     backup01  = backup-01.aim.hosting
     backup-01 = backup-01.aim.hosting
