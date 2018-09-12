@@ -39,6 +39,7 @@ alias gd='git diff'
 alias gds='git diff --staged'
 alias ga='git autosquash'
 alias gf='git fixup'
+alias gffs='git checkout develop; git pull; git flow feature start'
 
 alias diffsf='git diff --no-index --color'
 
