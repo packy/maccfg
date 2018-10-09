@@ -58,3 +58,9 @@ if function_exists uniq_path; then
 else
     echoerr "Unable to remove duplicate directories from path; uniq_path() not loaded"
 fi
+
+# if we have a perlbrew version set, make sure it's
+# directory has been moved to the front of the path
+if [[ ! -z "$PERLBREW_PERL" ]]; then
+  perlbrew switch $PERLBREW_PERL
+fi
