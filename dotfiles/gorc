@@ -96,6 +96,24 @@
       check_is_up      = false
     </oms-06>
 
+    <oms-07>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </oms-07>
+
+    <oms-08>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </oms-08>
+
+    <oms-09>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </oms-09>
+
     <oms-db-01>
       default_username = jp1070
       method           = publickey
@@ -120,6 +138,18 @@
       check_is_up      = false
     </oms-db-04>
 
+    <oms-db-05>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </oms-db-05>
+
+    <vingo-oms-db>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </vingo-oms-db>
+
     <ci-01>
       default_username = jp1070
       method           = publickey
@@ -143,6 +173,18 @@
       method           = publickey
       check_is_up      = false
     </test-01>
+
+    <svc-05>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </svc-05>
+
+    <gitlab.aim.hosting>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </gitlab.aim.hosting>
 
     <vm01>
         address = `vbox-guest-ip "psd-vm01" 2>&1`
@@ -171,6 +213,8 @@
     kirby     = kirby.local
     slappy    = slappy.local
     bluehost  = www.dardan.com
+    svc05     = svc-05
+    gitlab    = gitlab.aim.hosting
     psd01     = psd-01.aim.hosting
     psd10     = psd-10.aim.hosting
     psd11     = psd-11.aim.hosting
