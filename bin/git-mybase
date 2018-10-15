@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+function parse_git_branch {
+  WRAP=$1
+  ref=$(git-symbolic-ref HEAD 2> /dev/null) || return
+  if [[ "$WRAP" = "wrap" ]] ; then
+    echo "(${ref#refs/heads/})"
+  else
+    echo "${ref#refs/heads/}"
+  fi
+}
+
+PARENT=$1
+TARGET=${2:-$(parse_git_branch)}
+
+dirty="$(git diff --name-only --exit-code HEAD)"
+
+( test -z "$dirty" || git stash ) &&
+  git checkout $PARENT &&
+  git pull &&
+  git checkout $TARGET &&
+  git rebase $PARENT
+  ( test -z "$dirty" || git stash pop )
