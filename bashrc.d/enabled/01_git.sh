@@ -28,7 +28,7 @@ function gg () { # go git
 
 function gg_autocomplete () {
   #FILES=$( ls -F $GITDIR | grep '\/$' | sed 's|/$||' )
-  FILES=$(find $GITDIR -path "*/.git" -prune -o -type d -depth -4 | grep -v '/.git' | sed "s|^$GITDIR/||")
+  FILES=$(ls -d $GITDIR/*/.git | sed 's|/.git$||' | sed "s|^$GITDIR/||")
   complete -W "$FILES" gg
 }
 gg_autocomplete
