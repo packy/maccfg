@@ -14,3 +14,11 @@
 # ignore Emacs working files
 \#*#
 
+# ignore ackrc files
+.ackrc
+
+# ignore JetBrains tools directories
+.idea
+
+# ignore python virtual environments
+venv
