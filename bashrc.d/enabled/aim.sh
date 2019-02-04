@@ -6,3 +6,7 @@ re_source_file $HOME/.bash_aim # work files
 pbindent () {
   pbpaste | INDENT=$1 perl -pe 's/^/" "x$ENV{INDENT}/e' | pbcopy
 }
+
+pbrelease () {
+  pbpaste | jira-release-notes-to-md | pbcopy
+}

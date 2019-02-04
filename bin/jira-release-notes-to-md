@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+use URI::Escape;
+
+my $notes;
+while (my $line = <>) {
+  $notes .= $line;
+}
+
+# grab a JIRA URL
+my ($url) = $notes =~ m{<a href='([^']+)'>};
+my ($project) = $url =~ m{browse/([^\-]+)-\d+};
+$url =~ s{browse/($project)-\d+}{issues/?jql=};
+
+# get the version number
+my ($version) = $notes =~ m{Release notes\s+-\s+[^\-]+\s+-\s+Version\s+(\d+)};
+my $query = uri_escape(qq{project = $project AND fixVersion = $version});
+
+# create header
+$notes =~ s{\n\s+Release notes\s+-\s+[^\-]+\s+-\s+Version\s+(\d+)}{# Version [$1]($url$query)};
+
+# convert links
+$notes =~ s{<li>\[<a href='([^']+)'>([^>]+)<\/a>\]\s+-\s+(.+)\n<\/li>}{* [$2]($1) - $3}g;
+
+# headers
+$notes =~ s{<h(\d)>\s+(.+)}{('#' x $1) . " $2"}ge;
+
+# discard list start tags
+$notes =~ s{<(?:ul)>\n}{}g;
+
+# discard open end tags
+$notes =~ s{<\/(?:h\d|ul)>\n}{}g;
+
+# collapse empty lines
+$notes =~ s{^\s+$}{}gm;
+
+print $notes;
