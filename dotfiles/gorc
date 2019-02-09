@@ -162,6 +162,12 @@
       check_is_up      = false
     </ci-02>
 
+    <net-svc-1>
+      default_username = jp1070
+      method           = publickey
+      check_is_up      = false
+    </net-svc-1>
+
     <mgmt.las.aim.hosting>
       default_username = jp1070
       method           = publickey

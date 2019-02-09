@@ -30,7 +30,7 @@ my $godir        = $gitdir.'/maccfg/go';
 my $push_cmds    = 1;
 my $def_user     = '$USER';
 my $method       = 'password';
-my $check_if_up  = 1;
+my $check_if_up  = 0;
 my $verbose      = 0;
 my $fake         = 0;
 my $color;
