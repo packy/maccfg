@@ -52,7 +52,7 @@
 
 [color "diff"]
     meta = yellow
-    frag = magenta
+    frag = magenta bold
     old = red
     new = green
     commit = yellow reverse
