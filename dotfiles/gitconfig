@@ -13,6 +13,7 @@
     stashed = stash list --pretty=stashed
     jira = log --pretty=jira
     unpushed = log origin/master..HEAD
+    files = diff-tree --no-commit-id --name-only -r
 
 [apply]
     whitespace = fix
