@@ -1,7 +1,7 @@
 .PHONY: install
-install: OpenGoogleMail.app OpenGoogleInbox.app OpenGooglePlayMusic.app
-	cp -rfv *.app /Applications/
+install: OpenHomeGoogleMail.app OpenWorkGoogleMail.app OpenGooglePlayMusic.app
+	echo you need to install these by hand
 
 %.app:
-	osacompile -o "$*.app" "$*.applescript"
-
+	#osacompile -x -o "$*.app" "$*.applescript"
+	open /Applications/Utilities/Script\ Editor.app
