@@ -250,7 +250,7 @@ re_source_file ~/bin/gitp4_auto # experimental
 git_commits_ahead () {
     DELTA=/tmp/git_upstream_status_delta.$$
 
-    git for-each-ref --format="%(refname:short) %(upstream:short)" $(git-symbolic-ref HEAD) > $DELTA
+    git for-each-ref --format="%(refname:short) %(upstream:short)" $(git symbolic-ref HEAD) > $DELTA
     read local remote < $DELTA
     if [ ! -z "$remote" ]; then
         # this branch has an upstream remote
