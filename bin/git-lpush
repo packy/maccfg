@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# store output in a temp file
+TMP=/tmp/git-lpush.$$.out
+
+# set up a function that will be run
+# when this script exits that will
+# delete the temp file
+function exit_trap () {
+  rm -f $TMP
+}
+trap exit_trap EXIT
+
+# run the git push command,
+# and capture the output
+git push "$@" > $TMP 2>&1
+cat $TMP # show the output to the user
+
+# check the output for a message about
+# running 'git push --set-upstream'
+if grep 'git push --set-upstream' $TMP >>/dev/null 2>&1; then
+
+  # grab the command from the message
+  COMMAND=$(grep 'git push --set-upstream' $TMP)
+
+  # tell the user we're running it
+  echo "running> $COMMAND"
+
+  # then run the command and capture ITS output
+  $COMMAND > $TMP 2>&1
+  cat $TMP
+fi
+
+# check the output for a message about
+# creating a merge request
+if grep 'To create a merge request' $TMP >>/dev/null 2>&1; then
+
+  # add a space after the message
+  echo
+
+  # capture the URL and remove the
+  # 'remote: ' from the start of it
+  URL=$(grep http $TMP | sed -e 's/^remote:\ *//')
+
+  # then tell the user we're opening the URL
+  # and open it in the default browser
+  echo Opening $URL
+  open $URL
+fi
