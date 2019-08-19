@@ -43,6 +43,8 @@ alias gffs='git checkout develop; git pull; git flow feature start'
 
 alias diffsf='git diff --no-index --color'
 
+alias fire='git commit -a -m Fire\! ; git push'
+
 #
 # git.io URL shortener
 #
