@@ -5,16 +5,19 @@ use v5.010;
 
 use Cwd;
 use Getopt::Long qw( :config pass_through );
+use Data::Dumper::Concise;
 
 my $clean = 1;
 my $pause = 1;
 my $title;
 my $height;
+my $width;
 
 GetOptions
     'clean!'   => \$clean,
     'pause!'   => \$pause,
     'height=i' => \$height,
+    'width=i'  => \$width,
     'title=s'  => \$title;
 
 shift @ARGV if $ARGV[0] eq '--';
@@ -41,7 +44,12 @@ my @script = ( qq{#!/usr/local/bin/bash} );
 push @script, qq{source \$HOME/.bashrc};
 push @script, qq{cd "}.getcwd().qq{"};
 push @script, qq{printf "\e]0;%s\007" "$title"} if defined $title;
-push @script, qq{printf "\e[8;%d;%dt" $height 80} if defined $height;
+if (defined($height) || defined($width)) {
+  $height //= 50;
+  $width  //= 132;
+  push @script, qq{printf "\e[8;%d;%dt" $height $width};
+}
+push @script, qq{export LINES=$height; export COLUMNS=$width};
 push @script, $cmd;
 push @script, qq{echo; read -n 1 -s -p "Press any key to exit"} if $pause;
 push @script, qq{rm -f $base*} if $clean;
