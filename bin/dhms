@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+use v5.12;
+my $seconds = shift @ARGV;
+my @parts;
+
+if ($seconds > 86400) {
+  my $days = int($seconds / 86400);
+  $seconds -= $days * 86400;
+  push @parts, sprintf('%dd', $days);
+}
+
+if ($seconds > 3600) {
+  my $hours = int($seconds / 3600);
+  $seconds -= $hours * 3600;
+  push @parts, sprintf('%dh', $hours);
+}
+
+if ($seconds > 60) {
+  my $minutes = int($seconds / 60);
+  $seconds -= $minutes * 60;
+  push @parts, sprintf('%dm', $minutes);
+}
+
+if ($seconds > 0) {
+  push @parts, sprintf('%ds', $seconds);
+}
+
+say join(q{ }, @parts);
