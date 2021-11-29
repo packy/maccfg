@@ -3,7 +3,7 @@ $(shell mkdir -p .d)
 .PHONY: install
 install: homebrew iterm2 keka diff-so-fancy hr screenresolution pcre \
          readline git p7zip quicklook bash highlight mas wget atom hub \
-         sleepwatcher
+         sleepwatcher xz shellcheck
 
 homebrew:         .d/homebrew
 appcleaner:       .d/appcleaner.brew
@@ -26,11 +26,13 @@ mas:              .d/mas.brew
 mysql:            .d/mysql.brew
 openssl:          .d/openssl.brew
 p7zip:            .d/p7zip.brew
+xz:               .d/xz.brew
 pcre:             .d/pcre.brew
 perl:             .d/perl.brew
 pyenv:            .d/pyenv.brew
 readline:         .d/readline.brew
 screenresolution: .d/screenresolution.brew
+shellcheck:       .d/shellcheck.brew
 sleepwatcher:     .d/sleepwatcher.brew
 sqlite:           .d/sqlite.brew
 subversion:       .d/subversion.brew

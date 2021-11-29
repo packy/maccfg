@@ -97,3 +97,6 @@ re_source_file $HOME/git/ack2/completion.bash
 
 export GREP_COLOR='30;43'
 export GREP_OPTIONS='--color=auto'
+
+# alias to the ack3 beta
+alias ack3=$(ls $CFGBIN/ack-2.999* | tail -1)

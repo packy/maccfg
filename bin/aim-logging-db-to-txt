@@ -1,0 +1,11 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use v5.14;
+
+while (<>) {
+  s/^\d+\t//;
+  s/\t(INFO|TRACE|FATAL|WARN)/ [$1]/;
+  s/\t(\S+ #\d+)\t/ ($1) /;
+  print;
+}

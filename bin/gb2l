@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+# atom:set useSoftTabs tabLength=4 grammar=perl:
+use strict;
+use warnings;
+use v5.010;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my $help;
+my $man;
+my $start;
+my $stop;
+GetOptions
+    "start=s" => \$start,
+    "stop=s"  => \$stop,
+    "man"     => \$man,
+    "help|?"  => \$help,
+  or pod2usage(2);
+
+pod2usage(1) if $help;
+pod2usage(-exitval => 0, -verbose => 2) if $man;
+
+my $header = (@ARGV > 1);
+
+while (my $filename = shift @ARGV) {
+  say "=== $filename ===" if ($header);
+  my $print = 0;
+  open my $fh, '<', $filename;
+  while (my $line = <$fh>) {
+    if ($line =~ /$start/) {
+      $print = 1;
+    }
+
+    print $line if $print;
+
+    if ($line =~ /$stop/) {
+      $print = 0;
+    }
+  }
+  close $fh;
+}

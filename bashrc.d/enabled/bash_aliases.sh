@@ -15,5 +15,3 @@ alias airport='/System/Library/PrivateFrameworks/Apple80211.framework/Versions/C
 export MY_APPLESCRIPTS="$GITDIR/maccfg/AppleScript"
 
 alias inbox='osascript "$MY_APPLESCRIPTS/Open Google Inbox.applescript"'
-alias music='osascript "$MY_APPLESCRIPTS/Open Google Play Music.applescript"'
-alias play='osascript "$MY_APPLESCRIPTS/Open Google Play Music.applescript"'

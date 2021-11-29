@@ -1,7 +1,7 @@
 #; -*-Conf-*-  Set emacs conf mode
 [user]
-    name = Packy Anderson
-    email = PAnderson@advancedinfomanagement.com
+	name = Packy Anderson
+	email = panderson@advancedinfomanagement.com
 
 [alias]
     alias = "!sh -c '[ $# = 2 ] && git config --global alias.\"$1\" \"$2\" && exit 0 || echo \"usage: git alias <new alias> <original command>\" >&2 && exit 1' -"

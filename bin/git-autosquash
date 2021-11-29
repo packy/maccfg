@@ -10,7 +10,9 @@ branch_has_no_tracking_information () {
   [[ $(git remote show | wc -l) -eq 0 ]]
 }
 
-if branch_has_no_tracking_information; then
+if [[ ! -z "$1 " ]]; then
+  RANGE="$1"
+elif branch_has_no_tracking_information; then
   N=$(git log --format=%H | egrep -v -f <(git log --format=%H "--grep=git-svn-id") | wc -l)
   RANGE="HEAD~$((N))"
 else

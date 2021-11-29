@@ -1,2 +1,2 @@
 #!/bin/bash
-sleep 1; touch $1; echo Touched $1
+sleep 1; touch "$1"; echo "Touched '$1'"

@@ -17,6 +17,12 @@
         check_is_up      = false
     </slappy.local>
 
+    <daffy>
+        default_username = packy
+        method           = publickey
+        check_is_up      = false
+    </daffy>
+
     <www.dardan.com>
         default_username = dardanco
         method           = publickey
@@ -34,13 +40,6 @@
         method           = publickey
         check_is_up      = false
     </psd-10.aim.hosting>
-
-    <oms-db-07.aim.hosting>
-        default_username = jp1070
-        method           = publickey
-        check_is_up      = false
-        color = 004400
-    </oms-db-07.aim.hosting>
 
     <psd-11.aim.hosting>
         default_username = jp1070
@@ -212,6 +211,19 @@
         method           = publickey
         check_is_up      = false
     </G3QJ-wired>
+
+    <daffy-k8s0>
+        default_username = packy
+    </daffy-k8s0>
+    <daffy-k8s1>
+        default_username = packy
+    </daffy-k8s1>
+    <daffy-k8s2>
+        default_username = packy
+    </daffy-k8s2>
+    <daffy-k8s3>
+        default_username = packy
+    </daffy-k8s3>
 </hosts>
 
 <aliases>
@@ -227,11 +239,9 @@
     psd-01    = psd-01.aim.hosting
     psd-10    = psd-10.aim.hosting
     psd-11    = psd-11.aim.hosting
-    oms-db-07 = oms-db-07.aim.hosting
     test01    = test-01
     backup01  = backup-01.aim.hosting
     backup-01 = backup-01.aim.hosting
-    mgmt-las  = mgmt.las.aim.hosting
     G3QJ      = G3QJ-WiFI
     pacbook   = G3QJ-wired
 </aliases>

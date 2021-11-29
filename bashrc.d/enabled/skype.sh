@@ -38,7 +38,7 @@ function skype-mood-home () {
 }
 
 function skype-mood-aim () {
-  set-skype-mood "⛪ @ 620 Union"
+  set-skype-mood "🏦 @ 120 Erie"
   set-skype-status online
 }
 

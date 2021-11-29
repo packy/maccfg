@@ -37,3 +37,8 @@ function is_in_list () {
   fi
   false
 }
+
+# from https://github.com/gwaldo/dotfiles/blob/master/dot-zshrc
+function yamllint () {
+  for i in $(find . -name '*.yml' -o -name '*.yaml'); do echo $i; ruby -e "require 'yaml';YAML.load_file(\"$i\")"; done
+}

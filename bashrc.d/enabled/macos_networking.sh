@@ -33,3 +33,5 @@ function set-location () {
     sleep 1
   done
 }
+
+alias netutil='open /System/Library/CoreServices/Applications/Network\ Utility.app'

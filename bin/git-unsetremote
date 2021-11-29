@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+ref=$(git-symbolic-ref HEAD 2> /dev/null)
+BRANCH=$(echo "${ref#refs/heads/}")
+echo "> git config --unset branch.${BRANCH}.remote"
+echo "> git config --unset branch.${BRANCH}.merge"
+git config --unset branch.${BRANCH}.remote
+git config --unset branch.${BRANCH}.merge

@@ -39,11 +39,30 @@ alias gd='git diff'
 alias gds='git diff --staged'
 alias ga='git autosquash'
 alias gf='git fixup'
-alias gffs='git checkout develop; git pull; git flow feature start'
 
 alias diffsf='git diff --no-index --color'
 
 alias fire='git commit -a -m Fire\! ; git push'
+
+function gffs () {
+  git checkout develop
+  git pull
+  BRANCH=$1; shift
+  for var in "$@"; do
+    BRANCH+="_$var"
+  done
+  git flow feature start $BRANCH
+}
+
+function kfb () {
+  git checkout release/0000
+  git pull
+  BRANCH=$1; shift
+  for var in "$@"; do
+    BRANCH+="_$var"
+  done
+  git branchfrom release/0000 feature/$BRANCH
+}
 
 #
 # git.io URL shortener
@@ -251,4 +270,8 @@ git_is_dirty () {
 
 git_was_dirty () {
   [[ ! -z "$__GIT_IS_DIRTY" ]]
+}
+
+git-changedfiles () {
+  git status --porcelain=v1 | grep -v '\?' | perl -pe 'substr($_, 0, 3, "")'
 }

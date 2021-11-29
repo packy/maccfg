@@ -22,3 +22,8 @@
 
 # ignore python virtual environments
 venv
+
+# ignore python cache files
+__pycache__
+
+package-lock.json
