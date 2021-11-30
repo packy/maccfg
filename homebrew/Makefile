@@ -51,7 +51,7 @@ qlcolorcode: highlight .d/qlcolorcode.cask
 	@./install
 
 .d/atom.cask:
-	@brew cask install atom
+	@brew install --cask atom
 	@apm install sync-settings
 	@./write_atom_config.pl
 	@./install
