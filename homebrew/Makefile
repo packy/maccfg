@@ -3,7 +3,7 @@ $(shell mkdir -p .d)
 .PHONY: install
 install: homebrew iterm2 keka diff-so-fancy hr screenresolution pcre \
          readline git p7zip quicklook bash highlight mas wget atom hub \
-         sleepwatcher xz shellcheck
+         sleepwatcher xz shellcheck font-jetbrains
 
 homebrew:         .d/homebrew
 appcleaner:       .d/appcleaner.brew
@@ -15,6 +15,7 @@ betterzip:        .d/betterzip.cask
 diff-so-fancy:    .d/diff-so-fancy.brew
 disk-inventory-x: .d/disk-inventory-x.brew
 emacs:            .d/emacs.cask
+font-jetbrains:   .d/font-jetbrains-mono.cask
 gimp:             .d/gimp.cask
 git:              .d/git.brew
 highlight:        .d/highlight.brew
