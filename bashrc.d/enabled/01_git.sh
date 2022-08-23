@@ -280,3 +280,5 @@ git-names-only () {
     COMMITS=${1:--1};
     git log $COMMITS --name-only --pretty=format: | sort -u | egrep -v '^$'
 }
+
+alias git-changed-files="git status --porcelain | awk '{ print \$2 }'"
