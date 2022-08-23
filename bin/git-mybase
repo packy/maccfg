@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 function parse_git_branch {
   WRAP=$1
-  ref=$(git-symbolic-ref HEAD 2> /dev/null) || return
+  ref=$(git symbolic-ref HEAD 2> /dev/null) || return
   if [[ "$WRAP" = "wrap" ]] ; then
     echo "(${ref#refs/heads/})"
   else
