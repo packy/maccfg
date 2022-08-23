@@ -275,3 +275,8 @@ git_was_dirty () {
 git-changedfiles () {
   git status --porcelain=v1 | grep -v '\?' | perl -pe 'substr($_, 0, 3, "")'
 }
+
+git-names-only () {
+    COMMITS=${1:--1};
+    git log $COMMITS --name-only --pretty=format: | sort -u | egrep -v '^$'
+}
