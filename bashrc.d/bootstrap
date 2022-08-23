@@ -33,7 +33,7 @@ function source_file () {
     if [[ -f $FILE ]]; then
         is_interactive && save_cursor
         is_interactive && clear_line_cursor_right
-        is_interactive && printf "Sourcing %s ..." $(basename $FILE)
+        is_interactive && printf "Sourcing %s ... " $(basename $FILE)
         source $FILE
         is_interactive && restore_cursor
     elif [[ "$PRINTERR" != "" ]]; then
