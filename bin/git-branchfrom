@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
-DEST="$2"
 SOURCE="$1"
+DEST="$2"
+
 git checkout -b "$DEST" "$SOURCE"
