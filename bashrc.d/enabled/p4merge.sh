@@ -6,5 +6,5 @@ P4MERGE=/Applications/p4merge.app/Contents/Resources/launchp4merge
 
 export P4MERGE
 p4diff () {
-    $P4MERGE "$@" &
+    ($P4MERGE "$@" &)
 }
