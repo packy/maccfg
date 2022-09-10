@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # for syntax highlightling in emacs, mostly
 
+export BASH_SILENCE_DEPRECATION_WARNING=1
+
 source $HOME/.bashrc
 
 alias gam="/Users/packy/bin/gam/gam"
