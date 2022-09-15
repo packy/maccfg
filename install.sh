@@ -3,14 +3,6 @@
 # update the Command Line Tools for Xcode
 xcode-select --install
 
-# make sure /usr/local is writable by the current user
-USER=$(whoami)
-if [[ ! -w /usr/local ]]; then
-    echo Error: The /usr/local directory is not writable.
-    echo running sudo chown -R $USER:admin /usr/local
-    sudo chown -R $USER:admin /usr/local
-fi
-
 # install Homebrew if it's not installed: https://brew.sh/
 if ! which brew; then
     URL=https://raw.githubusercontent.com/Homebrew/install/master/install
@@ -46,8 +38,12 @@ mkdir $HOME/git
 cd $HOME/git
 
 # clone this project
-git clone --recursive git@github.com:packy/maccfg.git
+git clone --recursive https://github.com/packy/maccfg.git
 cd maccfg
+
+# make sure my PERSONAL email is set for this repo,
+# since my global email is probably my employer's
+git config user.email "PackyAnderson@gmail.com"
 
 # install it!
 make install
