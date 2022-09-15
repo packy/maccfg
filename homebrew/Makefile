@@ -3,7 +3,7 @@ $(shell mkdir -p .d)
 .PHONY: install
 install: homebrew iterm2 keka diff-so-fancy hr screenresolution pcre \
          readline git p7zip quicklook bash highlight mas wget atom hub \
-         sleepwatcher xz shellcheck font-jetbrains
+         sleepwatcher shellcheck font-jetbrains
 
 homebrew:         .d/homebrew
 appcleaner:       .d/appcleaner.brew
@@ -11,7 +11,6 @@ apr-util:         .d/apr-util.brew
 apr:              .d/apr.brew
 atom:             .d/atom.cask
 bash:             .d/bash.brew
-betterzip:        .d/betterzip.cask
 diff-so-fancy:    .d/diff-so-fancy.brew
 disk-inventory-x: .d/disk-inventory-x.brew
 emacs:            .d/emacs.cask
@@ -60,9 +59,6 @@ qlcolorcode: highlight .d/qlcolorcode.cask
 
 .d/git.brew: pcre
 	@export USE_LIBPCRE=yes; brew install --build-from-source git
-
-.d/betterzip.cask:
-	brew install caskroom/cask/betterzip
 
 .d/%.cask: .d/caskroom
 	brew cask install $*
