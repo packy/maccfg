@@ -32,13 +32,13 @@ homebrewed:
 git: USE_LIBPCRE=yes
 git: homebrew pcre
 
-/usr/local/bin/ansi:
-	cd /usr/local/bin; curl -OL git.io/ansi; chmod 755 ansi
+$(HOMEBREW_PREFIX)/bin/ansi:
+	cd $(HOMEBREW_PREFIX)/bin; curl -OL git.io/ansi; chmod 755 ansi
 
 bash: /etc/shells
-	@if ! grep -q "/usr/local/bin/bash" /etc/shells; then \
-	    echo "Adding /usr/local/bin/bash to /etc/shells"; \
-	    echo "/usr/local/bin/bash" | sudo tee -a /etc/shells; \
+	@if ! grep -q "$(HOMEBREW_PREFIX)/bin/bash" /etc/shells; then \
+	    echo "Adding $(HOMEBREW_PREFIX)/bin/bash to /etc/shells"; \
+	    echo "$(HOMEBREW_PREFIX)/bin/bash" | sudo tee -a /etc/shells; \
 	fi
 
 .PHONY: install

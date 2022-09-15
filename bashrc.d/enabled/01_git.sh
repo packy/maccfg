@@ -1,6 +1,6 @@
 #!/bin/bash
 if function_exists unshift_path; then # add dirs to the FRONT of the PATH
-    unshift_path /usr/local/bin
+    unshift_path /opt/homebrew/bin
 fi
 
 export GITDIR=$HOME/git
@@ -92,7 +92,7 @@ function git () {
         echo "Don't run git as root!" 1>&2
         bash -c "exit 1"; # so the status is 1
     else
-        /usr/local/bin/git "$@"
+        $GIT_BIN "$@"
     fi
 }
 

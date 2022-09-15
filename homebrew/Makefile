@@ -56,7 +56,7 @@ qlcolorcode: highlight .d/qlcolorcode.cask
 	@apm install sync-settings
 	@./write_atom_config.pl
 	@./install
-	@ln -s /Applications/Atom.app/Contents/Resources/app/atom.sh /usr/local/bin/atom
+	@ln -s /Applications/Atom.app/Contents/Resources/app/atom.sh $HOMEBREW_PREFIX/bin/atom
 
 .d/git.brew: pcre
 	@export USE_LIBPCRE=yes; brew install --build-from-source git

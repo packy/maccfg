@@ -44,10 +44,10 @@ restore_cursor_clear_line
 
 if function_exists unshift_path; then
     # add dirs to the FRONT of the PATH
-    unshift_path /usr/local/sbin
-    unshift_path /usr/local/bin
-    unshift_path /usr/local/opt/findutils/libexec/gnubin
-    unshift_path /usr/local/opt/openssl/bin
+    unshift_path $HOMEBREW_PREFIX/sbin
+    unshift_path $HOMEBREW_PREFIX/bin
+    unshift_path $HOMEBREW_PREFIX/opt/findutils/libexec/gnubin
+    unshift_path $HOMEBREW_PREFIX/opt/openssl/bin
     unshift_path $HOME/bin
     [[ -d "$HOME/.pyenv/shims" ]] && unshift_path $HOME/.pyenv/shims
 else

@@ -2,6 +2,11 @@
 # for syntax highlightling in emacs, mostly
 
 export BASH_SILENCE_DEPRECATION_WARNING=1
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  export HOMEBREW_PREFIX=$(/opt/homebrew/bin/brew --prefix)
+elif [[ -x /usr/local/bin/brew ]]; then
+  export HOMEBREW_PREFIX=$(/usr/local/bin/brew --prefix)
+fi
 
 source $HOME/.bashrc
 

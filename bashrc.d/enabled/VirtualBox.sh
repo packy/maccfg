@@ -9,18 +9,18 @@ if [[ -d /Applications/VirtualBox.app ]]; then
     VBoxManage=$VirtualBoxVM_Contents/MacOS/VBoxManage
     VBoxHeadless=$VirtualBoxVM_Contents/MacOS/VBoxHeadless
 
-    VBoxLog=/usr/local/log/VBox
+    VBoxLog=$HOMEBREW_PREFIX/log/VBox
     mkdir -p $VBoxLog
 
     function vbox-logrotate () {
         local LOG=$1
-        local CONF=$VBoxLog/logrotate.conf 
+        local CONF=$VBoxLog/logrotate.conf
         touch $LOG
         local FILES=$VBoxLog/*/*.log
-        mkdir -p /usr/local/var/lib
+        mkdir -p $HOMEBREW_PREFIX/var/lib
         cat -> $CONF <<EOF
 compress
-compresscmd /usr/local/bin/7z
+compresscmd $HOMEBREW_PREFIX/bin/7z
 compressoptions a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on
 dateext
 

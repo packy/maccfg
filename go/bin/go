@@ -15,12 +15,13 @@ use Readonly;
 use Scalar::Readonly ':all';
 use Term::ReadKey;
 
+Readonly my $brewbin => $ENV{HOMEBREW_PREFIX}.'/bin';
 Readonly my $iTerm2  => '^/.+\.app/Contents/MacOS/iTerm2';
-Readonly my $bash    => '/usr/local/bin/bash';
-Readonly my $sshpass => '/usr/local/bin/sshpass';
-Readonly my $ssh     => '/usr/bin/ssh -oStrictHostKeyChecking=no '
+Readonly my $bash    => $brewbin.'/bash';
+Readonly my $sshpass => $brewbin.'/sshpass';
+Readonly my $ssh     => $brewbin.'/ssh -oStrictHostKeyChecking=no '
                      . '-oServerAliveInterval=60';
-Readonly my $scp     => '/usr/bin/scp -oStrictHostKeyChecking=no';
+Readonly my $scp     => $brewbin.'/scp -oStrictHostKeyChecking=no';
 Readonly my $dest    => '/tmp/packybin';
 
 my %hostmap;
