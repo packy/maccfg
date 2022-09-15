@@ -24,7 +24,7 @@ push_path () {
 }
 
 uniq_path () {
-  export PATH=$(/usr/bin/perl -e '
+  export PATH=$(perl -e '
     my $sep  = q{:};
     my %seen;
     my @PATH = grep { ! $seen{$_}++ } split /$sep/, $ENV{PATH};
@@ -33,7 +33,7 @@ uniq_path () {
 }
 
 explode_path () {
-  /usr/bin/perl -e '
+  perl -e '
     my $PATH  = $ENV{PATH};
     my $sep   = q{:};
     my @parts = split /$sep/, $PATH;

@@ -1,4 +1,4 @@
-#!/usr/local/bin/bash
+#!/usr/bin/env bash
 
 export P4PORT=${P4PORT:-rnd-scm.bmc.com:4742}
 export P4USER=${P4USER:-pacander}

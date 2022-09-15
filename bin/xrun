@@ -40,7 +40,7 @@ unless (defined $title) {
     $title = $cmd;
 }
 
-my @script = ( qq{#!/usr/local/bin/bash} );
+my @script = ( qq{#!/usr/bin/env bash} );
 push @script, qq{source \$HOME/.bashrc};
 push @script, qq{cd "}.getcwd().qq{"};
 push @script, qq{printf "\e]0;%s\007" "$title"} if defined $title;
