@@ -17,3 +17,15 @@ if [[ -d /Applications/Microsoft\ PowerPoint.app ]]; then
     open -a Microsoft\ PowerPoint "$@"
   }
 fi
+
+if [[ -d /Applications/Microsoft\ Teams.app ]]; then
+  function teams () {
+    open -a Microsoft\ Teams "$@"
+  }
+fi
+
+if [[ -d /Applications/Microsoft\ Outlook.app ]]; then
+  function outlook () {
+    open -a Microsoft\ Outlook "$@"
+  }
+fi
