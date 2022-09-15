@@ -42,7 +42,7 @@ EOF
     function vbox-vm-is-running () {
         vbox-running | grep -q "$1"
     }
-    
+
     function vbox-vm-prop () {
         local VM="$1"
         local PROP="$2"
@@ -50,7 +50,7 @@ EOF
             GuestIP) PROP="/VirtualBox/GuestInfo/Net/0/V4/IP" ;;
             NoLoggedInUsers) PROP="/VirtualBox/GuestInfo/OS/NoLoggedInUsers" ;;
         esac
-        $VBoxManage guestproperty get "$VM" "$PROP" 
+        $VBoxManage guestproperty get "$VM" "$PROP"
     }
 
     function vbox-vm-is-booted () {
