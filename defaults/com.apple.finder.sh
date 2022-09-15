@@ -12,4 +12,8 @@ defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
 # Finder > View > Show Path Bar
 defaults write com.apple.finder ShowPathbar -bool true
 
+# Enable 'natural' (Lion-style) scrolling
+defaults write -g com.apple.swipescrolldirection -bool false
+
+killall cfprefsd > /dev/null 2>&1
 killall Finder > /dev/null 2>&1
