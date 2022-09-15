@@ -1,9 +1,12 @@
 .d
 .DS_Store
 Applescript/*.app
+# GridApp stuff
 go/linux/discovery.pl
 go/linux/mtd_client
 go/linux/mtd_client.sh
 go/linux/mtd_client_nowait
 go/linux/pretty_print.pl
 go/linux/send_mgmt_command
+# Amdocs stuff
+bashrc.d/enabled/amdocs.sh
