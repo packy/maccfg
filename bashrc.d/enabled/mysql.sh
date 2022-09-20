@@ -1,4 +1,10 @@
 #!bash
+push_path /opt/homebrew/opt/mysql-client/bin
+
+function mysqll () {
+  LOGIN=$1; shift
+  mysql --login-path=$LOGIN "$@"
+}
 
 function mysqlg () {
   mysql --defaults-group-suffix=$1
