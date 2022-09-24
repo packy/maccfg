@@ -48,8 +48,8 @@ if (defined($height) || defined($width)) {
   $height //= 50;
   $width  //= 132;
   push @script, qq{printf "\e[8;%d;%dt" $height $width};
+  push @script, qq{export LINES=$height; export COLUMNS=$width};
 }
-push @script, qq{export LINES=$height; export COLUMNS=$width};
 push @script, $cmd;
 push @script, qq{echo; read -n 1 -s -p "Press any key to exit"} if $pause;
 push @script, qq{rm -f $base*} if $clean;
