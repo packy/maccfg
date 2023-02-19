@@ -5,6 +5,12 @@
         check_is_up      = false
     </speedy.local>
 
+    <daffy.local>
+        default_username = packy
+        method           = publickey
+        check_is_up      = false
+    </daffy.local>
+
     <kirby.local>
         default_username = packy
         method           = publickey
@@ -29,189 +35,6 @@
         check_is_up      = false
     </www.dardan.com>
 
-    <psd-01.aim.hosting>
-        default_username = jp1070
-        method           = publickey
-        check_is_up      = false
-    </psd-01.aim.hosting>
-
-    <psd-10.aim.hosting>
-        default_username = jp1070
-        method           = publickey
-        check_is_up      = false
-    </psd-10.aim.hosting>
-
-    <psd-11.aim.hosting>
-        default_username = jp1070
-        method           = publickey
-        check_is_up      = false
-        color = 000000
-        color = 000044
-        color = 004400
-        color = 005566
-        color = 660066
-        color = 660055
-    </psd-11.aim.hosting>
-
-    <backup-01.aim.hosting>
-        default_username = jp1070
-        method           = publickey
-        check_is_up      = false
-    </backup-01.aim.hosting>
-
-    <oms-01>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </oms-01>
-
-    <oms-02>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </oms-02>
-
-    <oms-03>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </oms-03>
-
-    <oms-04>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </oms-04>
-
-    <oms-05>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </oms-05>
-
-    <oms-06>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </oms-06>
-
-    <oms-07>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </oms-07>
-
-    <oms-08>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </oms-08>
-
-    <oms-09>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </oms-09>
-
-    <oms-db-01>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </oms-db-01>
-
-    <oms-db-02>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </oms-db-02>
-
-    <oms-db-03>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </oms-db-03>
-
-    <oms-db-04>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </oms-db-04>
-
-    <oms-db-05>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </oms-db-05>
-
-    <vingo-oms-db>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </vingo-oms-db>
-
-    <ci-01>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </ci-01>
-
-    <ci-02>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </ci-02>
-
-    <net-svc-1>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </net-svc-1>
-
-    <mgmt.las.aim.hosting>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </mgmt.las.aim.hosting>
-
-    <test-01>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </test-01>
-
-    <svc-05>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </svc-05>
-
-    <gitlab.aim.hosting>
-      default_username = jp1070
-      method           = publickey
-      check_is_up      = false
-    </gitlab.aim.hosting>
-
-    <vm01>
-        address = `vbox-guest-ip "psd-vm01" 2>&1`
-        default_username = root
-        method           = publickey
-        check_is_up      = false
-    </vm01>
-
-    <G3QJ-WiFI>
-        address = `dig \@192.168.1.1 G3QJ A +short`
-        default_username = jp1070
-        method           = publickey
-        check_is_up      = false
-    </G3QJ-WiFI>
-
-    <G3QJ-wired>
-        address = `dig \@192.168.1.1 G3QJ-wired A +short`
-        default_username = jp1070
-        method           = publickey
-        check_is_up      = false
-    </G3QJ-wired>
-
     <daffy-k8s0>
         default_username = packy
     </daffy-k8s0>
@@ -228,20 +51,8 @@
 
 <aliases>
     speedy    = speedy.local
+    daffy     = daffy.local
     kirby     = kirby.local
     slappy    = slappy.local
     bluehost  = www.dardan.com
-    svc05     = svc-05
-    gitlab    = gitlab.aim.hosting
-    psd01     = psd-01.aim.hosting
-    psd10     = psd-10.aim.hosting
-    psd11     = psd-11.aim.hosting
-    psd-01    = psd-01.aim.hosting
-    psd-10    = psd-10.aim.hosting
-    psd-11    = psd-11.aim.hosting
-    test01    = test-01
-    backup01  = backup-01.aim.hosting
-    backup-01 = backup-01.aim.hosting
-    G3QJ      = G3QJ-WiFI
-    pacbook   = G3QJ-wired
 </aliases>
