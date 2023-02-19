@@ -29,12 +29,73 @@
 # -H Symbolic links on the command line are followed.  This option is
 #    assumed if none of the -F, -d, or -l options are specified.
 
-alias   ls='/bin/ls -bG'
-alias   ll='/bin/ls -bGlhOH'
-alias  lll='/bin/ls -bGlhOpH'
-alias llll='/bin/ls -bGlheOpH'
+#alias   ls='/bin/ls -bG'
+#alias   ll='/bin/ls -bGlhOH'
+#alias  lll='/bin/ls -bGlhOpH'
+#alias llll='/bin/ls -bGlheOpH'
+alias lllll='/bin/ls -bGlheOpH'
 
-alias llrt='/bin/ls -bGlhOHrt'
+# https://the.exa.website/
+# -l, --long
+# Displays files in a table along with their metadata.
+
+# --icons
+# Displays Unicode icons by file names.
+
+# -s, --sort=SORT_FIELD
+# Configures which field to sort by.
+#
+# * name or filename sorts by name, case-insensitively.
+# * Name or Filename sorts by name, case-sensitively.
+# * cname or cfilename sorts by name, case-insensitively and canonically.
+# * Cname or Cfilename sorts by name, case-sensitively and canonically.
+# * .name or .filename sorts by name without a leading dot, case-insensitively.
+# * .Name or .Filename sorts by name without a leading dot, case-sensitively.
+# * size or filesize sorts by size, with smaller files listed first.
+# * ext or extension sorts by file extension, case-insensitively.
+# * Ext or Extension sorts by file extension, case-sensitively.
+# * mod or modified sorts by file modified date, with older files listed first.
+# * acc or accessed sorts by file accessed date.
+# * cr or created sorts by file created date.
+# * inode sorts by file inode.
+# * type sorts by the type of file (directory, socket, link).
+# * none disables sorting, and lists files in an arbitrary order.
+#
+# The modified field has the aliases date, time, and new, and newest. Also,
+# because we usually think about dates relatively, its reverse has the
+# aliases age, old, and oldest.
+#
+# Fields starting with a capital letter will sort uppercase before lowercase.
+#
+# Canonical sorting means that numbers will be treated as strings of digits
+# instead of numbers. Normally, 9 comes before 10, but sorting by Cname will
+# sort 10 before 9 because it sees the 1 digit first.
+
+# --group-directories-first
+# Lists directories before other files when sorting.
+
+# -g, --group
+# Lists each file’s group.
+
+# -h, --header
+# Adds a header row to each column in the table.
+
+# -@, --extended
+# Lists each file’s extended attributes and sizes.
+
+# --git
+# Lists each file’s Git status, if tracked.
+
+# --color-scale, --colour-scale
+# Highlights levels of file size distinctly.
+
+alias    ls='exa --group-directories-first'
+alias    ll='exa --long --header --group --icons --git --group-directories-first --color-scale'
+alias   lll='exa --long --header --group --icons --git --group-directories-first --color-scale --classify'
+alias  llll='exa --long --header --group --icons --git --group-directories-first --color-scale --classify --extendeda'
+
+#alias llrt='/bin/ls -bGlhOHrt'
+alias llrt='exa -lhg --icons --sort=mod'
 
 # LSCOLORS
 # The value of this variable describes what color to use for which
