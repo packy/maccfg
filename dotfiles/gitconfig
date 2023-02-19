@@ -1,6 +1,6 @@
 #; -*-Conf-*-  Set emacs conf mode
-[user]
-	name = Packy Anderson
+[include]
+    path = ~/.gitconfig_user
 
 [alias]
     alias = "!sh -c '[ $# = 2 ] && git config --global alias.\"$1\" \"$2\" && exit 0 || echo \"usage: git alias <new alias> <original command>\" >&2 && exit 1' -"
@@ -78,9 +78,6 @@
 [push]
     default = simple
 
-[log]
-    date = local
-    decorate = auto
 
 #
 # Using p4merge as Git mergetool
@@ -101,5 +98,20 @@
 
 [difftool "p4mergetool"]
     cmd = /Applications/p4merge.app/Contents/Resources/launchp4merge "$LOCAL" "$REMOTE"
+
 [credential]
 	helper = store
+
+[log]
+    date = local
+    decorate = auto
+
+[git-p4]
+    skipSubmitEdit = true
+    autostash = True
+[user]
+    name = Packy Anderson
+    email = packy@cpan.org
+
+[svn]
+    rmdir = true
