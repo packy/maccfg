@@ -112,157 +112,160 @@ else
 fi
 
 if [[ $USE_EXA -eq 1 ]]; then
-    # Before looking at a file’s extension, exa looks at the file’s class in
-    # the filesystem — whether it’s a directory, a socket, a link, or (in a
-    # special case) an executable file.
-    #
-    # You can customise the colours used for each file by using one of these 
-    # two-character-long keys with a colour:
-    #
-    # fi Normal file
-    # di Directory
-    # ex Executable file
-    # pi Named pipe
-    # so Socket
-    # bd Block device
-    # cd Character device
-    # ln Symlink
-    # or Broken symlink
-    #
-    # Codes exa doesn’t do anything with:
-    #  // MULTIHARDLINK, DOOR, SETUID, SETGID, CAPABILITY,
-    #  // STICKY_OTHER_WRITABLE, OTHER_WRITABLE, STICKY, MISSING
+  # Before looking at a file’s extension, exa looks at the file’s class in
+  # the filesystem — whether it’s a directory, a socket, a link, or (in a
+  # special case) an executable file.
+  #
+  # You can customise the colours used for each file by using one of these 
+  # two-character-long keys with a colour:
+  #
+  # fi Normal file
+  # di Directory
+  # ex Executable file
+  # pi Named pipe
+  # so Socket
+  # bd Block device
+  # cd Character device
+  # ln Symlink
+  # or Broken symlink
+  #
+  # Codes exa doesn’t do anything with:
+  #  // MULTIHARDLINK, DOOR, SETUID, SETGID, CAPABILITY,
+  #  // STICKY_OTHER_WRITABLE, OTHER_WRITABLE, STICKY, MISSING
 
-    export EXA_COLORS="ln=1;35:so=35:bd=1;33:cd=33:lc=35:uw=36:su=1;31:sf=31:tw=1;31"
+  export EXA_COLORS="ln=1;35:so=35:bd=1;33:cd=33:lc=35:uw=36:su=1;31:sf=31:tw=1;31"
 
 else
-    # LSCOLORS
-    # The value of this variable describes what color to use for which
-    # attribute when colors are enabled with CLICOLOR.  This string is a
-    # concatenation of pairs of the format fb, where f is the foreground
-    # color and b is the background color.
-    #
-    # The color designators are as follows:
-    #
-    #       a     black
-    #       b     red
-    #       c     green
-    #       d     brown
-    #       e     blue
-    #       f     magenta
-    #       g     cyan
-    #       h     light grey
-    #       A     bold black, usually shows up as dark grey
-    #       B     bold red
-    #       C     bold green
-    #       D     bold brown, usually shows up as yellow
-    #       E     bold blue
-    #       F     bold magenta
-    #       G     bold cyan
-    #       H     bold light grey; looks like bright white
-    #       x     default foreground or background
-    #
-    # Note that the above are standard ANSI colors.  The actual display
-    # may differ depending on the color capabilities of the terminal in
-    # use.
-    #
-    # The order of the attributes are as follows:
-    #       1.   directory
-    #       2.   symbolic link
-    #       3.   socket
-    #       4.   pipe
-    #       5.   executable
-    #       6.   block special
-    #       7.   character special
-    #       8.   executable with setuid bit set
-    #       9.   executable with setgid bit set
-    #       10.  directory writable to others, with sticky bit
-    #       11.  directory writable to others, without sticky bit
-    #
-    # The default is "exfxcxdxbxegedabagacad", i.e. blue foreground and
-    # default background for regular directories, black foreground and red
-    # background for setuid executables, etc.
+  # LSCOLORS
+  # The value of this variable describes what color to use for which
+  # attribute when colors are enabled with CLICOLOR.  This string is a
+  # concatenation of pairs of the format fb, where f is the foreground
+  # color and b is the background color.
+  #
+  # The color designators are as follows:
+  #
+  #       a     black
+  #       b     red
+  #       c     green
+  #       d     brown
+  #       e     blue
+  #       f     magenta
+  #       g     cyan
+  #       h     light grey
+  #       A     bold black, usually shows up as dark grey
+  #       B     bold red
+  #       C     bold green
+  #       D     bold brown, usually shows up as yellow
+  #       E     bold blue
+  #       F     bold magenta
+  #       G     bold cyan
+  #       H     bold light grey; looks like bright white
+  #       x     default foreground or background
+  #
+  # Note that the above are standard ANSI colors.  The actual display
+  # may differ depending on the color capabilities of the terminal in
+  # use.
+  #
+  # The order of the attributes are as follows:
+  #       1.   directory
+  #       2.   symbolic link
+  #       3.   socket
+  #       4.   pipe
+  #       5.   executable
+  #       6.   block special
+  #       7.   character special
+  #       8.   executable with setuid bit set
+  #       9.   executable with setgid bit set
+  #       10.  directory writable to others, with sticky bit
+  #       11.  directory writable to others, without sticky bit
+  #
+  # The default is "exfxcxdxbxegedabagacad", i.e. blue foreground and
+  # default background for regular directories, black foreground and red
+  # background for setuid executables, etc.
 
-    export  CLICOLOR=1
-    export  LSCOLORS=ExFxfxdxCxehbhBxGxDcDx
-    #export LSCOLORS=ExfxFxdxCxehbhabagacad
-    #export LSCOLORS=ExfxFxdxCxGgDdabagacad
-    #export LSCOLORS=Exfxcxdxbxegedabagacad
+  export  CLICOLOR=1
+  export  LSCOLORS=ExFxfxdxCxehbhBxGxDcDx
+  #export LSCOLORS=ExfxFxdxCxehbhabagacad
+  #export LSCOLORS=ExfxFxdxCxGgDdabagacad
+  #export LSCOLORS=Exfxcxdxbxegedabagacad
 fi
 
 function demo_ls_colors () {
-    #
-    # define examples
-    #
-    local DIR=/tmp/cdemo
-    local FILE01=1-directory
-    local FILE02=2-symbolic_link
-    local FILE03=3-socket
-    local FILE04=4-pipe
-    local FILE05=5-executable
-    local FILE06=/dev/disk0
-    local FILE07=/dev/console
-    local FILE08=8-setuid
-    local FILE09=9-setgid
-    local FILE10=A-dir_writegroup
-    local FILE11=B-dir_writeothers_NOsticky
-    local FILE12=C-dir_writeothers_stickybit
+  #
+  # define examples
+  #
+  local DIR=/tmp/cdemo
+  local FILE01=1-directory
+  local FILE02=2-symbolic_link
+  local FILE03=3-socket
+  local FILE04=4-pipe
+  local FILE05=5-executable
+  local FILE06=/dev/disk0
+  local FILE07=/dev/console
+  local FILE08=8-setuid
+  local FILE09=9-setgid
+  local FILE10=A-dir_writegroup
+  local FILE11=B-dir_writeothers_NOsticky
+  local FILE12=C-dir_writeothers_stickybit
 
-    #
-    # make examples
-    #
-    mkdir -p $DIR; cd $DIR
-    mkdir -p $FILE01
-    ln -s /tmp $FILE02
-    python -c "import socket as s; sock = s.socket(s.AF_UNIX); sock.bind('$FILE03')"
-    mkfifo $FILE04
-    touch    $FILE05 ;                          chmod u+x    $FILE05
-    touch    $FILE08 ;                          chmod u+sx   $FILE08
-    touch    $FILE09 ; chgrp everyone $FILE09 ; chmod g+sx   $FILE09
-    mkdir -p $FILE10 ;                          chmod g+w    $FILE10
-    mkdir -p $FILE11 ;                          chmod o+w    $FILE11
-    mkdir -p $FILE12 ;                          chmod o+w,+t $FILE12
+  #
+  # make examples
+  #
+  mkdir -p $DIR; cd $DIR
+  mkdir -p $FILE01
+  ln -s /tmp $FILE02
+  python -c "import socket as s; sock = s.socket(s.AF_UNIX); sock.bind('$FILE03')"
+  mkfifo $FILE04
+  touch    $FILE05 ;                          chmod u+x    $FILE05
+  touch    $FILE08 ;                          chmod u+sx   $FILE08
+  touch    $FILE09 ; chgrp everyone $FILE09 ; chmod g+sx   $FILE09
+  mkdir -p $FILE10 ;                          chmod g+w    $FILE10
+  mkdir -p $FILE11 ;                          chmod o+w    $FILE11
+  mkdir -p $FILE12 ;                          chmod o+w,+t $FILE12
 
-    echo
+  echo
+  if [[ $USE_EXA -eq 0 ]]; then
     echo Generate new spec with http://geoff.greer.fm/lscolors/
     echo
-    local  FORMAT01=" 1 - directory (%s):                                "
-    local  FORMAT02=" 2 - symbolic link (%s): . . . . . . . . . . . . .  "
-    local  FORMAT03=" 3 - socket (%s):                                   "
-    local  FORMAT04=" 4 - pipe (%s):  . . . . . . . . . . . . . . . . .  "
-    local  FORMAT05=" 5 - executable (%s):                               "
-    local  FORMAT06=" 6 - block special (%s): . . . . . . . . . . . . .  "
-    local  FORMAT07=" 7 - character special (%s):                        "
-    local  FORMAT08=" 8 - executable with setuid bit set (%s):  . . . .  "
-    local  FORMAT09=" 9 - file with setgid bit set (%s):                 "     
-    local  FORMAT10=" A - dir writeable to others, with sticky bit (%s): "
-    local  FORMAT11=" B - dir writeable to others, NO sticky bit (%s):   "
+  fi
+  local  FORMAT01=" 1 - directory (%s):                                "
+  local  FORMAT02=" 2 - symbolic link (%s): . . . . . . . . . . . . .  "
+  local  FORMAT03=" 3 - socket (%s):                                   "
+  local  FORMAT04=" 4 - pipe (%s):  . . . . . . . . . . . . . . . . .  "
+  local  FORMAT05=" 5 - executable (%s):                               "
+  local  FORMAT06=" 6 - block special (%s): . . . . . . . . . . . . .  "
+  local  FORMAT07=" 7 - character special (%s):                        "
+  local  FORMAT08=" 8 - executable with setuid bit set (%s):  . . . .  "
+  local  FORMAT09=" 9 - file with setgid bit set (%s):                 "     
+  local  FORMAT10=" A - dir writeable to group: . . . . . . . . . . .  "
+  local  FORMAT11=" B - dir writeable to others, NO sticky bit (%s):   "
+  local  FORMAT12=" C - dir writeable to others, with sticky bit (%s): "
 
-    # display colors!
-    if [[ $USE_EXA -eq 1 ]]; then
-      LS="$(which exa) -lnghdH" # long, numeric uid/gid, show group, headers, directory not contents, # links
-    else
-      LS="$(which ls) -Glnhd" # color, long, numeric uid/gid, human-readable size, directory not contents
-    fi
-    $LS * $FILE06 $FILE07
+  # display colors!
+  if [[ $USE_EXA -eq 1 ]]; then
+    LS="$(which exa) -lnghdH" # long, numeric uid/gid, show group, headers, directory not contents, # links
+  else
+    LS="$(which ls) -Glnhd" # color, long, numeric uid/gid, human-readable size, directory not contents
+  fi
+  $LS * $FILE06 $FILE07
 
-    echo
-    if [[ $USE_EXA -eq 1 ]]; then
-      LS="$(which exa) -d" # directory not contents
-      echo EXA_COLORS=$EXA_COLORS yields:
-      LIST="1 2 3 4 5 6 7"
-    else
-      LS="$(which ls) -Gd" # color, directory not contents
-      echo LSCOLORS=$LSCOLORS yields:
-      LIST="1 2 3 4 5 6 7 8 9 10 11"
-    fi
-    for i in $LIST; do
-        FMT=$(printf "\$FORMAT%02d" $i); eval FORMAT="$FMT"
-        FIL=$(printf "\$FILE%02d" $i);   eval FILE="$FIL"
-        CODE=$(perl -e 'print substr($ENV{LSCOLORS}, ($ARGV[0]-1) * 2, 2)' $i)
-        printf "$FORMAT" $CODE; $LS $FILE
-    done
-    echo
-    cd - >/dev/null
-    rm -rf $DIR
+  echo
+  if [[ $USE_EXA -eq 1 ]]; then
+    LS="$(which exa) -d" # directory not contents
+    echo EXA_COLORS=$EXA_COLORS yields:
+    LIST="1 2 3 4 5 6 7"
+  else
+    LS="$(which ls) -Gd" # color, directory not contents
+    echo LSCOLORS=$LSCOLORS yields:
+    LIST="1 2 3 4 5 6 7 8 9 10 11 12"
+  fi
+  for i in $LIST; do
+      FMT=$(printf "\$FORMAT%02d" $i); eval FORMAT="$FMT"
+      FIL=$(printf "\$FILE%02d" $i);   eval FILE="$FIL"
+      CODE=$(perl -e '$i = $ARGV[0]-1; $i = ($i==11) ? $i = 9 : ($i==9) ? $i=11 : $i; $code = $i*2; print substr($ENV{LSCOLORS}, $code, 2) if $i <= 10;' $i)
+      printf "$FORMAT" $CODE; $LS $FILE
+  done
+  echo
+  cd - >/dev/null
+  rm -rf $DIR
 }
