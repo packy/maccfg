@@ -134,13 +134,14 @@ sub make_temp_sh {
     my $script = join "\n", @_;
 
     my $tmp = tempfile($target, 'sh');
+    my $path = $ENV{PATH};
     open my $out, '>', $tmp;
     print {$out}  de_indent(qq[
         #!$bash
+        export PATH=$path
         any () {
           echo; read -n 1 -s -p "Press any key to exit"
         }
-
         $script
     ]);
 
