@@ -8,4 +8,5 @@
 --type-add=vue:ext:vue
 # JetBrains software
 --ignore-dir=.idea
---ignore-dir=frontend/dist/_nuxt
+# VS Code
+--ignore-dir=.vscode

@@ -1,5 +1,6 @@
 .d
 .DS_Store
+.vscode
 Applescript/*.app
 # GridApp stuff
 go/linux/discovery.pl
