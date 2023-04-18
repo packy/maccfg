@@ -12,8 +12,10 @@ my $pause = 1;
 my $title;
 my $height;
 my $width;
+my $type;
 
 GetOptions
+    'type=s'   => \$type,
     'clean!'   => \$clean,
     'pause!'   => \$pause,
     'height=i' => \$height,
@@ -30,11 +32,19 @@ my $base = sprintf q{%s/xrun_%d}, $dir, $$;
 my $sh   = $base . '.sh';
 my $osa  = $base . '.osa';
 
-write_file($osa,
-           qq{tell application "iTerm2"},
-           qq{  set newWindow to (create window with }.
-           qq{default profile command "$sh")},
-           qq{end tell});
+my @applescript = (
+    qq{tell application "iTerm2"},
+    qq{  set newWindow to (create window with }.
+    qq{default profile command "$sh")}
+);
+if ($type) {
+    push @applescript, qq{  tell current session of current window};
+    push @applescript, qq{    write text "$type"};
+    push @applescript, qq{  end tell};
+}
+push @applescript, qq{end tell};
+
+write_file($osa,@applescript);
 
 unless (defined $title) {
     $title = $cmd;
