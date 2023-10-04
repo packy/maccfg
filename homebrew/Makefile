@@ -2,19 +2,19 @@ $(shell mkdir -p .d)
 
 .PHONY: install
 install: homebrew iterm2 keka diff-so-fancy hr screenresolution pcre \
-         readline git p7zip quicklook bash highlight mas wget atom hub \
+         readline git p7zip quicklook bash highlight mas wget hub \
          sleepwatcher shellcheck font-jetbrains
 
 homebrew:         .d/homebrew
 appcleaner:       .d/appcleaner.brew
 apr-util:         .d/apr-util.brew
 apr:              .d/apr.brew
-atom:             .d/atom.cask
+#atom:             .d/atom.cask
 bash:             .d/bash.brew
 diff-so-fancy:    .d/diff-so-fancy.brew
 disk-inventory-x: .d/disk-inventory-x.brew
 emacs:            .d/emacs.cask
-font-jetbrains:   .d/font-jetbrains-mono.cask
+font-jetbrains:   .d/font-jetbrains-mono-nerd-font.cask
 gimp:             .d/gimp.cask
 git:              .d/git.brew
 highlight:        .d/highlight.brew
@@ -50,12 +50,12 @@ qlcolorcode: highlight .d/qlcolorcode.cask
 .d/caskroom:
 	@./install
 
-.d/atom.cask:
-	@brew install --cask atom
-	@apm install sync-settings
-	@./write_atom_config.pl
-	@./install
-	@ln -s /Applications/Atom.app/Contents/Resources/app/atom.sh $HOMEBREW_PREFIX/bin/atom
+# .d/atom.cask:
+# 	@brew install --cask atom
+# 	@apm install sync-settings
+# 	@./write_atom_config.pl
+# 	@./install
+# 	@ln -s /Applications/Atom.app/Contents/Resources/app/atom.sh $HOMEBREW_PREFIX/bin/atom
 
 .d/git.brew: pcre
 	@export USE_LIBPCRE=yes; brew install --build-from-source git
