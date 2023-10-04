@@ -9,9 +9,7 @@ $(shell ./make_dependencies $(DEPDIR) )
 PERLBREW := $(HOME)/perl5/perlbrew/bin/perlbrew
 pwd := $(shell pwd)
 
-all:  homebrewed perlbrew ack emacsfiles install
-
-include ack2.mk
+all:  homebrewed perlbrew install
 
 ${gitdir}/z:
 	git clone https://github.com/rupa/z.git ${gitdir}/z
@@ -41,10 +39,11 @@ bash: /etc/shells
 	    echo "$(HOMEBREW_PREFIX)/bin/bash" | sudo tee -a /etc/shells; \
 	fi
 
+ack:
+	@curl https://beyondgrep.com/ack-v3.7.0 > ~/bin/ack && chmod 0755 ~/bin/ack
+
 .PHONY: install
 install: ack
 	@ln -fs ${gitdir}/bashrc.d $(HOME)/.bashrc.d
 	@cd dotfiles && $(MAKE)
 	@cd bin      && $(MAKE)
-	@cd emacs.d  && $(MAKE)
-	@ln -vfs ${gitdir}/ack2/ack-standalone ${bindir}/ack; touch ${bindir}/ack
