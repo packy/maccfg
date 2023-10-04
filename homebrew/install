@@ -14,6 +14,7 @@ fi
 #
 if [[ ! -d $(brew --prefix)/Caskroom ]]; then
     brew tap homebrew/cask
+    brew tap homebrew/cask-fonts
 fi
 
 #

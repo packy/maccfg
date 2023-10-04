@@ -61,7 +61,7 @@ qlcolorcode: highlight .d/qlcolorcode.cask
 	@export USE_LIBPCRE=yes; brew install --build-from-source git
 
 .d/%.cask: .d/caskroom
-	brew cask install $*
+	brew install --cask $*
 	@./install
 
 .d/%.brew:
