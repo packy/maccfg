@@ -23,7 +23,7 @@ function pwc () {
 
   # find the latest challenge directory
   CHALLENGE_DIR=$(ls -d challenge-* | tail -1)
-  cd $CHALLENGE_DIR
+  cd $CHALLENGE_DIR/packy-anderson
 
   # set up the skeleton files
   mkdir raku
