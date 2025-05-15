@@ -1,8 +1,7 @@
 #!/usr/bin/env perl
-use v5.38;
+use v5.40;
 
-sub solution {
-  my @arr = @_;
+sub solution(@arr) {
   say 'Input: @arr = (' . join(', ', @arr) . ')';
   say 'Output: (' . join(', ', @arr) . ')';
 }

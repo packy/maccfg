@@ -38,6 +38,10 @@ function pwc () {
   pwc_skeleton $CFGDIR/pwc/skeleton.py python/ch-1.py
   pwc_skeleton $CFGDIR/pwc/skeleton.py python/ch-2.py
 
+  mkdir elixir
+  pwc_skeleton $CFGDIR/pwc/skeleton.exs elixir/ch-1.exs
+  pwc_skeleton $CFGDIR/pwc/skeleton.exs elixir/ch-2.exs
+
   touch blog.txt
   git add .
   code .
