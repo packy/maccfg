@@ -34,41 +34,41 @@ else
   esac
 fi
 
-slack () {
-  echo "Setting slack status to $@"
-  slack_status_set "$@" > /dev/null
-}
+# slack () {
+#   echo "Setting slack status to $@"
+#   slack_status_set "$@" > /dev/null
+# }
 
 case $location in
   620union)
     set-location "620 Union"
-    slack-status-aim
-    [[ $(hostname) =~ $SKYPEHOST ]] && slack-here
-    [[ $(hostname) =~ $SKYPEHOST ]] && skype-mood-aim
+    # slack-status-aim
+    # [[ $(hostname) =~ $SKYPEHOST ]] && slack-here
+    # [[ $(hostname) =~ $SKYPEHOST ]] && skype-mood-aim
   ;;
   120erie)
     set-location "120 Erie"
-    slack-status-aim
-    [[ $(hostname) =~ $SKYPEHOST ]] && slack-here
-    [[ $(hostname) =~ $SKYPEHOST ]] && skype-mood-aim
+    # slack-status-aim
+    # [[ $(hostname) =~ $SKYPEHOST ]] && slack-here
+    # [[ $(hostname) =~ $SKYPEHOST ]] && skype-mood-aim
   ;;
   home)
     set-location
-    slack-status-home
-    [[ $(hostname) =~ $SKYPEHOST ]] && slack-here
-    [[ $(hostname) =~ $SKYPEHOST ]] && skype-mood-home
+    # slack-status-home
+    # [[ $(hostname) =~ $SKYPEHOST ]] && slack-here
+    # [[ $(hostname) =~ $SKYPEHOST ]] && skype-mood-home
   ;;
   anderhome)
     set-location
-    slack :house: "🐾 @ parents' house"
-    [[ $(hostname) =~ $SKYPEHOST ]] && slack-here
-    [[ $(hostname) =~ $SKYPEHOST ]] && set-skype-mood "🏠 🐾 @ parents' house"
+    # slack :house: "🐾 @ parents' house"
+    # [[ $(hostname) =~ $SKYPEHOST ]] && slack-here
+    # [[ $(hostname) =~ $SKYPEHOST ]] && set-skype-mood "🏠 🐾 @ parents' house"
   ;;
   amtrak)
     set-location
-    slack :house: "on the train"
-    [[ $(hostname) =~ $SKYPEHOST ]] && slack-here
-    [[ $(hostname) =~ $SKYPEHOST ]] && set-skype-mood "on the train"
+    # slack :house: "on the train"
+    # [[ $(hostname) =~ $SKYPEHOST ]] && slack-here
+    # [[ $(hostname) =~ $SKYPEHOST ]] && set-skype-mood "on the train"
   ;;
   *)
     echo Unknown location

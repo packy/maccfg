@@ -7,5 +7,5 @@ for SCRIPT in $SCRIPTS; do
 done
 
 # if my mac is sleeping, I'm away
-set-skype-status away
-slack-away
+# set-skype-status away
+# slack-away
