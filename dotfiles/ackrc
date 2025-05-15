@@ -6,6 +6,7 @@
 --type-add=psql:ext:psql
 --type-add=php:firstlinematch:/<[?]php/
 --type-add=vue:ext:vue
+--type-set=raku:ext:raku
 # JetBrains software
 --ignore-dir=.idea
 # VS Code
